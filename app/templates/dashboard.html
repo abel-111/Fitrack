@@ -1,0 +1,23 @@
+{% extends "base.html" %}
+{% block title %}Dashboard{% endblock %}
+{% block content %}
+<div class="page-wrapper">
+    <h2>Welcome, {{ current_user.username }}!</h2>
+    <p class="page-subtitle">Here's where your progress will live.</p>
+
+    <div class="dashboard-grid">
+        <div class="stat-card">
+            <p class="stat-label">Fitness level</p>
+            <p class="stat-value">{{ current_user.fitness_level or 'Not set' }}</p>
+        </div>
+        <div class="stat-card">
+            <p class="stat-label">Goal</p>
+            <p class="stat-value">{{ current_user.goal or 'Not set' }}</p>
+        </div>
+        <div class="stat-card">
+            <p class="stat-label">This month's rank</p>
+            <p class="stat-value">Coming soon</p>
+        </div>
+    </div>
+</div>
+{% endblock %}
