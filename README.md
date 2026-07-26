@@ -41,3 +41,22 @@ Visit `http://127.0.0.1:5000` in your browser.
 - **PreferredDay** — user's chosen workout days of the week
 
 ## Project Structure
+app/
+routes/
+auth.py # signup, login, logout, dashboard
+attendance.py # daily check-in
+templates/
+models.py # User, Attendance, WeightLog, PreferredDay + streak logic
+init.py # app factory, blueprint registration
+config.py
+run.py
+## Roadmap
+
+- [x] Auth + user profiles
+- [x] Attendance check-in + streaks
+- [ ] Weight log + progress charts
+- [ ] Community ranking/leaderboard
+
+## Author
+
+Abel — CS student, building this as a portfolio project alongside a Flask-based Expense Tracker.
