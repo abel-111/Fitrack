@@ -1,7 +1,7 @@
 from flask_sqlalchemy import SQLAlchemy
 from flask_login import UserMixin
 from werkzeug.security import generate_password_hash, check_password_hash
-from datetime import datetime
+from datetime import datetime, date, timedelta
 
 db = SQLAlchemy()
 
@@ -32,6 +32,55 @@ class User(UserMixin, db.Model):
 
     def check_password(self, password):
         return check_password_hash(self.password_hash, password)
+
+    def _checkin_dates(self):
+        """All distinct check-in dates, newest first."""
+        return sorted({a.date for a in self.attendances}, reverse=True)
+
+    def has_checked_in_today(self):
+        return date.today() in {a.date for a in self.attendances}
+
+    def get_current_streak(self):
+        dates = self._checkin_dates()
+        if not dates:
+            return 0
+
+        today = date.today()
+        # streak is "alive" only if last check-in was today or yesterday
+        if dates[0] not in (today, today - timedelta(days=1)):
+            return 0
+
+        streak = 1
+        expected = dates[0] - timedelta(days=1)
+        for d in dates[1:]:
+            if d == expected:
+                streak += 1
+                expected -= timedelta(days=1)
+            elif d < expected:
+                break
+        return streak
+
+    def get_longest_streak(self):
+        dates = sorted({a.date for a in self.attendances})
+        if not dates:
+            return 0
+
+        longest = current = 1
+        for prev, curr in zip(dates, dates[1:]):
+            if curr == prev + timedelta(days=1):
+                current += 1
+            else:
+                current = 1
+            longest = max(longest, current)
+        return longest
+
+    def get_month_checkin_count(self):
+        today = date.today()
+        return sum(
+            1 for a in self.attendances
+            if a.date.year == today.year and a.date.month == today.month
+        )
+
 
 
 class Attendance(db.Model):
