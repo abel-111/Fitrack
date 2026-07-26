@@ -7,17 +7,31 @@
 
     <div class="dashboard-grid">
         <div class="stat-card">
-            <p class="stat-label">Fitness level</p>
-            <p class="stat-value">{{ current_user.fitness_level or 'Not set' }}</p>
+            <p class="stat-label">Current streak</p>
+            <p class="stat-value">{{ current_streak }} day{{ 's' if current_streak != 1 }}</p>
         </div>
         <div class="stat-card">
-            <p class="stat-label">Goal</p>
-            <p class="stat-value">{{ current_user.goal or 'Not set' }}</p>
+            <p class="stat-label">Longest streak</p>
+            <p class="stat-value">{{ longest_streak }} day{{ 's' if longest_streak != 1 }}</p>
         </div>
         <div class="stat-card">
-            <p class="stat-label">This month's rank</p>
-            <p class="stat-value">Coming soon</p>
+            <p class="stat-label">Check-ins this month</p>
+            <p class="stat-value">{{ month_count }}</p>
         </div>
+    </div>
+
+    <div style="margin-top: 1.5rem;">
+        {% if checked_in_today %}
+            <button class="btn-primary-custom" style="width:auto; padding:12px 24px; opacity:0.5; cursor:default;" disabled>
+                ✓ Checked in today
+            </button>
+        {% else %}
+            <form method="POST" action="{{ url_for('attendance.checkin') }}">
+                <button type="submit" class="btn-primary-custom" style="width:auto; padding:12px 24px;">
+                    Check in
+                </button>
+            </form>
+        {% endif %}
     </div>
 </div>
 {% endblock %}
