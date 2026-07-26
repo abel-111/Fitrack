@@ -1,6 +1,7 @@
 # Fitrack
 Track your reps, your meals, and your macros — all in one place.
-the fun is going to begin now## Setup
+
+## Setup
 
 ```bash
 # Clone the repo
@@ -25,13 +26,18 @@ python run.py
 
 Visit `http://127.0.0.1:5000` in your browser.
 
+## Features
+
+- **Auth** — signup, login, logout with hashed passwords (Flask-Login)
+- **Dashboard** — shows fitness level, goal, and attendance stats at a glance
+- **Attendance check-in** — one-click daily check-in; a user can only check in once per day
+- **Streak tracking** — current streak, longest streak, and this month's check-in count, computed live from attendance history
+
 ## Database Models
 
 - **User** — profile info, credentials, fitness level, goal
-- **Attendance** — one row per gym check-in, powers ranking/streaks
+- **Attendance** — one row per gym check-in, powers streaks and (later) ranking
 - **WeightLog** — weight history over time, for progress charts
 - **PreferredDay** — user's chosen workout days of the week
 
-## Author
-
-Abel — CS student, building this as a portfolio project alongside an Flask-based Expense Tracker.
+## Project Structure
