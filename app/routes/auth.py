@@ -63,7 +63,13 @@ def logout():
 @auth_bp.route('/dashboard')
 @login_required
 def dashboard():
-    return render_template('dashboard.html')
+    return render_template(
+        'dashboard.html',
+        current_streak=current_user.get_current_streak(),
+        longest_streak=current_user.get_longest_streak(),
+        month_count=current_user.get_month_checkin_count(),
+        checked_in_today=current_user.has_checked_in_today()
+    )
 
 
 @auth_bp.route('/')
