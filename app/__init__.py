@@ -23,6 +23,8 @@ def create_app():
         return User.query.get(int(user_id))
 
     from app.routes.auth import auth_bp
+    from app.routes.attendance import attendance_bp
     app.register_blueprint(auth_bp)
+    app.register_blueprint(attendance_bp)
 
     return app
