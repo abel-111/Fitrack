@@ -24,7 +24,9 @@ def create_app():
 
     from app.routes.auth import auth_bp
     from app.routes.attendance import attendance_bp
+    from app.routes.weight import weight_bp
     app.register_blueprint(auth_bp)
     app.register_blueprint(attendance_bp)
+    app.register_blueprint(weight_bp)
 
     return app
