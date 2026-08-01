@@ -32,12 +32,13 @@ Visit `http://127.0.0.1:5000` in your browser.
 - **Dashboard** — shows fitness level, goal, and attendance stats at a glance
 - **Attendance check-in** — one-click daily check-in; a user can only check in once per day
 - **Streak tracking** — current streak, longest streak, and this month's check-in count, computed live from attendance history
+- **Weight logging** — log weight over time, view history in a table, and see progress on a hand-drawn SVG line chart (no external chart library)
 
 ## Database Models
 
 - **User** — profile info, credentials, fitness level, goal
 - **Attendance** — one row per gym check-in, powers streaks and (later) ranking
-- **WeightLog** — weight history over time, for progress charts
+- **WeightLog** — weight history over time, powers the progress chart
 - **PreferredDay** — user's chosen workout days of the week
 
 ## Project Structure
@@ -45,6 +46,7 @@ app/
 routes/
 auth.py # signup, login, logout, dashboard
 attendance.py # daily check-in
+weight.py # weight logging + progress chart
 templates/
 models.py # User, Attendance, WeightLog, PreferredDay + streak logic
 init.py # app factory, blueprint registration
@@ -54,7 +56,7 @@ run.py
 
 - [x] Auth + user profiles
 - [x] Attendance check-in + streaks
-- [ ] Weight log + progress charts
+- [x] Weight log + progress chart
 - [ ] Community ranking/leaderboard
 
 ## Author
