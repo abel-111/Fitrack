@@ -1,0 +1,109 @@
+{% extends "base.html" %}
+{% block title %}Profile{% endblock %}
+{% block content %}
+<div class="page-wrapper">
+    <h2>Your Profile</h2>
+    <p class="page-subtitle">Update your profile picture.</p>
+
+    <div class="stat-card" style="max-width:320px; text-align:center;">
+        {% if current_user.profile_picture and current_user.profile_picture != 'default.png' %}
+            <img src="{{ url_for('static', filename='uploads/' + current_user.profile_picture) }}"
+                 alt="Profile picture"
+                 style="width:120px; height:120px; border-radius:50%; object-fit:cover; margin-bottom:1rem;">
+        {% else %}
+            <div style="width:120px; height:120px; border-radius:50%; background:#e24b4a; color:#fff; font-size:40px; display:flex; align-items:center; justify-content:center; margin:0 auto 1rem;">
+                {{ current_user.username[0]|upper }}
+            </div>
+        {% endif %}
+
+        <input type="file" id="pictureInput" accept="image/png, image/jpeg, image/webp"
+               style="color:#9a9a9a; font-size:13px; display:block; margin:0 auto;">
+        <p id="uploadStatus" style="color:#5dcaa5; font-size:12px; margin-top:8px; display:none;">Profile picture updated!</p>
+        <p id="uploadError" style="color:#f0997b; font-size:12px; margin-top:8px; display:none;"></p>
+    </div>
+</div>
+
+<!-- Crop modal -->
+<div id="cropModal" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.7); z-index:1000; align-items:center; justify-content:center;">
+    <div style="background:#141414; border:0.5px solid #2a2a2a; border-radius:12px; padding:1.5rem; max-width:420px; width:90%;">
+        <h3 style="color:#fff; font-size:16px; font-weight:500; margin:0 0 1rem;">Crop your picture</h3>
+        <div style="max-height:320px; overflow:hidden;">
+            <img id="cropImage" style="max-width:100%; display:block;">
+        </div>
+        <div style="display:flex; gap:10px; margin-top:1.25rem;">
+            <button id="cancelCrop" type="button"
+                    style="flex:1; background:#1f1f1f; border:0.5px solid #333; color:#fff; border-radius:8px; padding:10px; cursor:pointer;">
+                Cancel
+            </button>
+            <button id="confirmCrop" type="button" class="btn-primary-custom" style="flex:1; margin-top:0;">Save</button>
+        </div>
+    </div>
+</div>
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.6.2/cropper.min.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.6.2/cropper.min.js"></script>
+<script>
+    const pictureInput = document.getElementById('pictureInput');
+    const cropModal = document.getElementById('cropModal');
+    const cropImage = document.getElementById('cropImage');
+    const cancelCrop = document.getElementById('cancelCrop');
+    const confirmCrop = document.getElementById('confirmCrop');
+    const uploadStatus = document.getElementById('uploadStatus');
+    const uploadError = document.getElementById('uploadError');
+    let cropper = null;
+
+    pictureInput.addEventListener('change', (e) => {
+        const file = e.target.files[0];
+        if (!file) return;
+
+        const reader = new FileReader();
+        reader.onload = () => {
+            cropImage.src = reader.result;
+            cropModal.style.display = 'flex';
+
+            if (cropper) cropper.destroy();
+            cropper = new Cropper(cropImage, {
+                aspectRatio: 1,
+                viewMode: 1,
+                background: false,
+                autoCropArea: 1,
+            });
+        };
+        reader.readAsDataURL(file);
+    });
+
+    cancelCrop.addEventListener('click', () => {
+        cropModal.style.display = 'none';
+        pictureInput.value = '';
+        if (cropper) { cropper.destroy(); cropper = null; }
+    });
+
+    confirmCrop.addEventListener('click', () => {
+        if (!cropper) return;
+
+        cropper.getCroppedCanvas({ width: 400, height: 400 }).toBlob((blob) => {
+            const formData = new FormData();
+            formData.append('picture', blob, 'profile.jpg');
+
+            fetch("{{ url_for('profile.upload_picture') }}", {
+                method: 'POST',
+                body: formData,
+            })
+            .then((res) => {
+                if (!res.ok) throw new Error('Upload failed');
+                uploadStatus.style.display = 'block';
+                uploadError.style.display = 'none';
+                cropModal.style.display = 'none';
+                cropper.destroy();
+                cropper = null;
+                pictureInput.value = '';
+                setTimeout(() => window.location.reload(), 600);
+            })
+            .catch(() => {
+                uploadError.textContent = 'Something went wrong. Try again.';
+                uploadError.style.display = 'block';
+            });
+        }, 'image/jpeg', 0.9);
+    });
+</script>
+{% endblock %}
