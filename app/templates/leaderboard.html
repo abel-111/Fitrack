@@ -1,0 +1,36 @@
+{% extends "base.html" %}
+{% block title %}Leaderboard{% endblock %}
+{% block content %}
+<div class="page-wrapper">
+    <h2>Leaderboard</h2>
+    <p class="page-subtitle">Top 20 by check-ins this month.</p>
+
+    {% if rows %}
+    <table style="width:100%; color:#fff; border-collapse:collapse;">
+        <thead>
+            <tr style="text-align:left; color:#9a9a9a; font-size:12px; text-transform:uppercase;">
+                <th style="padding:8px 0; border-bottom:0.5px solid #2a2a2a; width:50px;">Rank</th>
+                <th style="padding:8px 0; border-bottom:0.5px solid #2a2a2a;">User</th>
+                <th style="padding:8px 0; border-bottom:0.5px solid #2a2a2a;">Check-ins</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for row in rows %}
+            <tr style="{{ 'background:#1a1010;' if row.id == current_user_id }}">
+                <td style="padding:10px 0; border-bottom:0.5px solid #1f1f1f; font-size:14px;">{{ loop.index }}</td>
+                <td style="padding:10px 0; border-bottom:0.5px solid #1f1f1f; font-size:14px;">
+                    {{ row.username }}
+                    {% if row.id == current_user_id %}
+                        <span style="color:#e24b4a; font-size:12px;">(you)</span>
+                    {% endif %}
+                </td>
+                <td style="padding:10px 0; border-bottom:0.5px solid #1f1f1f; font-size:14px;">{{ row.checkin_count }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    {% else %}
+        <p style="color:#9a9a9a; font-size:14px;">No check-ins yet this month. Be the first!</p>
+    {% endif %}
+</div>
+{% endblock %}
