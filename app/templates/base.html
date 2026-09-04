@@ -9,8 +9,23 @@
 <body>
     <div class="navbar-custom">
         <a class="navbar-brand" href="{{ url_for('auth.index') }}">🏋 Gym Community</a>
+
         {% if current_user.is_authenticated %}
-            <a href="{{ url_for('auth.logout') }}" style="color:#9a9a9a; font-size:13px; text-decoration:none;">Logout</a>
+        <div class="avatar-menu">
+            <button class="avatar-btn" id="avatarBtn" type="button">
+                {% if current_user.profile_picture and current_user.profile_picture != 'default.png' %}
+                    <img src="{{ url_for('static', filename='uploads/' + current_user.profile_picture) }}" alt="Profile">
+                {% else %}
+                    <span>{{ current_user.username[0]|upper }}</span>
+                {% endif %}
+            </button>
+            <div class="avatar-dropdown" id="avatarDropdown">
+                <div class="avatar-dropdown-name">{{ current_user.username }}</div>
+                <a href="{{ url_for('profile.view') }}">Profile</a>
+                <a href="{{ url_for('leaderboard.leaderboard') }}">Leaderboard</a>
+                <a href="{{ url_for('auth.logout') }}">Logout</a>
+            </div>
+        </div>
         {% endif %}
     </div>
 
@@ -25,5 +40,23 @@
     </div>
 
     {% block content %}{% endblock %}
+
+    {% if current_user.is_authenticated %}
+    <script>
+        const avatarBtn = document.getElementById('avatarBtn');
+        const avatarDropdown = document.getElementById('avatarDropdown');
+
+        avatarBtn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            avatarDropdown.classList.toggle('open');
+        });
+
+        document.addEventListener('click', (e) => {
+            if (!avatarBtn.contains(e.target) && !avatarDropdown.contains(e.target)) {
+                avatarDropdown.classList.remove('open');
+            }
+        });
+    </script>
+    {% endif %}
 </body>
 </html>
