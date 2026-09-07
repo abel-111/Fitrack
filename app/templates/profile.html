@@ -3,7 +3,7 @@
 {% block content %}
 <div class="page-wrapper">
     <h2>Your Profile</h2>
-    <p class="page-subtitle">Update your profile picture.</p>
+    <p class="page-subtitle">Update your profile picture and workout schedule.</p>
 
     <div class="stat-card" style="max-width:320px; text-align:center;">
         {% if current_user.profile_picture and current_user.profile_picture != 'default.png' %}
@@ -20,6 +20,21 @@
                style="color:#9a9a9a; font-size:13px; display:block; margin:0 auto;">
         <p id="uploadStatus" style="color:#5dcaa5; font-size:12px; margin-top:8px; display:none;">Profile picture updated!</p>
         <p id="uploadError" style="color:#f0997b; font-size:12px; margin-top:8px; display:none;"></p>
+    </div>
+
+    <div class="stat-card" style="max-width:420px; margin-top:1.5rem;">
+        <p class="stat-label" style="margin-bottom:12px;">Preferred workout days</p>
+        <form method="POST" action="{{ url_for('profile.update_days') }}">
+            <div style="display:flex; flex-wrap:wrap; gap:8px; margin-bottom:1.25rem;">
+                {% for day in days %}
+                <label style="display:flex; align-items:center; gap:6px; background:#1f1f1f; border:0.5px solid #333; border-radius:8px; padding:8px 12px; font-size:13px; color:#fff; cursor:pointer;">
+                    <input type="checkbox" name="days" value="{{ day }}" {% if day in selected_days %}checked{% endif %}>
+                    {{ day }}
+                </label>
+                {% endfor %}
+            </div>
+            <button type="submit" class="btn-primary-custom" style="width:auto; padding:10px 20px;">Save days</button>
+        </form>
     </div>
 </div>
 

@@ -18,6 +18,16 @@
             <p class="stat-label">Check-ins this month</p>
             <p class="stat-value">{{ month_count }}</p>
         </div>
+        <div class="stat-card">
+            <p class="stat-label">Preferred days</p>
+            {% if preferred_days %}
+                <p class="stat-value" style="font-size:16px;">{{ preferred_days|join(', ') }}</p>
+            {% else %}
+                <p style="color:#9a9a9a; font-size:13px; margin:0;">
+                    <a href="{{ url_for('profile.view') }}" style="color:#e24b4a;">Set your days</a>
+                </p>
+            {% endif %}
+</div>
     </div>
 
     <div style="margin-top: 1.5rem;">

@@ -80,6 +80,11 @@ class User(UserMixin, db.Model):
             1 for a in self.attendances
             if a.date.year == today.year and a.date.month == today.month
         )
+    DAY_ORDER = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun']
+
+    def get_preferred_days_sorted(self):
+        days = {pd.day_of_week for pd in self.preferred_days}
+        return [d for d in self.DAY_ORDER if d in days]
 
 
 
