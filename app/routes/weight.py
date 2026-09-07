@@ -1,4 +1,4 @@
-from flask import Blueprint, render_template, redirect, url_for, flash, request
+from flask import Blueprint, render_template, redirect, url_for, flash, request, abort
 from flask_login import login_required, current_user
 from app.models import db, WeightLog
 
@@ -39,6 +39,49 @@ def log_weight():
 
     db.session.commit()
     flash('Weight logged!', 'success')
+    return redirect(url_for('weight.history'))
+
+
+@weight_bp.route('/<int:log_id>/edit', methods=['POST'])
+@login_required
+def edit_weight(log_id):
+    entry = WeightLog.query.get_or_404(log_id)
+
+    if entry.user_id != current_user.id:
+        abort(403)
+
+    weight = request.form.get('weight_kg', type=float)
+    if not weight or weight <= 0:
+        flash('Enter a valid weight.', 'danger')
+        return redirect(url_for('weight.history'))
+
+    entry.weight_kg = weight
+    db.session.commit()
+
+    # if this was the most recent entry, keep profile weight in sync
+    latest = (WeightLog.query
+              .filter_by(user_id=current_user.id)
+              .order_by(WeightLog.logged_at.desc())
+              .first())
+    if latest and latest.id == entry.id:
+        current_user.weight_kg = weight
+        db.session.commit()
+
+    flash('Entry updated!', 'success')
+    return redirect(url_for('weight.history'))
+
+
+@weight_bp.route('/<int:log_id>/delete', methods=['POST'])
+@login_required
+def delete_weight(log_id):
+    entry = WeightLog.query.get_or_404(log_id)
+
+    if entry.user_id != current_user.id:
+        abort(403)
+
+    db.session.delete(entry)
+    db.session.commit()
+    flash('Entry deleted.', 'success')
     return redirect(url_for('weight.history'))
 
 
