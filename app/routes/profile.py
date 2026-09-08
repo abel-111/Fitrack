@@ -8,6 +8,8 @@ profile_bp = Blueprint('profile', __name__, url_prefix='/profile')
 
 ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'webp'}
 DAYS = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun']
+FITNESS_LEVELS = ['beginner', 'intermediate', 'advanced']
+GOALS = ['cutting', 'maintaining', 'bulking']
 
 
 def allowed_file(filename):
@@ -18,7 +20,13 @@ def allowed_file(filename):
 @login_required
 def view():
     selected_days = {pd.day_of_week for pd in current_user.preferred_days}
-    return render_template('profile.html', days=DAYS, selected_days=selected_days)
+    return render_template(
+        'profile.html',
+        days=DAYS,
+        selected_days=selected_days,
+        fitness_levels=FITNESS_LEVELS,
+        goals=GOALS
+    )
 
 
 @profile_bp.route('/picture', methods=['POST'])
@@ -60,4 +68,20 @@ def update_days():
     db.session.commit()
 
     flash('Workout days updated!', 'success')
+    return redirect(url_for('profile.view'))
+
+
+@profile_bp.route('/settings', methods=['POST'])
+@login_required
+def update_settings():
+    fitness_level = request.form.get('fitness_level')
+    goal = request.form.get('goal')
+
+    if fitness_level in FITNESS_LEVELS:
+        current_user.fitness_level = fitness_level
+    if goal in GOALS:
+        current_user.goal = goal
+
+    db.session.commit()
+    flash('Training settings updated!', 'success')
     return redirect(url_for('profile.view'))
