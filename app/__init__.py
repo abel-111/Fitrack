@@ -7,6 +7,7 @@ from app.models import db, User
 login_manager = LoginManager()
 migrate = Migrate()
 
+
 def create_app():
     app = Flask(__name__)
     app.config.from_object(Config)
@@ -26,11 +27,14 @@ def create_app():
     from app.routes.attendance import attendance_bp
     from app.routes.weight import weight_bp
     from app.routes.leaderboard import leaderboard_bp
-    from app.routes.profile import profile_bp   
+    from app.routes.profile import profile_bp
+    from app.routes.workouts import workouts_bp
+
     app.register_blueprint(auth_bp)
     app.register_blueprint(attendance_bp)
     app.register_blueprint(weight_bp)
     app.register_blueprint(leaderboard_bp)
-    app.register_blueprint(profile_bp)            
+    app.register_blueprint(profile_bp)
+    app.register_blueprint(workouts_bp)
 
     return app
