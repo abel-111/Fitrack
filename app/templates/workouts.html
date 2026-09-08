@@ -1,0 +1,29 @@
+{% extends "base.html" %}
+{% block title %}Workout Plan{% endblock %}
+{% block content %}
+<div class="page-wrapper">
+    <h2>Your Workout Plan</h2>
+    <p class="page-subtitle">{{ level|capitalize }} level, {{ goal }} — {{ sets }} sets x {{ reps }} reps per exercise.</p>
+
+    <div class="stat-card" style="margin-bottom:1.5rem;">
+        <p style="color:#9a9a9a; font-size:13px; margin:0;">{{ note }}</p>
+    </div>
+
+    <div class="dashboard-grid">
+        {% for day in days %}
+        <div class="stat-card">
+            <p class="stat-label">{{ day.title }}</p>
+            <ul style="margin:0; padding-left:18px; color:#fff; font-size:14px;">
+                {% for ex in day.exercises %}
+                <li style="margin-bottom:6px;">{{ ex }} — {{ sets }} x {{ reps }}</li>
+                {% endfor %}
+            </ul>
+        </div>
+        {% endfor %}
+    </div>
+
+    <p style="color:#9a9a9a; font-size:13px; margin-top:1.5rem;">
+        Want a different split? <a href="{{ url_for('profile.view') }}" style="color:#e24b4a;">Update your level or goal</a>.
+    </p>
+</div>
+{% endblock %}
