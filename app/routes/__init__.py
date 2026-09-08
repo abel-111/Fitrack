@@ -25,8 +25,15 @@ def create_app():
     from app.routes.auth import auth_bp
     from app.routes.attendance import attendance_bp
     from app.routes.weight import weight_bp
+    from app.routes.leaderboard import leaderboard_bp
+    from app.routes.profile import profile_bp
+    from app.routes.workouts import workouts_bp
+
     app.register_blueprint(auth_bp)
     app.register_blueprint(attendance_bp)
     app.register_blueprint(weight_bp)
+    app.register_blueprint(leaderboard_bp)
+    app.register_blueprint(profile_bp)
+    app.register_blueprint(workouts_bp)
 
     return app
