@@ -23,7 +23,9 @@
                 <div class="avatar-dropdown-name">{{ current_user.username }}</div>
                 <a href="{{ url_for('profile.view') }}">Profile</a>
                 <a href="{{ url_for('leaderboard.leaderboard') }}">Leaderboard</a>
+                <a href="{{ url_for('workouts.plan') }}">Workout Plan</a>
                 <a href="{{ url_for('auth.logout') }}">Logout</a>
+                
             </div>
         </div>
         {% endif %}
