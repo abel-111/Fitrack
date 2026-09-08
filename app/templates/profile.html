@@ -3,7 +3,7 @@
 {% block content %}
 <div class="page-wrapper">
     <h2>Your Profile</h2>
-    <p class="page-subtitle">Update your profile picture and workout schedule.</p>
+    <p class="page-subtitle">Update your profile picture, training settings, and workout schedule.</p>
 
     <div class="stat-card" style="max-width:320px; text-align:center;">
         {% if current_user.profile_picture and current_user.profile_picture != 'default.png' %}
@@ -20,6 +20,36 @@
                style="color:#9a9a9a; font-size:13px; display:block; margin:0 auto;">
         <p id="uploadStatus" style="color:#5dcaa5; font-size:12px; margin-top:8px; display:none;">Profile picture updated!</p>
         <p id="uploadError" style="color:#f0997b; font-size:12px; margin-top:8px; display:none;"></p>
+    </div>
+
+    <div class="stat-card" style="max-width:420px; margin-top:1.5rem;">
+        <p class="stat-label" style="margin-bottom:12px;">Training settings</p>
+        <form method="POST" action="{{ url_for('profile.update_settings') }}">
+            <div class="form-group">
+                <label>Fitness level</label>
+                <select name="fitness_level" style="width:100%; background:#1f1f1f; border:0.5px solid #333; border-radius:8px; padding:10px 12px; color:#fff; font-size:14px;">
+                    {% for level in fitness_levels %}
+                        <option value="{{ level }}" {% if current_user.fitness_level == level %}selected{% endif %}>
+                            {{ level|capitalize }}
+                        </option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="form-group">
+                <label>Goal</label>
+                <select name="goal" style="width:100%; background:#1f1f1f; border:0.5px solid #333; border-radius:8px; padding:10px 12px; color:#fff; font-size:14px;">
+                    {% for goal in goals %}
+                        <option value="{{ goal }}" {% if current_user.goal == goal %}selected{% endif %}>
+                            {{ goal|capitalize }}
+                        </option>
+                    {% endfor %}
+                </select>
+            </div>
+            <button type="submit" class="btn-primary-custom" style="width:auto; padding:10px 20px; margin-top:0.5rem;">Save settings</button>
+        </form>
+        <p style="color:#9a9a9a; font-size:12px; margin-top:1rem; margin-bottom:0;">
+            This drives your <a href="{{ url_for('workouts.plan') }}" style="color:#e24b4a;">workout plan</a>.
+        </p>
     </div>
 
     <div class="stat-card" style="max-width:420px; margin-top:1.5rem;">
