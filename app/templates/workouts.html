@@ -1,29 +1,90 @@
 {% extends "base.html" %}
-{% block title %}Workout Plan{% endblock %}
+{% block title %}Workout Split — Fitrack{% endblock %}
 {% block content %}
 <div class="page-wrapper">
-    <h2>Your Workout Plan</h2>
-    <p class="page-subtitle">{{ level|capitalize }} level, {{ goal }} — {{ sets }} sets x {{ reps }} reps per exercise.</p>
-
-    <div class="stat-card" style="margin-bottom:1.5rem;">
-        <p style="color:#9a9a9a; font-size:13px; margin:0;">{{ note }}</p>
+    <!-- Header Banner -->
+    <div class="ai-hero-banner" style="margin-bottom:1.8rem;">
+        <div class="ai-hero-content">
+            <div class="ai-hero-title">
+                <span>🏋️</span> {{ level|capitalize }} Routine
+                <span class="badge-chip badge-coral">{{ goal|capitalize }}</span>
+                <span class="badge-chip badge-ai">{{ role_info.title }}</span>
+            </div>
+            <p class="ai-hero-desc">
+                <strong>Training Parameters:</strong> {{ sets }} working sets × {{ reps }} reps • Rest interval: <strong>{{ rest }}</strong> between sets.
+                <br>
+                <em>{{ note }}</em>
+            </p>
+        </div>
+        <div>
+            <a href="{{ url_for('profile.view') }}" class="btn-secondary-custom" style="font-size:13px;">
+                ⚙️ Change Split / Level
+            </a>
+        </div>
     </div>
 
-    <div class="dashboard-grid">
+    <!-- Role-Specific Warm-Up & Mobility Protocol -->
+    <div class="stat-card" style="margin-bottom:2rem; border-left:3px solid #a55eea;">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
+            <h3 style="font-size:17px; font-weight:700; color:#fff; display:flex; align-items:center; gap:8px;">
+                <span>🧘</span> {{ warmup.title }}
+            </h3>
+            <span class="badge-chip badge-ai">Pre-Workout Mobility</span>
+        </div>
+        <p style="color:var(--text-secondary); font-size:13.5px; margin-bottom:12px;">{{ warmup.note }}</p>
+
+        <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(230px, 1fr)); gap:10px;">
+            {% for item in warmup.exercises %}
+            <div style="background:var(--bg-surface-elevated); border:1px solid var(--border-subtle); border-radius:var(--radius-sm); padding:10px 14px; font-size:13px; color:#e2e8f0; display:flex; align-items:center; gap:8px;">
+                <span style="color:#a55eea; font-weight:bold;">→</span>
+                <span>{{ item }}</span>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+
+    <!-- Days Grid -->
+    <h3 style="font-size:20px; font-weight:700; color:#fff; margin-bottom:1.2rem;">Scheduled Training Sessions</h3>
+    <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(320px, 1fr)); gap:1.4rem;">
         {% for day in days %}
         <div class="stat-card">
-            <p class="stat-label">{{ day.title }}</p>
-            <ul style="margin:0; padding-left:18px; color:#fff; font-size:14px;">
+            <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:12px;">
+                <div>
+                    <h4 style="font-size:18px; font-weight:700; color:#fff; margin:0;">{{ day.title }}</h4>
+                    <span style="font-size:12px; color:var(--text-muted); font-weight:600;">Focus: {{ day.focus }}</span>
+                </div>
+                <span class="badge-chip badge-cyan" style="font-size:11px;">{{ day.exercises|length }} Exercises</span>
+            </div>
+
+            <div style="display:flex; flex-direction:column; gap:12px; margin-top:14px;">
                 {% for ex in day.exercises %}
-                <li style="margin-bottom:6px;">{{ ex }} — {{ sets }} x {{ reps }}</li>
+                <div style="background:var(--bg-surface-elevated); border:1px solid var(--border-subtle); border-radius:var(--radius-sm); padding:12px 14px;">
+                    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:4px;">
+                        <strong style="color:#fff; font-size:14.5px;">{{ ex.name }}</strong>
+                        <span class="badge-chip badge-coral" style="font-size:10.5px;">{{ sets }} × {{ reps }}</span>
+                    </div>
+                    <div style="font-size:11.5px; color:#48dbfb; margin-bottom:4px;">🎯 {{ ex.muscle }}</div>
+                    <div style="font-size:12.5px; color:var(--text-secondary); font-style:italic;">"{{ ex.tip }}"</div>
+
+                    <!-- Interactive Set Checkboxes -->
+                    <div style="display:flex; gap:8px; margin-top:10px; align-items:center;">
+                        <span style="font-size:11px; color:var(--text-muted); font-weight:600;">SETS:</span>
+                        {% for s in range(1, sets + 1) %}
+                        <label style="display:inline-flex; align-items:center; gap:4px; background:rgba(255,255,255,0.04); border:1px solid var(--border-subtle); border-radius:4px; padding:3px 8px; font-size:11px; cursor:pointer;">
+                            <input type="checkbox" style="accent-color:var(--brand-primary); cursor:pointer;">
+                            <span>{{ s }}</span>
+                        </label>
+                        {% endfor %}
+                    </div>
+                </div>
                 {% endfor %}
-            </ul>
+            </div>
         </div>
         {% endfor %}
     </div>
 
-    <p style="color:#9a9a9a; font-size:13px; margin-top:1.5rem;">
-        Want a different split? <a href="{{ url_for('profile.view') }}" style="color:#e24b4a;">Update your level or goal</a>.
-    </p>
+    <div style="margin-top:2.5rem; text-align:center; color:var(--text-muted); font-size:13.5px;">
+        Want to switch to a different training split? <a href="{{ url_for('profile.view') }}" style="color:var(--brand-primary); font-weight:600;">Update your level or goal in Profile</a>.
+    </div>
 </div>
 {% endblock %}

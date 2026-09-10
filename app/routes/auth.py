@@ -13,6 +13,7 @@ def signup():
         username = request.form.get('username')
         email = request.form.get('email')
         password = request.form.get('password')
+        role = request.form.get('role', 'general')
 
         if User.query.filter_by(email=email).first():
             flash('Email already registered.', 'danger')
@@ -22,7 +23,7 @@ def signup():
             flash('Username already taken.', 'danger')
             return redirect(url_for('auth.signup'))
 
-        user = User(username=username, email=email)
+        user = User(username=username, email=email, role=role if role in User.ROLE_LABELS else 'general')
         user.set_password(password)
         db.session.add(user)
         db.session.commit()
@@ -30,7 +31,9 @@ def signup():
         flash('Account created! Please log in.', 'success')
         return redirect(url_for('auth.login'))
 
-    return render_template('signup.html')
+    from app.services.ai_coach import ROLE_DETAILS
+    return render_template('signup.html', roles=ROLE_DETAILS)
+
 
 
 @auth_bp.route('/login', methods=['GET', 'POST'])
@@ -63,14 +66,34 @@ def logout():
 @auth_bp.route('/dashboard')
 @login_required
 def dashboard():
+    from app.services.ai_coach import ROLE_DETAILS, get_user_ai_recommendations
+    from app.models import UserDietPlan
+
+    role_key = current_user.role if current_user.role in ROLE_DETAILS else 'general'
+    role_info = ROLE_DETAILS[role_key]
+    ai_insights = get_user_ai_recommendations(current_user)
+    active_plan = UserDietPlan.query.filter_by(user_id=current_user.id, is_active=True).first()
+
+    bmi, bmi_cat = current_user.calculate_bmi()
+    calorie_target = current_user.get_calorie_target()
+    macros = current_user.get_target_macros()
+
     return render_template(
         'dashboard.html',
         current_streak=current_user.get_current_streak(),
         longest_streak=current_user.get_longest_streak(),
         month_count=current_user.get_month_checkin_count(),
         checked_in_today=current_user.has_checked_in_today(),
-        preferred_days=current_user.get_preferred_days_sorted()   # add this
+        preferred_days=current_user.get_preferred_days_sorted(),
+        role_info=role_info,
+        ai_insights=ai_insights,
+        active_plan=active_plan,
+        bmi=bmi,
+        bmi_category=bmi_cat,
+        calorie_target=calorie_target,
+        macros=macros
     )
+
 
 
 @auth_bp.route('/')

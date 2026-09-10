@@ -19,6 +19,9 @@ class User(UserMixin, db.Model):
 
     fitness_level = db.Column(db.String(20), default='beginner')   # beginner / intermediate / advanced
     goal = db.Column(db.String(20), default='maintaining')          # cutting / bulking / maintaining
+    role = db.Column(db.String(50), default='general')              # desk_worker / student / athlete / bodybuilder / busy_parent / general
+    dietary_preference = db.Column(db.String(30), default='standard') # standard / vegetarian / vegan / keto / high_protein
+    activity_level = db.Column(db.String(30), default='moderate')  # sedentary / light / moderate / very_active
 
     profile_picture = db.Column(db.String(200), default='default.png')
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
@@ -26,12 +29,116 @@ class User(UserMixin, db.Model):
     attendances = db.relationship('Attendance', backref='user', lazy=True)
     weight_logs = db.relationship('WeightLog', backref='user', lazy=True)
     preferred_days = db.relationship('PreferredDay', backref='user', lazy=True)
+    diet_plans = db.relationship('UserDietPlan', backref='user', lazy=True, order_by='desc(UserDietPlan.created_at)')
+
+    ROLE_LABELS = {
+        'desk_worker': '💼 Desk Worker',
+        'student': '🎓 Student',
+        'athlete': '🏃 Athlete',
+        'bodybuilder': '🏋️ Bodybuilder',
+        'busy_parent': '👨‍👩‍👧 Busy Parent / Pro',
+        'general': '🧘 General Fitness',
+    }
 
     def set_password(self, password):
         self.password_hash = generate_password_hash(password)
 
     def check_password(self, password):
         return check_password_hash(self.password_hash, password)
+
+    def get_role_display(self):
+        return self.ROLE_LABELS.get(self.role, '🧘 General Fitness')
+
+    def calculate_bmi(self):
+        """Calculate BMI if height and weight exist."""
+        weight = self.weight_kg
+        if not weight and self.weight_logs:
+            weight = self.weight_logs[-1].weight_kg
+        if not weight or not self.height_cm or self.height_cm <= 0:
+            return None, 'Unknown'
+        h_m = self.height_cm / 100.0
+        bmi = round(weight / (h_m * h_m), 1)
+        if bmi < 18.5:
+            cat = 'Underweight'
+        elif bmi < 25.0:
+            cat = 'Healthy weight'
+        elif bmi < 30.0:
+            cat = 'Overweight'
+        else:
+            cat = 'Obese'
+        return bmi, cat
+
+    def calculate_bmr(self):
+        """Mifflin-St Jeor formula for BMR."""
+        weight = self.weight_kg or 70.0
+        height = self.height_cm or 175.0
+        age = self.age or 25
+        gender = (self.gender or 'male').lower()
+        if gender == 'female':
+            bmr = (10 * weight) + (6.25 * height) - (5 * age) - 161
+        else:
+            bmr = (10 * weight) + (6.25 * height) - (5 * age) + 5
+        return round(bmr)
+
+    def calculate_tdee(self):
+        """Total Daily Energy Expenditure based on activity level & role."""
+        bmr = self.calculate_bmr()
+        multipliers = {
+            'sedentary': 1.2,
+            'light': 1.375,
+            'moderate': 1.55,
+            'very_active': 1.725
+        }
+        # adjust activity factor if role implies sedentary desk or intense athlete
+        activity = self.activity_level or 'moderate'
+        if self.role == 'desk_worker' and activity == 'moderate':
+            factor = 1.35
+        elif self.role == 'athlete' and activity in ('moderate', 'light'):
+            factor = 1.7
+        else:
+            factor = multipliers.get(activity, 1.45)
+        return round(bmr * factor)
+
+    def get_calorie_target(self):
+        tdee = self.calculate_tdee()
+        goal = self.goal or 'maintaining'
+        if goal == 'cutting':
+            return max(1300, round(tdee - 450))
+        elif goal == 'bulking':
+            return round(tdee + 350)
+        return tdee
+
+    def get_target_macros(self):
+        """Return dict of calories, protein (g), carbs (g), fat (g)."""
+        calories = self.get_calorie_target()
+        weight = self.weight_kg or 70.0
+        goal = self.goal or 'maintaining'
+
+        if goal == 'cutting':
+            protein_g = round(weight * 2.2)
+            fat_cals = calories * 0.25
+            fat_g = round(fat_cals / 9)
+            carb_cals = max(0, calories - (protein_g * 4) - (fat_g * 9))
+            carb_g = round(carb_cals / 4)
+        elif goal == 'bulking':
+            protein_g = round(weight * 2.0)
+            fat_cals = calories * 0.25
+            fat_g = round(fat_cals / 9)
+            carb_cals = max(0, calories - (protein_g * 4) - (fat_g * 9))
+            carb_g = round(carb_cals / 4)
+        else:
+            protein_g = round(weight * 1.8)
+            fat_cals = calories * 0.28
+            fat_g = round(fat_cals / 9)
+            carb_cals = max(0, calories - (protein_g * 4) - (fat_g * 9))
+            carb_g = round(carb_cals / 4)
+
+        return {
+            'calories': calories,
+            'protein': protein_g,
+            'carbs': carb_g,
+            'fat': fat_g
+        }
 
     def _checkin_dates(self):
         """All distinct check-in dates, newest first."""
@@ -106,3 +213,20 @@ class PreferredDay(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
     day_of_week = db.Column(db.String(10), nullable=False)  # 'Mon', 'Tue', etc.
+
+
+class UserDietPlan(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    title = db.Column(db.String(120), nullable=False)
+    goal = db.Column(db.String(30), nullable=False)
+    role = db.Column(db.String(50), nullable=False)
+    dietary_preference = db.Column(db.String(30), nullable=False)
+    target_calories = db.Column(db.Integer, nullable=False)
+    target_protein = db.Column(db.Integer, nullable=False)
+    target_carbs = db.Column(db.Integer, nullable=False)
+    target_fat = db.Column(db.Integer, nullable=False)
+    meals_json = db.Column(db.Text, nullable=False)  # JSON-encoded array of meals
+    role_tips = db.Column(db.Text, nullable=True)     # JSON-encoded or newline-separated tips
+    is_active = db.Column(db.Boolean, default=True)
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)

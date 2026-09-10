@@ -1,0 +1,262 @@
+{% extends "base.html" %}
+{% block title %}AI Diet & Nutrition — Fitrack{% endblock %}
+{% block content %}
+<div class="page-wrapper">
+    <!-- Top Hero Banner with Role Intelligence -->
+    <div class="ai-hero-banner">
+        <div class="ai-hero-content">
+            <div class="ai-hero-title">
+                <span>{{ role_info.icon }}</span> {{ plan.title }}
+                <span class="badge-chip badge-coral" style="font-size:11px;">{{ current_user.goal|capitalize }}</span>
+                <span class="badge-chip badge-ai" style="font-size:11px;">{{ plan.dietary_preference|capitalize }}</span>
+            </div>
+            <p class="ai-hero-desc">
+                {{ role_info.summary }} <strong>Nutrition Directive:</strong> {{ role_info.diet_focus }}
+            </p>
+        </div>
+        <div>
+            <button class="btn-ai-custom" onclick="openGenModal()" type="button">
+                ✨ Customize AI Plan
+            </button>
+        </div>
+    </div>
+
+    <!-- Macro Targets Overview Cards -->
+    <div class="dashboard-grid" style="margin-bottom:1.5rem;">
+        <div class="stat-card">
+            <div class="stat-label">
+                <span>Daily Calories</span>
+                <span class="badge-chip badge-coral">{{ current_user.goal|capitalize }}</span>
+            </div>
+            <div class="stat-value">{{ plan.target_calories }} <span style="font-size:14px; color:var(--text-muted);">kcal</span></div>
+            <div class="stat-subtext">BMR: {{ targets.bmr }} kcal • TDEE: {{ targets.tdee }} kcal</div>
+            <div class="progress-bar-wrap">
+                <div class="progress-bar-fill progress-bar-coral" style="width: 100%;"></div>
+            </div>
+        </div>
+
+        <div class="stat-card">
+            <div class="stat-label">
+                <span>Target Protein</span>
+                <span style="color:#ff6b81; font-weight:700;">{{ (plan.target_protein * 400 / plan.target_calories)|round }}%</span>
+            </div>
+            <div class="stat-value">{{ plan.target_protein }} <span style="font-size:14px; color:var(--text-muted);">g</span></div>
+            <div class="stat-subtext">Optimal for muscle repair & satiety</div>
+            <div class="progress-bar-wrap">
+                <div class="progress-bar-fill progress-bar-coral" style="width: 85%;"></div>
+            </div>
+        </div>
+
+        <div class="stat-card">
+            <div class="stat-label">
+                <span>Target Carbs</span>
+                <span style="color:#48dbfb; font-weight:700;">{{ (plan.target_carbs * 400 / plan.target_calories)|round }}%</span>
+            </div>
+            <div class="stat-value">{{ plan.target_carbs }} <span style="font-size:14px; color:var(--text-muted);">g</span></div>
+            <div class="stat-subtext">Clean energy fueling your daily role</div>
+            <div class="progress-bar-wrap">
+                <div class="progress-bar-fill progress-bar-cyan" style="width: 70%;"></div>
+            </div>
+        </div>
+
+        <div class="stat-card">
+            <div class="stat-label">
+                <span>Target Fats & Water</span>
+                <span style="color:#fbc531; font-weight:700;">{{ targets.water_liters }}L 💧</span>
+            </div>
+            <div class="stat-value">{{ plan.target_fat }} <span style="font-size:14px; color:var(--text-muted);">g</span></div>
+            <div class="stat-subtext">Hormonal balance & joint longevity</div>
+            <div class="progress-bar-wrap">
+                <div class="progress-bar-fill progress-bar-purple" style="width: 65%;"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Adherence Progress & Daily Reset Action -->
+    <div style="display:flex; flex-wrap:wrap; justify-content:space-between; align-items:center; background:var(--bg-surface); border:1px solid var(--border-subtle); border-radius:var(--radius-md); padding:1rem 1.4rem; margin-bottom:1.5rem; gap:1rem;">
+        <div style="display:flex; align-items:center; gap:1rem;">
+            <div>
+                <span style="font-size:12px; color:var(--text-muted); text-transform:uppercase; font-weight:600;">Daily Meal Adherence</span>
+                <div style="font-size:18px; font-weight:700; color:#fff;" id="adherenceSummary">
+                    {{ completed_meals }} of {{ total_meals }} meals logged (<span id="adherencePct">{{ adherence_pct }}%</span>)
+                </div>
+            </div>
+            <div style="width:160px;">
+                <div class="progress-bar-wrap" style="height:10px; margin-top:0;">
+                    <div class="progress-bar-fill progress-bar-emerald" id="adherenceBar" style="width: {{ adherence_pct }}%;"></div>
+                </div>
+            </div>
+        </div>
+
+        <form method="POST" action="{{ url_for('diet.reset_daily') }}" style="margin:0;">
+            <button type="submit" class="btn-secondary-custom" style="padding:6px 14px; font-size:13px;">
+                ↺ Reset Today's Checkmarks
+            </button>
+        </form>
+    </div>
+
+    <!-- 4-Meal Plan Grid -->
+    <h3 style="font-size:20px; font-weight:700; margin-bottom:0.8rem;">Today's AI Meal Blueprint</h3>
+    <div class="meals-grid">
+        {% for meal in meals %}
+        <div class="meal-card {% if meal.completed %}completed{% endif %}" id="card-{{ meal.id }}">
+            <div>
+                <div class="meal-header">
+                    <div>
+                        <span class="meal-slot-label">{{ meal.slot_name }}</span>
+                        <h4 class="meal-name">{{ meal.name }}</h4>
+                    </div>
+                    <span class="meal-time">🕒 {{ meal.time }}</span>
+                </div>
+
+                <div class="macro-pills">
+                    <span class="macro-pill macro-pill-cals">🔥 {{ meal.calories }} kcal</span>
+                    <span class="macro-pill macro-pill-protein">🥩 {{ meal.protein }}g Protein</span>
+                    <span class="macro-pill macro-pill-carb">🌾 {{ meal.carbs }}g Carbs</span>
+                    <span class="macro-pill macro-pill-fat">🥑 {{ meal.fat }}g Fat</span>
+                    <span class="macro-pill" style="background:rgba(255,255,255,0.05); color:var(--text-secondary);">⏱ {{ meal.prep_time }}</span>
+                </div>
+
+                <p style="font-size:13px; color:#cbd5e1; margin-bottom:10px;">{{ meal.description }}</p>
+
+                <div class="meal-role-benefit">
+                    <strong>{{ role_info.icon }} Role Optimization:</strong> {{ meal.role_benefit }}
+                </div>
+
+                <details style="margin-top:8px; cursor:pointer;">
+                    <summary style="font-size:12.5px; color:var(--text-muted); font-weight:600;">View Ingredients & Portions</summary>
+                    <ul class="ingredients-list">
+                        {% for ing in meal.ingredients %}
+                            <li>{{ ing }}</li>
+                        {% endfor %}
+                    </ul>
+                </details>
+            </div>
+
+            <div class="meal-action-row">
+                <span style="font-size:12px; color:var(--text-muted);">
+                    <span id="status-label-{{ meal.id }}">
+                        {% if meal.completed %}✓ Logged as eaten{% else %}Pending meal{% endif %}
+                    </span>
+                </span>
+                <button type="button" 
+                        class="check-meal-btn {% if meal.completed %}is-checked{% endif %}" 
+                        id="btn-{{ meal.id }}" 
+                        onclick="toggleMeal('{{ meal.id }}')">
+                    <span id="check-icon-{{ meal.id }}">{% if meal.completed %}✓ Eaten{% else %}○ Mark Eaten{% endif %}</span>
+                </button>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+
+    <!-- Role-Specific Nutrition Guidelines Card -->
+    <div class="stat-card" style="margin-top:2.5rem;">
+        <h3 style="font-size:18px; font-weight:700; color:#fff; display:flex; align-items:center; gap:8px; margin-bottom:12px;">
+            <span>💡</span> Nutrition Rules for {{ role_info.title }}
+        </h3>
+        <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(250px, 1fr)); gap:1rem;">
+            {% for tip in role_tips %}
+            <div style="background:rgba(255,255,255,0.03); border:1px solid var(--border-subtle); border-radius:var(--radius-sm); padding:12px 14px; font-size:13.5px; color:#e2e8f0; display:flex; gap:10px; align-items:flex-start;">
+                <span style="color:#a55eea; font-weight:bold; font-size:16px;">•</span>
+                <span>{{ tip }}</span>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+
+<!-- Modal: Customize & Generate AI Diet Plan -->
+<div class="modal-overlay" id="genModal">
+    <div class="modal-card">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1.5rem;">
+            <h3 style="font-size:20px; font-weight:700; color:#fff; margin:0;">✨ Customize AI Diet Plan</h3>
+            <button type="button" onclick="closeGenModal()" style="background:none; border:none; color:var(--text-muted); font-size:22px; cursor:pointer;">&times;</button>
+        </div>
+
+        <form method="POST" action="{{ url_for('diet.generate_new') }}">
+            <div class="form-group">
+                <label>Your Current Role / Lifestyle</label>
+                <select name="role" class="form-control">
+                    {% for r_key, r_data in roles.items() %}
+                        <option value="{{ r_key }}" {% if current_user.role == r_key %}selected{% endif %}>
+                            {{ r_data.icon }} {{ r_data.title }}
+                        </option>
+                    {% endfor %}
+                </select>
+                <small style="color:var(--text-muted); font-size:11.5px; display:block; margin-top:4px;">
+                    Adapts meal schedules, carb timing, and nutrient density to your daily routine.
+                </small>
+            </div>
+
+            <div class="form-group">
+                <label>Dietary Preference</label>
+                <select name="dietary_preference" class="form-control">
+                    {% for pref_key, pref_label in dietary_preferences %}
+                        <option value="{{ pref_key }}" {% if plan.dietary_preference == pref_key %}selected{% endif %}>
+                            {{ pref_label }}
+                        </option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label>Custom Daily Calorie Target (Optional override)</label>
+                <input type="number" name="custom_calories" class="form-control" placeholder="Leave empty for auto-calculated ({{ targets.calories }} kcal)" min="1200" max="6000">
+                <small style="color:var(--text-muted); font-size:11.5px; display:block; margin-top:4px;">
+                    Recommended for your {{ current_user.goal }} goal: {{ targets.calories }} kcal.
+                </small>
+            </div>
+
+            <div style="display:flex; gap:10px; margin-top:1.75rem;">
+                <button type="button" onclick="closeGenModal()" class="btn-secondary-custom" style="flex:1;">Cancel</button>
+                <button type="submit" class="btn-ai-custom" style="flex:1;">Generate Plan</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script>
+    function openGenModal() {
+        document.getElementById('genModal').style.display = 'flex';
+    }
+    function closeGenModal() {
+        document.getElementById('genModal').style.display = 'none';
+    }
+
+    async function toggleMeal(mealId) {
+        try {
+            const res = await fetch("{{ url_for('diet.toggle_meal') }}", {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ meal_id: mealId })
+            });
+            const data = await res.json();
+            if (data.success) {
+                const card = document.getElementById('card-' + mealId);
+                const btn = document.getElementById('btn-' + mealId);
+                const icon = document.getElementById('check-icon-' + mealId);
+                const statusLabel = document.getElementById('status-label-' + mealId);
+
+                if (data.completed) {
+                    card.classList.add('completed');
+                    btn.classList.add('is-checked');
+                    icon.textContent = '✓ Eaten';
+                    statusLabel.textContent = '✓ Logged as eaten';
+                } else {
+                    card.classList.remove('completed');
+                    btn.classList.remove('is-checked');
+                    icon.textContent = '○ Mark Eaten';
+                    statusLabel.textContent = 'Pending meal';
+                }
+
+                document.getElementById('adherenceSummary').innerHTML = 
+                    `${data.completed_count} of ${data.total_meals} meals logged (<span id="adherencePct">${data.adherence_pct}%</span>)`;
+                document.getElementById('adherenceBar').style.width = data.adherence_pct + '%';
+            }
+        } catch (err) {
+            console.error('Failed to toggle meal:', err);
+        }
+    }
+</script>
+{% endblock %}

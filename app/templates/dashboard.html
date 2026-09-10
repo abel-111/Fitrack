@@ -1,54 +1,157 @@
 {% extends "base.html" %}
-{% block title %}Dashboard{% endblock %}
+{% block title %}Dashboard — Fitrack{% endblock %}
 {% block content %}
 <div class="page-wrapper">
-    <h2>Welcome, {{ current_user.username }}!</h2>
-    <p class="page-subtitle">Here's where your progress will live.</p>
+    <!-- Hero Banner with Role & AI Coach Insight -->
+    <div class="ai-hero-banner">
+        <div class="ai-hero-content">
+            <div style="display:flex; align-items:center; gap:10px; margin-bottom:4px; flex-wrap:wrap;">
+                <span style="font-size:22px;">👋</span>
+                <h2 style="font-size:24px; font-weight:700; color:#fff; margin:0;">
+                    Welcome back, {{ current_user.username }}!
+                </h2>
+                <span class="badge-chip badge-coral">{{ current_user.get_role_display() }}</span>
+                <span class="badge-chip badge-cyan">{{ current_user.goal|capitalize }}</span>
+            </div>
+            <p class="ai-hero-desc" style="margin-top:6px;">
+                <strong>✨ AI Daily Focus:</strong> {{ ai_insights.daily_priority }}
+            </p>
+        </div>
+        <div>
+            {% if checked_in_today %}
+                <button class="btn-primary-custom" style="opacity:0.65; cursor:default; background:#10b981; box-shadow:0 0 15px rgba(16,185,129,0.3);" disabled>
+                    ✓ Checked In Today!
+                </button>
+            {% else %}
+                <form method="POST" action="{{ url_for('attendance.checkin') }}" style="margin:0;">
+                    <button type="submit" class="btn-primary-custom">
+                        🔥 Check In Today
+                    </button>
+                </form>
+            {% endif %}
+        </div>
+    </div>
 
+    <!-- Core Stat Cards Grid -->
     <div class="dashboard-grid">
         <div class="stat-card">
-            <p class="stat-label">Current streak</p>
-            <p class="stat-value">{{ current_streak }} day{{ 's' if current_streak != 1 }}</p>
+            <div class="stat-label">
+                <span>Current Streak</span>
+                <span style="font-size:16px;">🔥</span>
+            </div>
+            <div class="stat-value">{{ current_streak }} <span style="font-size:14px; color:var(--text-muted);">day{{ 's' if current_streak != 1 }}</span></div>
+            <div class="stat-subtext">
+                {% if current_streak > 0 %}Streak is blazing! Keep it going.{% else %}Check in today to start a new streak!{% endif %}
+            </div>
+            <div class="progress-bar-wrap">
+                <div class="progress-bar-fill progress-bar-coral" style="width: {{ [current_streak * 14, 100]|min }}%;"></div>
+            </div>
         </div>
+
         <div class="stat-card">
-            <p class="stat-label">Longest streak</p>
-            <p class="stat-value">{{ longest_streak }} day{{ 's' if longest_streak != 1 }}</p>
+            <div class="stat-label">
+                <span>All-Time Best Streak</span>
+                <span style="font-size:16px;">🏆</span>
+            </div>
+            <div class="stat-value">{{ longest_streak }} <span style="font-size:14px; color:var(--text-muted);">day{{ 's' if longest_streak != 1 }}</span></div>
+            <div class="stat-subtext">Your personal record for continuous consistency</div>
+            <div class="progress-bar-wrap">
+                <div class="progress-bar-fill progress-bar-purple" style="width: {{ [longest_streak * 10, 100]|min }}%;"></div>
+            </div>
         </div>
+
         <div class="stat-card">
-            <p class="stat-label">Check-ins this month</p>
-            <p class="stat-value">{{ month_count }}</p>
+            <div class="stat-label">
+                <span>Check-ins this Month</span>
+                <span style="font-size:16px;">📅</span>
+            </div>
+            <div class="stat-value">{{ month_count }} <span style="font-size:14px; color:var(--text-muted);">sessions</span></div>
+            <div class="stat-subtext">Consistency rating: {{ ai_insights.consistency_score }}%</div>
+            <div class="progress-bar-wrap">
+                <div class="progress-bar-fill progress-bar-emerald" style="width: {{ [month_count * 4, 100]|min }}%;"></div>
+            </div>
         </div>
+
         <div class="stat-card">
-            <p class="stat-label">Preferred days</p>
-            {% if preferred_days %}
-                <p class="stat-value" style="font-size:16px;">{{ preferred_days|join(', ') }}</p>
-            {% else %}
-                <p style="color:#9a9a9a; font-size:13px; margin:0;">
-                    <a href="{{ url_for('profile.view') }}" style="color:#e24b4a;">Set your days</a>
-                </p>
-            {% endif %}
-</div>
+            <div class="stat-label">
+                <span>Daily Nutrition Target</span>
+                <span style="font-size:16px;">🥗</span>
+            </div>
+            <div class="stat-value">{{ calorie_target }} <span style="font-size:14px; color:var(--text-muted);">kcal</span></div>
+            <div class="stat-subtext">{{ macros.protein }}g Protein • {{ macros.carbs }}g Carbs • {{ macros.fat }}g Fat</div>
+            <div class="progress-bar-wrap">
+                <div class="progress-bar-fill progress-bar-cyan" style="width: 85%;"></div>
+            </div>
+        </div>
     </div>
 
-    <div style="margin-top: 1.5rem;">
-        {% if checked_in_today %}
-            <button class="btn-primary-custom" style="width:auto; padding:12px 24px; opacity:0.5; cursor:default;" disabled>
-                ✓ Checked in today
-            </button>
-        {% else %}
-            <form method="POST" action="{{ url_for('attendance.checkin') }}">
-                <button type="submit" class="btn-primary-custom" style="width:auto; padding:12px 24px;">
-                    Check in
-                </button>
-            </form>
-        {% endif %}
-    </div>
-    <a href="{{ url_for('workouts.plan') }}" style="color:#e24b4a; font-size:14px; text-decoration:none; margin-top:1rem; margin-right:1.5rem; display:inline-block;">
-    → View workout plan
-</a>
-    <a href="{{ url_for('weight.history') }}" style="color:#e24b4a; font-size:14px; text-decoration:none; margin-top:1rem; display:inline-block;">
-        → View weight log
-    </a>
-</div>
+    <!-- Interactive Navigation Hub Cards -->
+    <h3 style="font-size:18px; font-weight:700; margin-bottom:1rem; color:#fff;">Quick Hub</h3>
+    <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(280px, 1fr)); gap:1.25rem;">
+        <!-- AI Diet Card -->
+        <div class="stat-card" style="border-left: 3px solid #ff4757;">
+            <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:8px;">
+                <h4 style="font-size:16px; font-weight:700; color:#fff;">🥗 AI Diet Blueprint</h4>
+                <span class="badge-chip badge-coral">Role Optimized</span>
+            </div>
+            <p style="color:var(--text-secondary); font-size:13px; margin-bottom:14px;">
+                Personalized 4-meal plan with exact portions, macros, and dietary preferences tailored to your {{ role_info.title }} schedule.
+            </p>
+            <a href="{{ url_for('diet.view_plan') }}" class="btn-secondary-custom" style="font-size:13px; padding:7px 14px;">
+                View AI Diet Plan →
+            </a>
+        </div>
 
+        <!-- Workout Plan Card -->
+        <div class="stat-card" style="border-left: 3px solid #00d2d3;">
+            <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:8px;">
+                <h4 style="font-size:16px; font-weight:700; color:#fff;">🏋️ Workout Routine</h4>
+                <span class="badge-chip badge-cyan">{{ current_user.fitness_level|capitalize }}</span>
+            </div>
+            <p style="color:var(--text-secondary); font-size:13px; margin-bottom:14px;">
+                Custom resistance split with role-specific mobility warm-ups, progressive overload tracking, and form cues.
+            </p>
+            <a href="{{ url_for('workouts.plan') }}" class="btn-secondary-custom" style="font-size:13px; padding:7px 14px;">
+                Start Workout →
+            </a>
+        </div>
+
+        <!-- Weight Tracking Card -->
+        <div class="stat-card" style="border-left: 3px solid #10b981;">
+            <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:8px;">
+                <h4 style="font-size:16px; font-weight:700; color:#fff;">📈 Weight & BMI</h4>
+                {% if bmi %}
+                    <span class="badge-chip badge-emerald">BMI {{ bmi }}</span>
+                {% else %}
+                    <span class="badge-chip badge-emerald">Track</span>
+                {% endif %}
+            </div>
+            <p style="color:var(--text-secondary); font-size:13px; margin-bottom:14px;">
+                {% if current_user.weight_kg %}Current: {{ current_user.weight_kg }}kg{% else %}No weight logged yet{% endif %}.
+                Log regularly to view your progress forecast chart.
+            </p>
+            <a href="{{ url_for('weight.history') }}" class="btn-secondary-custom" style="font-size:13px; padding:7px 14px;">
+                Log Weight →
+            </a>
+        </div>
+
+        <!-- Preferred Days Card -->
+        <div class="stat-card" style="border-left: 3px solid #a55eea;">
+            <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:8px;">
+                <h4 style="font-size:16px; font-weight:700; color:#fff;">🗓 Training Schedule</h4>
+                <span class="badge-chip badge-ai">Weekly</span>
+            </div>
+            <p style="color:var(--text-secondary); font-size:13px; margin-bottom:14px;">
+                {% if preferred_days %}
+                    Scheduled days: <strong style="color:#fff;">{{ preferred_days|join(', ') }}</strong>
+                {% else %}
+                    No preferred days selected yet. Choose the days you hit the gym!
+                {% endif %}
+            </p>
+            <a href="{{ url_for('profile.view') }}" class="btn-secondary-custom" style="font-size:13px; padding:7px 14px;">
+                Manage Days →
+            </a>
+        </div>
+    </div>
+</div>
 {% endblock %}

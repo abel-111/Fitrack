@@ -1,24 +1,46 @@
 {% extends "base.html" %}
-{% block title %}Sign Up{% endblock %}
+{% block title %}Sign Up — Fitrack{% endblock %}
 {% block content %}
 <div class="auth-wrapper">
     <div class="auth-card">
-        <h2>Create account</h2>
-        <p class="subtitle">Join the community and start tracking</p>
+        <h2>Join Fitrack</h2>
+        <p class="subtitle">Personalized AI nutrition & progressive tracking</p>
         <form method="POST">
             <div class="form-group">
                 <label>Username</label>
-                <input type="text" name="username" required>
+                <input type="text" name="username" class="form-control" required placeholder="Choose a username">
             </div>
             <div class="form-group">
                 <label>Email</label>
-                <input type="email" name="email" required>
+                <input type="email" name="email" class="form-control" required placeholder="name@example.com">
             </div>
             <div class="form-group">
                 <label>Password</label>
-                <input type="password" name="password" required>
+                <input type="password" name="password" class="form-control" required placeholder="••••••••">
             </div>
-            <button type="submit" class="btn-primary-custom">Sign up</button>
+            <div class="form-group">
+                <label>Your Primary Role / Lifestyle</label>
+                <select name="role" class="form-control">
+                    {% if roles %}
+                        {% for r_key, r_data in roles.items() %}
+                            <option value="{{ r_key }}" {% if r_key == 'desk_worker' %}selected{% endif %}>
+                                {{ r_data.icon }} {{ r_data.title }}
+                            </option>
+                        {% endfor %}
+                    {% else %}
+                        <option value="desk_worker">💼 Desk Worker / Corporate</option>
+                        <option value="student">🎓 Student</option>
+                        <option value="athlete">🏃 Athlete</option>
+                        <option value="bodybuilder">🏋️ Bodybuilder</option>
+                        <option value="busy_parent">👨‍👩‍👧 Busy Parent / Pro</option>
+                        <option value="general">🧘 General Fitness</option>
+                    {% endif %}
+                </select>
+                <small style="color:var(--text-muted); font-size:11.5px; display:block; margin-top:4px;">
+                    Calibrates your AI coach, daily meal plans, and posture warm-ups.
+                </small>
+            </div>
+            <button type="submit" class="btn-primary-custom" style="margin-top:1rem;">Create Account</button>
         </form>
         <p class="auth-footer">Already have an account? <a href="{{ url_for('auth.login') }}">Login</a></p>
     </div>

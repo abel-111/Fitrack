@@ -3,39 +3,74 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{% block title %}Gym Community{% endblock %}</title>
+    <title>{% block title %}Fitrack — AI Fitness & Nutrition{% endblock %}</title>
     <link href="{{ url_for('static', filename='css/style.css') }}" rel="stylesheet">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 </head>
 <body>
     <div class="navbar-custom">
-        <a class="navbar-brand" href="{{ url_for('auth.index') }}">🏋 Gym Community</a>
+        <div class="nav-brand-group">
+            <a class="navbar-brand" href="{{ url_for('auth.dashboard') if current_user.is_authenticated else url_for('auth.login') }}">
+                🏋️ Fit<span class="logo-highlight">rack</span>
+            </a>
+
+            {% if current_user.is_authenticated %}
+            <nav class="nav-links">
+                <a href="{{ url_for('auth.dashboard') }}" class="nav-link {% if request.endpoint == 'auth.dashboard' %}active{% endif %}">
+                    Dashboard
+                </a>
+                <a href="{{ url_for('diet.view_plan') }}" class="nav-link {% if request.blueprint == 'diet' %}active{% endif %}">
+                    🥗 AI Diet
+                </a>
+                <a href="{{ url_for('workouts.plan') }}" class="nav-link {% if request.blueprint == 'workouts' %}active{% endif %}">
+                    🏋️ Workouts
+                </a>
+                <a href="{{ url_for('weight.history') }}" class="nav-link {% if request.blueprint == 'weight' %}active{% endif %}">
+                    📈 Weight
+                </a>
+                <a href="{{ url_for('leaderboard.leaderboard') }}" class="nav-link {% if request.blueprint == 'leaderboard' %}active{% endif %}">
+                    🏆 Leaderboard
+                </a>
+                <a href="{{ url_for('ai.recommendations') }}" class="nav-link nav-link-ai {% if request.endpoint == 'ai.recommendations' %}active{% endif %}">
+                    ✨ AI Coach
+                </a>
+            </nav>
+            {% endif %}
+        </div>
 
         {% if current_user.is_authenticated %}
-        <div class="avatar-menu">
-            <button class="avatar-btn" id="avatarBtn" type="button">
-                {% if current_user.profile_picture and current_user.profile_picture != 'default.png' %}
-                    <img src="{{ url_for('static', filename='uploads/' + current_user.profile_picture) }}" alt="Profile">
-                {% else %}
-                    <span>{{ current_user.username[0]|upper }}</span>
-                {% endif %}
-            </button>
-            <div class="avatar-dropdown" id="avatarDropdown">
-                <div class="avatar-dropdown-name">{{ current_user.username }}</div>
-                <a href="{{ url_for('profile.view') }}">Profile</a>
-                <a href="{{ url_for('leaderboard.leaderboard') }}">Leaderboard</a>
-                <a href="{{ url_for('workouts.plan') }}">Workout Plan</a>
-                <a href="{{ url_for('auth.logout') }}">Logout</a>
-                
+        <div class="nav-right-group">
+            <div class="avatar-menu">
+                <button class="avatar-btn" id="avatarBtn" type="button" title="{{ current_user.username }}">
+                    {% if current_user.profile_picture and current_user.profile_picture != 'default.png' %}
+                        <img src="{{ url_for('static', filename='uploads/' + current_user.profile_picture) }}" alt="Profile">
+                    {% else %}
+                        <span>{{ current_user.username[0]|upper }}</span>
+                    {% endif %}
+                </button>
+                <div class="avatar-dropdown" id="avatarDropdown">
+                    <div class="avatar-dropdown-name">{{ current_user.username }} ({{ current_user.role|capitalize if current_user.role else 'General' }})</div>
+                    <a href="{{ url_for('profile.view') }}">⚙️ Profile & Biometrics</a>
+                    <a href="{{ url_for('diet.view_plan') }}">🥗 AI Diet Plan</a>
+                    <a href="{{ url_for('workouts.plan') }}">🏋️ Workout Split</a>
+                    <a href="{{ url_for('ai.recommendations') }}">✨ AI Coach Insights</a>
+                    <a href="{{ url_for('leaderboard.leaderboard') }}">🏆 Community</a>
+                    <a href="{{ url_for('auth.logout') }}" style="color:#fca5a5;">🚪 Logout</a>
+                </div>
             </div>
         </div>
         {% endif %}
     </div>
 
-    <div style="padding: 1rem 2rem;">
+    <div style="max-width: 1200px; margin: 0.8rem auto 0; padding: 0 1.8rem;">
         {% with messages = get_flashed_messages(with_categories=true) %}
             {% if messages %}
                 {% for category, message in messages %}
-                    <div class="alert-box alert-{{ category }}">{{ message }}</div>
+                    <div class="alert-box alert-{{ category }}">
+                        {% if category == 'success' %}✓{% elif category == 'danger' %}⚠{% else %}ℹ{% endif %}
+                        <span>{{ message }}</span>
+                    </div>
                 {% endfor %}
             {% endif %}
         {% endwith %}
@@ -44,20 +79,127 @@
     {% block content %}{% endblock %}
 
     {% if current_user.is_authenticated %}
+    <!-- Floating AI Coach Assistant -->
+    <button class="ai-coach-fab" id="aiCoachFab" type="button" title="Ask AI Coach">
+        <span>✨</span> Ask AI Coach
+    </button>
+
+    <div class="ai-chat-modal" id="aiChatModal">
+        <div class="ai-chat-header">
+            <div class="ai-chat-title">
+                <span>🤖</span> FitBot AI Coach
+                <span class="badge-chip badge-ai" style="font-size:10px; padding:2px 7px;">{{ current_user.get_role_display() }}</span>
+            </div>
+            <button class="ai-chat-close" id="aiChatClose" type="button">&times;</button>
+        </div>
+        <div class="ai-chat-body" id="aiChatBody">
+            <div class="chat-bubble chat-bubble-bot">
+                👋 Hey <strong>{{ current_user.username }}</strong>! I'm your AI Coach optimized for your <strong>{{ current_user.get_role_display() }}</strong> role and <strong>{{ current_user.goal }}</strong> goal. How can I assist you today?
+            </div>
+            <div class="chat-quick-chips">
+                <button class="chip-btn" onclick="sendQuickPrompt('What should my daily macros and calories be?')">🥗 My Macros</button>
+                <button class="chip-btn" onclick="sendQuickPrompt('Give me a quick nutrition hack for my role.')">💡 Role Hack</button>
+                <button class="chip-btn" onclick="sendQuickPrompt('Best pre-workout snack for today?')">⚡ Pre-Workout</button>
+                <button class="chip-btn" onclick="sendQuickPrompt('How do I keep my streak alive?')">🔥 Streak Tip</button>
+            </div>
+        </div>
+        <form class="ai-chat-footer" id="aiChatForm" onsubmit="handleChatSubmit(event)">
+            <input type="text" class="ai-chat-input" id="aiChatInput" placeholder="Ask about meals, workouts, recovery..." autocomplete="off">
+            <button type="submit" class="ai-chat-send">Send</button>
+        </form>
+    </div>
+
     <script>
+        // Avatar dropdown logic
         const avatarBtn = document.getElementById('avatarBtn');
         const avatarDropdown = document.getElementById('avatarDropdown');
+        if (avatarBtn && avatarDropdown) {
+            avatarBtn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                avatarDropdown.classList.toggle('open');
+            });
+            document.addEventListener('click', (e) => {
+                if (!avatarBtn.contains(e.target) && !avatarDropdown.contains(e.target)) {
+                    avatarDropdown.classList.remove('open');
+                }
+            });
+        }
 
-        avatarBtn.addEventListener('click', (e) => {
-            e.stopPropagation();
-            avatarDropdown.classList.toggle('open');
-        });
+        // AI Chat Floating Widget Logic
+        const aiCoachFab = document.getElementById('aiCoachFab');
+        const aiChatModal = document.getElementById('aiChatModal');
+        const aiChatClose = document.getElementById('aiChatClose');
+        const aiChatBody = document.getElementById('aiChatBody');
+        const aiChatInput = document.getElementById('aiChatInput');
 
-        document.addEventListener('click', (e) => {
-            if (!avatarBtn.contains(e.target) && !avatarDropdown.contains(e.target)) {
-                avatarDropdown.classList.remove('open');
+        if (aiCoachFab && aiChatModal) {
+            aiCoachFab.addEventListener('click', () => {
+                aiChatModal.classList.toggle('open');
+                if (aiChatModal.classList.contains('open')) {
+                    aiChatInput.focus();
+                }
+            });
+            aiChatClose.addEventListener('click', () => {
+                aiChatModal.classList.remove('open');
+            });
+        }
+
+        function appendMessage(text, isUser = false) {
+            const bubble = document.createElement('div');
+            bubble.className = `chat-bubble ${isUser ? 'chat-bubble-user' : 'chat-bubble-bot'}`;
+            // replace markdown-style bold and bullet lines
+            if (!isUser) {
+                let formatted = text
+                    .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+                    .replace(/\*(.*?)\*/g, '<em>$1</em>')
+                    .replace(/\n/g, '<br>');
+                bubble.innerHTML = formatted;
+            } else {
+                bubble.textContent = text;
             }
-        });
+            aiChatBody.appendChild(bubble);
+            aiChatBody.scrollTop = aiChatBody.scrollHeight;
+            return bubble;
+        }
+
+        function sendQuickPrompt(promptText) {
+            aiChatInput.value = promptText;
+            document.getElementById('aiChatForm').dispatchEvent(new Event('submit'));
+        }
+
+        async function handleChatSubmit(e) {
+            e.preventDefault();
+            const text = aiChatInput.value.trim();
+            if (!text) return;
+
+            appendMessage(text, true);
+            aiChatInput.value = '';
+
+            const loadingBubble = appendMessage('AI Coach is thinking...', false);
+            loadingBubble.style.opacity = '0.6';
+
+            try {
+                const response = await fetch("{{ url_for('ai.chat') }}", {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ message: text })
+                });
+                const data = await response.json();
+                if (data.success && data.response) {
+                    loadingBubble.style.opacity = '1';
+                    let formatted = data.response
+                        .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+                        .replace(/\*(.*?)\*/g, '<em>$1</em>')
+                        .replace(/\n/g, '<br>');
+                    loadingBubble.innerHTML = formatted;
+                } else {
+                    loadingBubble.textContent = data.error || 'Sorry, could not process that request.';
+                }
+            } catch (err) {
+                loadingBubble.textContent = 'Network error. Please try again.';
+            }
+            aiChatBody.scrollTop = aiChatBody.scrollHeight;
+        }
     </script>
     {% endif %}
 </body>

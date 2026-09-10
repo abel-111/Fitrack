@@ -1,86 +1,218 @@
 {% extends "base.html" %}
-{% block title %}Profile{% endblock %}
+{% block title %}Profile & Biometrics — Fitrack{% endblock %}
 {% block content %}
 <div class="page-wrapper">
-    <h2>Your Profile</h2>
-    <p class="page-subtitle">Update your profile picture, training settings, and workout schedule.</p>
-
-    <div class="stat-card" style="max-width:320px; text-align:center;">
-        {% if current_user.profile_picture and current_user.profile_picture != 'default.png' %}
-            <img src="{{ url_for('static', filename='uploads/' + current_user.profile_picture) }}"
-                 alt="Profile picture"
-                 style="width:120px; height:120px; border-radius:50%; object-fit:cover; margin-bottom:1rem;">
-        {% else %}
-            <div style="width:120px; height:120px; border-radius:50%; background:#e24b4a; color:#fff; font-size:40px; display:flex; align-items:center; justify-content:center; margin:0 auto 1rem;">
-                {{ current_user.username[0]|upper }}
-            </div>
-        {% endif %}
-
-        <input type="file" id="pictureInput" accept="image/png, image/jpeg, image/webp"
-               style="color:#9a9a9a; font-size:13px; display:block; margin:0 auto;">
-        <p id="uploadStatus" style="color:#5dcaa5; font-size:12px; margin-top:8px; display:none;">Profile picture updated!</p>
-        <p id="uploadError" style="color:#f0997b; font-size:12px; margin-top:8px; display:none;"></p>
+    <div class="page-header">
+        <h2 class="page-title">Profile & Fitness Persona</h2>
+        <p class="page-subtitle">Configure your lifestyle role, biometrics, dietary preferences, and training schedule.</p>
     </div>
 
-    <div class="stat-card" style="max-width:420px; margin-top:1.5rem;">
-        <p class="stat-label" style="margin-bottom:12px;">Training settings</p>
+    <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(320px, 1fr)); gap:1.5rem; margin-bottom:2rem;">
+        <!-- Profile Picture & Avatar Card -->
+        <div class="stat-card" style="text-align:center;">
+            <p class="stat-label" style="text-align:center;">Profile Picture</p>
+            {% if current_user.profile_picture and current_user.profile_picture != 'default.png' %}
+                <img src="{{ url_for('static', filename='uploads/' + current_user.profile_picture) }}"
+                     alt="Profile picture"
+                     style="width:120px; height:120px; border-radius:50%; object-fit:cover; margin:0 auto 1.2rem; border:2px solid var(--brand-primary); display:block;">
+            {% else %}
+                <div style="width:120px; height:120px; border-radius:50%; background:linear-gradient(135deg, #ff4757, #ee3545); color:#fff; font-size:42px; font-weight:700; display:flex; align-items:center; justify-content:center; margin:0 auto 1.2rem; border:2px solid rgba(255,255,255,0.1);">
+                    {{ current_user.username[0]|upper }}
+                </div>
+            {% endif %}
+
+            <input type="file" id="pictureInput" accept="image/png, image/jpeg, image/webp"
+                   style="color:var(--text-secondary); font-size:13px; display:block; margin:0 auto 8px; max-width:220px;">
+            <p id="uploadStatus" style="color:#10b981; font-size:12px; margin-top:6px; display:none;">✓ Profile picture updated!</p>
+            <p id="uploadError" style="color:#ef4444; font-size:12px; margin-top:6px; display:none;"></p>
+            <small style="color:var(--text-muted); font-size:11.5px; display:block;">Square crop supported before upload.</small>
+        </div>
+
+        <!-- Live Biometric Diagnostics Card -->
+        <div class="stat-card">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
+                <p class="stat-label" style="margin:0;">Calculated Biometrics</p>
+                <span class="badge-chip badge-coral">{{ current_user.get_role_display() }}</span>
+            </div>
+
+            <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-bottom:12px;">
+                <div style="background:rgba(255,255,255,0.03); border:1px solid var(--border-subtle); border-radius:var(--radius-sm); padding:10px;">
+                    <span style="font-size:11px; color:var(--text-muted); text-transform:uppercase; font-weight:600;">Body Mass Index</span>
+                    <div style="font-size:18px; font-weight:700; color:#fff; margin-top:2px;">
+                        {% if bmi %}{{ bmi }} <span style="font-size:12px; font-weight:normal; color:#48dbfb;">({{ bmi_category }})</span>{% else %}Not set{% endif %}
+                    </div>
+                </div>
+
+                <div style="background:rgba(255,255,255,0.03); border:1px solid var(--border-subtle); border-radius:var(--radius-sm); padding:10px;">
+                    <span style="font-size:11px; color:var(--text-muted); text-transform:uppercase; font-weight:600;">Daily Calorie Goal</span>
+                    <div style="font-size:18px; font-weight:700; color:#fff; margin-top:2px;">
+                        {{ calorie_target }} <span style="font-size:12px; font-weight:normal; color:var(--text-muted);">kcal</span>
+                    </div>
+                </div>
+
+                <div style="background:rgba(255,255,255,0.03); border:1px solid var(--border-subtle); border-radius:var(--radius-sm); padding:10px;">
+                    <span style="font-size:11px; color:var(--text-muted); text-transform:uppercase; font-weight:600;">Basal Metabolic Rate</span>
+                    <div style="font-size:16px; font-weight:600; color:#fff; margin-top:2px;">
+                        {{ bmr }} <span style="font-size:11px; color:var(--text-muted);">kcal</span>
+                    </div>
+                </div>
+
+                <div style="background:rgba(255,255,255,0.03); border:1px solid var(--border-subtle); border-radius:var(--radius-sm); padding:10px;">
+                    <span style="font-size:11px; color:var(--text-muted); text-transform:uppercase; font-weight:600;">Total Daily TDEE</span>
+                    <div style="font-size:16px; font-weight:600; color:#fff; margin-top:2px;">
+                        {{ tdee }} <span style="font-size:11px; color:var(--text-muted);">kcal</span>
+                    </div>
+                </div>
+            </div>
+
+            <div style="background:rgba(165,94,234,0.08); border:1px solid rgba(165,94,234,0.25); border-radius:var(--radius-sm); padding:10px 12px; font-size:12.5px; color:#e2d2fe;">
+                <strong>Macro Blueprint:</strong> {{ macros.protein }}g Protein • {{ macros.carbs }}g Carbs • {{ macros.fat }}g Healthy Fats
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Settings Form -->
+    <div class="stat-card" style="margin-bottom:2rem;">
+        <h3 style="font-size:18px; font-weight:700; color:#fff; margin-bottom:1.5rem; display:flex; align-items:center; gap:8px;">
+            <span>⚙️</span> Fitness Persona & Physical Metrics
+        </h3>
+
         <form method="POST" action="{{ url_for('profile.update_settings') }}">
-            <div class="form-group">
-                <label>Fitness level</label>
-                <select name="fitness_level" style="width:100%; background:#1f1f1f; border:0.5px solid #333; border-radius:8px; padding:10px 12px; color:#fff; font-size:14px;">
-                    {% for level in fitness_levels %}
-                        <option value="{{ level }}" {% if current_user.fitness_level == level %}selected{% endif %}>
-                            {{ level|capitalize }}
-                        </option>
-                    {% endfor %}
-                </select>
+            <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(260px, 1fr)); gap:1.25rem;">
+                <!-- Lifestyle Role -->
+                <div class="form-group">
+                    <label>Current Role / Daily Lifestyle</label>
+                    <select name="role" class="form-control">
+                        {% for r_key, r_data in roles.items() %}
+                            <option value="{{ r_key }}" {% if current_user.role == r_key %}selected{% endif %}>
+                                {{ r_data.icon }} {{ r_data.title }}
+                            </option>
+                        {% endfor %}
+                    </select>
+                    <small style="color:var(--text-muted); font-size:11.5px; display:block; margin-top:4px;">
+                        Personalizes hydration, posture warm-ups, and meal timing.
+                    </small>
+                </div>
+
+                <!-- Dietary Preference -->
+                <div class="form-group">
+                    <label>Dietary Preference</label>
+                    <select name="dietary_preference" class="form-control">
+                        {% for pref_key, pref_label in dietary_preferences %}
+                            <option value="{{ pref_key }}" {% if current_user.dietary_preference == pref_key %}selected{% endif %}>
+                                {{ pref_label }}
+                            </option>
+                        {% endfor %}
+                    </select>
+                    <small style="color:var(--text-muted); font-size:11.5px; display:block; margin-top:4px;">
+                        Guides recipe selection in your AI Diet Blueprint.
+                    </small>
+                </div>
+
+                <!-- Fitness Goal -->
+                <div class="form-group">
+                    <label>Primary Goal</label>
+                    <select name="goal" class="form-control">
+                        {% for g in goals %}
+                            <option value="{{ g }}" {% if current_user.goal == g %}selected{% endif %}>
+                                {{ g|capitalize }}
+                            </option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <!-- Fitness Experience Level -->
+                <div class="form-group">
+                    <label>Fitness Experience Level</label>
+                    <select name="fitness_level" class="form-control">
+                        {% for level in fitness_levels %}
+                            <option value="{{ level }}" {% if current_user.fitness_level == level %}selected{% endif %}>
+                                {{ level|capitalize }}
+                            </option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <!-- Activity Level -->
+                <div class="form-group">
+                    <label>Daily Activity Level</label>
+                    <select name="activity_level" class="form-control">
+                        {% for act_key, act_label in activity_levels %}
+                            <option value="{{ act_key }}" {% if current_user.activity_level == act_key %}selected{% endif %}>
+                                {{ act_label }}
+                            </option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <!-- Height -->
+                <div class="form-group">
+                    <label>Height (cm)</label>
+                    <input type="number" step="0.5" name="height_cm" class="form-control" placeholder="e.g. 175" value="{{ current_user.height_cm or '' }}">
+                </div>
+
+                <!-- Current Weight -->
+                <div class="form-group">
+                    <label>Current Weight (kg)</label>
+                    <input type="number" step="0.1" name="weight_kg" class="form-control" placeholder="e.g. 70" value="{{ current_user.weight_kg or '' }}">
+                </div>
+
+                <!-- Target Weight -->
+                <div class="form-group">
+                    <label>Target Weight (kg)</label>
+                    <input type="number" step="0.1" name="target_weight_kg" class="form-control" placeholder="e.g. 68" value="{{ current_user.target_weight_kg or '' }}">
+                </div>
+
+                <!-- Age -->
+                <div class="form-group">
+                    <label>Age</label>
+                    <input type="number" name="age" class="form-control" placeholder="e.g. 24" value="{{ current_user.age or '' }}">
+                </div>
+
+                <!-- Gender -->
+                <div class="form-group">
+                    <label>Gender (for BMR accuracy)</label>
+                    <select name="gender" class="form-control">
+                        <option value="male" {% if current_user.gender == 'male' %}selected{% endif %}>Male</option>
+                        <option value="female" {% if current_user.gender == 'female' %}selected{% endif %}>Female</option>
+                        <option value="other" {% if current_user.gender == 'other' %}selected{% endif %}>Other</option>
+                    </select>
+                </div>
             </div>
-            <div class="form-group">
-                <label>Goal</label>
-                <select name="goal" style="width:100%; background:#1f1f1f; border:0.5px solid #333; border-radius:8px; padding:10px 12px; color:#fff; font-size:14px;">
-                    {% for goal in goals %}
-                        <option value="{{ goal }}" {% if current_user.goal == goal %}selected{% endif %}>
-                            {{ goal|capitalize }}
-                        </option>
-                    {% endfor %}
-                </select>
+
+            <div style="margin-top:1.5rem;">
+                <button type="submit" class="btn-primary-custom">Save Profile & Biometrics</button>
             </div>
-            <button type="submit" class="btn-primary-custom" style="width:auto; padding:10px 20px; margin-top:0.5rem;">Save settings</button>
         </form>
-        <p style="color:#9a9a9a; font-size:12px; margin-top:1rem; margin-bottom:0;">
-            This drives your <a href="{{ url_for('workouts.plan') }}" style="color:#e24b4a;">workout plan</a>.
-        </p>
     </div>
 
-    <div class="stat-card" style="max-width:420px; margin-top:1.5rem;">
-        <p class="stat-label" style="margin-bottom:12px;">Preferred workout days</p>
+    <!-- Preferred Workout Days -->
+    <div class="stat-card">
+        <p class="stat-label" style="margin-bottom:12px;">Preferred Workout Days of the Week</p>
         <form method="POST" action="{{ url_for('profile.update_days') }}">
-            <div style="display:flex; flex-wrap:wrap; gap:8px; margin-bottom:1.25rem;">
+            <div style="display:flex; flex-wrap:wrap; gap:10px; margin-bottom:1.25rem;">
                 {% for day in days %}
-                <label style="display:flex; align-items:center; gap:6px; background:#1f1f1f; border:0.5px solid #333; border-radius:8px; padding:8px 12px; font-size:13px; color:#fff; cursor:pointer;">
-                    <input type="checkbox" name="days" value="{{ day }}" {% if day in selected_days %}checked{% endif %}>
-                    {{ day }}
+                <label style="display:flex; align-items:center; gap:8px; background:var(--bg-surface-elevated); border:1px solid var(--border-subtle); border-radius:var(--radius-sm); padding:10px 16px; font-size:13.5px; color:#fff; cursor:pointer; transition:all 0.2s ease;">
+                    <input type="checkbox" name="days" value="{{ day }}" {% if day in selected_days %}checked{% endif %} style="accent-color:var(--brand-primary); cursor:pointer;">
+                    <strong>{{ day }}</strong>
                 </label>
                 {% endfor %}
             </div>
-            <button type="submit" class="btn-primary-custom" style="width:auto; padding:10px 20px;">Save days</button>
+            <button type="submit" class="btn-primary-custom" style="padding:10px 22px;">Update Schedule</button>
         </form>
     </div>
 </div>
 
 <!-- Crop modal -->
-<div id="cropModal" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.7); z-index:1000; align-items:center; justify-content:center;">
-    <div style="background:#141414; border:0.5px solid #2a2a2a; border-radius:12px; padding:1.5rem; max-width:420px; width:90%;">
-        <h3 style="color:#fff; font-size:16px; font-weight:500; margin:0 0 1rem;">Crop your picture</h3>
-        <div style="max-height:320px; overflow:hidden;">
+<div id="cropModal" class="modal-overlay">
+    <div class="modal-card">
+        <h3 style="color:#fff; font-size:18px; font-weight:700; margin:0 0 1rem;">Crop Profile Photo</h3>
+        <div style="max-height:300px; overflow:hidden; border-radius:var(--radius-sm);">
             <img id="cropImage" style="max-width:100%; display:block;">
         </div>
         <div style="display:flex; gap:10px; margin-top:1.25rem;">
-            <button id="cancelCrop" type="button"
-                    style="flex:1; background:#1f1f1f; border:0.5px solid #333; color:#fff; border-radius:8px; padding:10px; cursor:pointer;">
-                Cancel
-            </button>
-            <button id="confirmCrop" type="button" class="btn-primary-custom" style="flex:1; margin-top:0;">Save</button>
+            <button id="cancelCrop" type="button" class="btn-secondary-custom" style="flex:1;">Cancel</button>
+            <button id="confirmCrop" type="button" class="btn-primary-custom" style="flex:1;">Save Picture</button>
         </div>
     </div>
 </div>

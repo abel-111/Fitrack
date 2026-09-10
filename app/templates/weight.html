@@ -1,73 +1,150 @@
 {% extends "base.html" %}
-{% block title %}Weight Log{% endblock %}
+{% block title %}Weight Log — Fitrack{% endblock %}
 {% block content %}
 <div class="page-wrapper">
-    <h2>Weight Log</h2>
-    <p class="page-subtitle">Track your weight over time.</p>
+    <div class="page-header">
+        <h2 class="page-title">Weight Log & Trajectory</h2>
+        <p class="page-subtitle">Track your weight over time and view your progress toward your target.</p>
+    </div>
 
-    <div class="stat-card" style="margin-bottom: 1.5rem;">
+    <!-- Quick Stats Bar -->
+    <div class="dashboard-grid" style="margin-bottom:1.8rem;">
+        <div class="stat-card">
+            <div class="stat-label">
+                <span>Latest Logged Weight</span>
+                <span class="badge-chip badge-coral">Current</span>
+            </div>
+            <div class="stat-value">
+                {% if logs %}
+                    {{ logs[0].weight_kg }} <span style="font-size:14px; color:var(--text-muted);">kg</span>
+                {% else %}
+                    None
+                {% endif %}
+            </div>
+            <div class="stat-subtext">Synced with your fitness profile</div>
+        </div>
+
+        <div class="stat-card">
+            <div class="stat-label">
+                <span>Target Weight</span>
+                <span class="badge-chip badge-cyan">Goal</span>
+            </div>
+            <div class="stat-value">
+                {% if current_user.target_weight_kg %}
+                    {{ current_user.target_weight_kg }} <span style="font-size:14px; color:var(--text-muted);">kg</span>
+                {% else %}
+                    <span style="font-size:16px; color:var(--text-muted);">Not set</span>
+                {% endif %}
+            </div>
+            <div class="stat-subtext">
+                {% if current_user.target_weight_kg and logs %}
+                    Delta: {{ (logs[0].weight_kg - current_user.target_weight_kg)|round(1) }} kg remaining
+                {% else %}
+                    <a href="{{ url_for('profile.view') }}" style="color:var(--brand-primary);">Set target weight</a>
+                {% endif %}
+            </div>
+        </div>
+
+        <div class="stat-card">
+            <div class="stat-label">
+                <span>BMI Status</span>
+                <span class="badge-chip badge-emerald">Health</span>
+            </div>
+            <div class="stat-value">
+                {% set bmi, cat = current_user.calculate_bmi() %}
+                {% if bmi %}{{ bmi }} <span style="font-size:14px; color:var(--text-muted);">({{ cat }})</span>{% else %}Not set{% endif %}
+            </div>
+            <div class="stat-subtext">Based on {{ current_user.height_cm or '?' }}cm height</div>
+        </div>
+    </div>
+
+    <!-- Chart Card -->
+    <div class="stat-card" style="margin-bottom: 2rem;">
+        <h3 style="font-size:16px; font-weight:700; color:#fff; margin-bottom:12px;">Progress Curve</h3>
         {% if has_logs %}
-            <svg viewBox="0 0 600 200" style="width:100%; height:auto;">
+            <svg viewBox="0 0 600 200" style="width:100%; height:auto; filter:drop-shadow(0 4px 12px rgba(255, 71, 87, 0.25));">
+                <defs>
+                    <linearGradient id="chartGradient" x1="0%" y1="0%" x2="0%" y2="100%">
+                        <stop offset="0%" stop-color="#ff4757" stop-opacity="0.3"/>
+                        <stop offset="100%" stop-color="#ff4757" stop-opacity="0.0"/>
+                    </linearGradient>
+                </defs>
                 <polyline
                     points="{{ chart_points }}"
                     fill="none"
-                    stroke="#e24b4a"
-                    stroke-width="2"
+                    stroke="#ff4757"
+                    stroke-width="3"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
                 />
                 {% for point in chart_points.split(' ') %}
                     {% set coords = point.split(',') %}
-                    <circle cx="{{ coords[0] }}" cy="{{ coords[1] }}" r="3" fill="#e24b4a" />
+                    <circle cx="{{ coords[0] }}" cy="{{ coords[1] }}" r="5" fill="#ff4757" stroke="#111722" stroke-width="2" />
                 {% endfor %}
             </svg>
         {% else %}
-            <p style="color:#9a9a9a; font-size:14px;">Log at least two entries to see your progress chart.</p>
+            <p style="color:var(--text-muted); font-size:14px; margin:1rem 0;">
+                Log at least two entries to unlock your progress curve chart.
+            </p>
         {% endif %}
     </div>
 
-    <form method="POST" action="{{ url_for('weight.log_weight') }}" style="display:flex; gap:10px; align-items:flex-end; margin-bottom: 2rem;">
-        <div class="form-group" style="margin-bottom:0; flex:1;">
-            <label>Weight (kg)</label>
-            <input type="number" step="0.1" name="weight_kg" required>
-        </div>
-        <button type="submit" class="btn-primary-custom" style="width:auto; padding:10px 20px;">Log</button>
-    </form>
+    <!-- Log Form -->
+    <div class="stat-card" style="margin-bottom: 2rem;">
+        <h3 style="font-size:16px; font-weight:700; color:#fff; margin-bottom:12px;">Log Today's Weight</h3>
+        <form method="POST" action="{{ url_for('weight.log_weight') }}" style="display:flex; gap:12px; align-items:flex-end; max-width:400px;">
+            <div class="form-group" style="margin-bottom:0; flex:1;">
+                <label>Weight (kg)</label>
+                <input type="number" step="0.1" name="weight_kg" class="form-control" placeholder="e.g. 72.5" required>
+            </div>
+            <button type="submit" class="btn-primary-custom" style="padding:10px 22px;">Log Entry</button>
+        </form>
+    </div>
 
-    <table style="width:100%; color:#fff; border-collapse:collapse;">
-        <thead>
-            <tr style="text-align:left; color:#9a9a9a; font-size:12px; text-transform:uppercase;">
-                <th style="padding:8px 0; border-bottom:0.5px solid #2a2a2a;">Date</th>
-                <th style="padding:8px 0; border-bottom:0.5px solid #2a2a2a;">Weight (kg)</th>
-                <th style="padding:8px 0; border-bottom:0.5px solid #2a2a2a; width:120px;">Actions</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for log in logs %}
-            <tr id="row-{{ log.id }}">
-                <td style="padding:10px 0; border-bottom:0.5px solid #1f1f1f; font-size:14px;">{{ log.logged_at.strftime('%d %b %Y') }}</td>
-                <td style="padding:10px 0; border-bottom:0.5px solid #1f1f1f; font-size:14px;" id="display-{{ log.id }}">
-                    {{ log.weight_kg }}
-                </td>
-                <td style="padding:10px 0; border-bottom:0.5px solid #1f1f1f; font-size:14px;">
-                    <div id="actions-{{ log.id }}">
-                        <a href="#" onclick="showEdit({{ log.id }}); return false;" style="color:#e24b4a; text-decoration:none; margin-right:12px;">Edit</a>
-                        <form method="POST" action="{{ url_for('weight.delete_weight', log_id=log.id) }}"
-                              style="display:inline;"
-                              onsubmit="return confirm('Delete this entry?');">
-                            <button type="submit" style="background:none; border:none; color:#f0997b; cursor:pointer; padding:0; font-size:14px;">Delete</button>
+    <!-- Table -->
+    <div class="stat-card">
+        <h3 style="font-size:16px; font-weight:700; color:#fff; margin-bottom:12px;">Logging History</h3>
+        {% if logs %}
+        <table class="custom-table">
+            <thead>
+                <tr>
+                    <th>Date</th>
+                    <th>Weight (kg)</th>
+                    <th style="width:140px;">Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for log in logs %}
+                <tr id="row-{{ log.id }}">
+                    <td>{{ log.logged_at.strftime('%d %b %Y, %H:%M') }}</td>
+                    <td id="display-{{ log.id }}">
+                        <strong style="color:#fff;">{{ log.weight_kg }}</strong> kg
+                    </td>
+                    <td>
+                        <div id="actions-{{ log.id }}">
+                            <a href="#" onclick="showEdit({{ log.id }}); return false;" style="color:var(--brand-primary); margin-right:12px; font-size:13px; font-weight:500;">Edit</a>
+                            <form method="POST" action="{{ url_for('weight.delete_weight', log_id=log.id) }}"
+                                  style="display:inline;"
+                                  onsubmit="return confirm('Delete this weight entry?');">
+                                <button type="submit" style="background:none; border:none; color:#fca5a5; cursor:pointer; padding:0; font-size:13px;">Delete</button>
+                            </form>
+                        </div>
+                        <form id="edit-form-{{ log.id }}" method="POST" action="{{ url_for('weight.edit_weight', log_id=log.id) }}"
+                              style="display:none; gap:6px; align-items:center;">
+                            <input type="number" step="0.1" name="weight_kg" value="{{ log.weight_kg }}" class="form-control"
+                                   style="width:80px; padding:4px 8px; font-size:13px;">
+                            <button type="submit" style="background:none; border:none; color:#10b981; cursor:pointer; font-size:13px; font-weight:600;">Save</button>
+                            <a href="#" onclick="hideEdit({{ log.id }}); return false;" style="color:var(--text-muted); font-size:12px; margin-left:4px;">Cancel</a>
                         </form>
-                    </div>
-                    <form id="edit-form-{{ log.id }}" method="POST" action="{{ url_for('weight.edit_weight', log_id=log.id) }}"
-                          style="display:none; gap:6px; align-items:center;">
-                        <input type="number" step="0.1" name="weight_kg" value="{{ log.weight_kg }}"
-                               style="width:70px; background:#1f1f1f; border:0.5px solid #333; border-radius:6px; color:#fff; padding:4px 6px; font-size:13px;">
-                        <button type="submit" style="background:none; border:none; color:#5dcaa5; cursor:pointer; padding:0; font-size:13px;">Save</button>
-                        <a href="#" onclick="hideEdit({{ log.id }}); return false;" style="color:#9a9a9a; font-size:13px; text-decoration:none;">Cancel</a>
-                    </form>
-                </td>
-            </tr>
-            {% endfor %}
-        </tbody>
-    </table>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        {% else %}
+            <p style="color:var(--text-muted); font-size:14px;">No weight entries logged yet.</p>
+        {% endif %}
+    </div>
 </div>
 
 <script>

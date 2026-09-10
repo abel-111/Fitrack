@@ -1,36 +1,59 @@
 {% extends "base.html" %}
-{% block title %}Leaderboard{% endblock %}
+{% block title %}Community Leaderboard — Fitrack{% endblock %}
 {% block content %}
 <div class="page-wrapper">
-    <h2>Leaderboard</h2>
-    <p class="page-subtitle">Top 20 by check-ins this month.</p>
+    <div class="page-header">
+        <h2 class="page-title">🏆 Community Leaderboard</h2>
+        <p class="page-subtitle">Top gym performers ranked by consistency & check-ins this month.</p>
+    </div>
 
-    {% if rows %}
-    <table style="width:100%; color:#fff; border-collapse:collapse;">
-        <thead>
-            <tr style="text-align:left; color:#9a9a9a; font-size:12px; text-transform:uppercase;">
-                <th style="padding:8px 0; border-bottom:0.5px solid #2a2a2a; width:50px;">Rank</th>
-                <th style="padding:8px 0; border-bottom:0.5px solid #2a2a2a;">User</th>
-                <th style="padding:8px 0; border-bottom:0.5px solid #2a2a2a;">Check-ins</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for row in rows %}
-            <tr style="{{ 'background:#1a1010;' if row.id == current_user_id }}">
-                <td style="padding:10px 0; border-bottom:0.5px solid #1f1f1f; font-size:14px;">{{ loop.index }}</td>
-                <td style="padding:10px 0; border-bottom:0.5px solid #1f1f1f; font-size:14px;">
-                    {{ row.username }}
-                    {% if row.id == current_user_id %}
-                        <span style="color:#e24b4a; font-size:12px;">(you)</span>
-                    {% endif %}
-                </td>
-                <td style="padding:10px 0; border-bottom:0.5px solid #1f1f1f; font-size:14px;">{{ row.checkin_count }}</td>
-            </tr>
-            {% endfor %}
-        </tbody>
-    </table>
-    {% else %}
-        <p style="color:#9a9a9a; font-size:14px;">No check-ins yet this month. Be the first!</p>
-    {% endif %}
+    <div class="stat-card">
+        {% if rows %}
+        <table class="custom-table">
+            <thead>
+                <tr>
+                    <th style="width:70px;">Rank</th>
+                    <th>Member</th>
+                    <th>Monthly Check-Ins</th>
+                    <th style="text-align:right;">Consistency</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for row in rows %}
+                <tr style="{% if row.id == current_user_id %}background: rgba(255, 71, 87, 0.08); border-left: 3px solid var(--brand-primary);{% endif %}">
+                    <td>
+                        {% if loop.index == 1 %}
+                            <span style="font-size:18px;" title="1st Place Gold">🥇</span>
+                        {% elif loop.index == 2 %}
+                            <span style="font-size:18px;" title="2nd Place Silver">🥈</span>
+                        {% elif loop.index == 3 %}
+                            <span style="font-size:18px;" title="3rd Place Bronze">🥉</span>
+                        {% else %}
+                            <span style="color:var(--text-muted); font-weight:600; padding-left:4px;">#{{ loop.index }}</span>
+                        {% endif %}
+                    </td>
+                    <td>
+                        <div style="display:flex; align-items:center; gap:8px;">
+                            <strong style="color:#fff; font-size:14.5px;">{{ row.username }}</strong>
+                            {% if row.id == current_user_id %}
+                                <span class="badge-chip badge-coral" style="font-size:10px; padding:2px 6px;">You</span>
+                            {% endif %}
+                        </div>
+                    </td>
+                    <td>
+                        <strong style="color:#fff; font-size:15px;">{{ row.checkin_count }}</strong>
+                        <span style="color:var(--text-muted); font-size:12px;"> session{{ 's' if row.checkin_count != 1 }}</span>
+                    </td>
+                    <td style="text-align:right;">
+                        <span class="badge-chip badge-emerald">Active</span>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        {% else %}
+            <p style="color:var(--text-muted); font-size:14px; padding:1rem 0;">No check-ins recorded yet this month. Be the first to claim the top rank!</p>
+        {% endif %}
+    </div>
 </div>
 {% endblock %}

@@ -1,0 +1,122 @@
+{% extends "base.html" %}
+{% block title %}AI Coaching Insights — Fitrack{% endblock %}
+{% block content %}
+<div class="page-wrapper">
+    <div class="page-header">
+        <h2 class="page-title">✨ AI Coach Diagnostics & Recommendations</h2>
+        <p class="page-subtitle">Real-time coaching intelligence analyzed for {{ current_user.username }} ({{ role_info.title }}).</p>
+    </div>
+
+    <!-- AI Daily Priority Directive Banner -->
+    <div class="ai-hero-banner" style="margin-bottom:1.8rem;">
+        <div class="ai-hero-content">
+            <div class="ai-hero-title">
+                <span>🎯</span> Today's AI Coaching Directive
+                <span class="badge-chip badge-coral">{{ current_user.goal|capitalize }}</span>
+                <span class="badge-chip badge-emerald">Momentum: {{ insights.consistency_score }}%</span>
+            </div>
+            <p class="ai-hero-desc" style="font-size:15px; color:#fff; font-weight:500;">
+                "{{ insights.daily_priority }}"
+            </p>
+        </div>
+        <div>
+            <button class="btn-primary-custom" onclick="document.getElementById('aiCoachFab').click();" type="button">
+                💬 Chat with AI Coach
+            </button>
+        </div>
+    </div>
+
+    <!-- Diagnostics Metrics Grid -->
+    <div class="dashboard-grid">
+        <div class="stat-card">
+            <div class="stat-label">
+                <span>Consistency Score</span>
+                <span class="badge-chip badge-emerald">{{ insights.consistency_score }} / 100</span>
+            </div>
+            <div class="stat-value">{{ insights.consistency_score }}%</div>
+            <div class="stat-subtext">Calculated from check-in frequency & streak velocity</div>
+            <div class="progress-bar-wrap">
+                <div class="progress-bar-fill progress-bar-emerald" style="width: {{ insights.consistency_score }}%;"></div>
+            </div>
+        </div>
+
+        <div class="stat-card">
+            <div class="stat-label">
+                <span>Weight Trajectory</span>
+                {% if insights.bmi %}
+                    <span class="badge-chip badge-cyan">BMI {{ insights.bmi }} ({{ insights.bmi_category }})</span>
+                {% endif %}
+            </div>
+            <div class="stat-value" style="font-size:20px;">{{ current_user.weight_kg or 'Not set' }} <span style="font-size:14px; color:var(--text-muted);">kg</span> 
+                {% if current_user.target_weight_kg %}
+                    <span style="font-size:13px; color:var(--text-secondary);">→ Target: {{ current_user.target_weight_kg }} kg</span>
+                {% endif %}
+            </div>
+            <div class="stat-subtext" style="color:#cbd5e1;">{{ insights.weight_insight }}</div>
+        </div>
+
+        <div class="stat-card">
+            <div class="stat-label">
+                <span>Role Hydration Goal</span>
+                <span class="badge-chip badge-cyan">💧 Essential</span>
+            </div>
+            <div class="stat-value">{{ insights.hydration_target }} <span style="font-size:14px; color:var(--text-muted);">Liters / day</span></div>
+            <div class="stat-subtext">Optimized for your sedentary vs active energy output</div>
+            <div class="progress-bar-wrap">
+                <div class="progress-bar-fill progress-bar-cyan" style="width: 80%;"></div>
+            </div>
+        </div>
+
+        <div class="stat-card">
+            <div class="stat-label">
+                <span>Active Streak</span>
+                <span class="badge-chip badge-coral">🔥 Live</span>
+            </div>
+            <div class="stat-value">{{ insights.streak }} <span style="font-size:14px; color:var(--text-muted);">days</span></div>
+            <div class="stat-subtext">{{ insights.month_checkins }} gym check-ins recorded this month</div>
+            <div class="progress-bar-wrap">
+                <div class="progress-bar-fill progress-bar-coral" style="width: {{ [insights.streak * 10, 100]|min }}%;"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Role Training & Mobility Adaptation -->
+    <div class="stat-card" style="margin-bottom:1.8rem;">
+        <h3 style="font-size:18px; font-weight:700; color:#fff; display:flex; align-items:center; gap:8px; margin-bottom:10px;">
+            <span>{{ role_info.icon }}</span> Training Adaptation for {{ role_info.title }}
+        </h3>
+        <p style="color:#cbd5e1; font-size:14px; margin-bottom:14px;">{{ insights.workout_focus }}</p>
+        
+        <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(260px, 1fr)); gap:1rem;">
+            {% for tip in insights.role_tips %}
+            <div style="background:rgba(255,255,255,0.03); border:1px solid var(--border-subtle); border-radius:var(--radius-sm); padding:12px; font-size:13px; color:#e2e8f0; display:flex; gap:8px;">
+                <span style="color:#a55eea; font-weight:bold;">✔</span>
+                <span>{{ tip }}</span>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+
+    <!-- Science-Backed Supplement Protocol -->
+    <div class="stat-card">
+        <h3 style="font-size:18px; font-weight:700; color:#fff; display:flex; align-items:center; gap:8px; margin-bottom:12px;">
+            <span>💊</span> Recommended Evidence-Based Supplement Protocol
+        </h3>
+        <p style="color:var(--text-secondary); font-size:13px; margin-bottom:14px;">
+            Tier-1 scientifically backed supplements to support muscle recovery, cognitive focus, and health.
+        </p>
+
+        <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(240px, 1fr)); gap:1rem;">
+            {% for supp in insights.supplements %}
+            <div style="background:var(--bg-surface-elevated); border:1px solid var(--border-subtle); border-radius:var(--radius-sm); padding:14px;">
+                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:6px;">
+                    <strong style="color:#fff; font-size:14px;">{{ supp.name }}</strong>
+                    <span class="badge-chip badge-coral" style="font-size:10.5px;">{{ supp.dosage }}</span>
+                </div>
+                <p style="color:var(--text-secondary); font-size:12.5px; margin:0;">{{ supp.benefit }}</p>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+{% endblock %}
