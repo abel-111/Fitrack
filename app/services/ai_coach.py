@@ -99,308 +99,8 @@ ROLE_DETAILS = {
     }
 }
 
-# Culinary database categorized by dietary preferences
-MEAL_RECIPES = {
-    'standard': {
-        'breakfast': [
-            {
-                'name': 'Power Scramble & Avocado Sourdough',
-                'description': '3 whole eggs scrambled with spinach and cherry tomatoes, served on toasted sourdough with sliced avocado.',
-                'ingredients': ['3 large eggs', '1 cup fresh baby spinach', '2 slices sourdough bread', '1/2 avocado', '1 tsp extra virgin olive oil', 'Pinch of black pepper & sea salt'],
-                'prep_time': '12 mins',
-                'base_cals': 520, 'p': 32, 'c': 42, 'f': 24
-            },
-            {
-                'name': 'High-Protein Berry & Greek Yogurt Bowl',
-                'description': 'Creamy non-fat Greek yogurt layered with whey protein, mixed antioxidant berries, chia seeds, and raw honey.',
-                'ingredients': ['250g plain Greek yogurt', '1 scoop (30g) vanilla whey protein', '1/2 cup blueberries', '1/2 cup strawberries', '1 tbsp chia seeds', '1 tbsp raw honey or almond slices'],
-                'prep_time': '5 mins',
-                'base_cals': 440, 'p': 46, 'c': 45, 'f': 8
-            },
-            {
-                'name': 'Steel-Cut Oats with Whey & Peanut Butter',
-                'description': 'Slow-simmered oats stirred with chocolate whey protein, topped with sliced banana and natural peanut butter.',
-                'ingredients': ['60g rolled oats', '1 scoop chocolate whey protein', '1 medium banana', '1.5 tbsp natural peanut butter', '1 cup unsweetened almond milk'],
-                'prep_time': '8 mins',
-                'base_cals': 530, 'p': 38, 'c': 62, 'f': 15
-            }
-        ],
-        'lunch': [
-            {
-                'name': 'Grilled Herb Chicken & Quinoa Harvest Bowl',
-                'description': 'Tender grilled chicken breast over fluffy quinoa, roasted zucchini, bell peppers, and lemon tahini drizzle.',
-                'ingredients': ['180g skinless chicken breast', '1 cup cooked quinoa', '1 roasted bell pepper', '1 sliced zucchini', '1 tbsp lemon-tahini dressing', 'Fresh parsley'],
-                'prep_time': '20 mins',
-                'base_cals': 560, 'p': 48, 'c': 52, 'f': 16
-            },
-            {
-                'name': 'Lean Beef & Sweet Potato Power Plate',
-                'description': '90% lean ground beef sauteed with garlic and paprika, alongside roasted cinnamon sweet potato wedges and steamed broccoli.',
-                'ingredients': ['170g extra-lean ground beef', '200g sweet potato cubes', '1.5 cups steamed broccoli florets', '1 tsp olive oil', 'Smoked paprika & garlic powder'],
-                'prep_time': '22 mins',
-                'base_cals': 580, 'p': 46, 'c': 56, 'f': 18
-            },
-            {
-                'name': 'Mediterranean Turkey & Hummus Wrap',
-                'description': 'Sliced roasted turkey breast in a whole wheat wrap with crisp cucumbers, tomatoes, kalamata olives, and garlic hummus.',
-                'ingredients': ['160g roasted turkey slices', '1 large whole wheat tortilla', '2 tbsp roasted garlic hummus', 'Cucumber slices', 'Shredded romaine lettuce', '1 tbsp feta cheese'],
-                'prep_time': '10 mins',
-                'base_cals': 490, 'p': 42, 'c': 44, 'f': 15
-            }
-        ],
-        'snack': [
-            {
-                'name': 'Banana & Almond Butter Rice Cakes',
-                'description': 'Crispy whole grain brown rice cakes spread with crunchy almond butter and sliced banana.',
-                'ingredients': ['2 whole brown rice cakes', '1.5 tbsp almond butter', '1/2 sliced banana', 'Pinch of cinnamon'],
-                'prep_time': '3 mins',
-                'base_cals': 260, 'p': 8, 'c': 34, 'f': 12
-            },
-            {
-                'name': 'Cottage Cheese with Pineapple & Walnuts',
-                'description': 'Slow-digesting casein-rich cottage cheese paired with tropical fresh pineapple and crushed walnuts.',
-                'ingredients': ['1 cup low-fat cottage cheese', '1/2 cup fresh diced pineapple', '15g crushed walnuts'],
-                'prep_time': '3 mins',
-                'base_cals': 270, 'p': 26, 'c': 22, 'f': 9
-            },
-            {
-                'name': 'Hard-Boiled Eggs & Crisp Apple',
-                'description': 'Two pasture-raised hard-boiled eggs with sea salt and a crisp Honeycrisp apple.',
-                'ingredients': ['2 large hard-boiled eggs', '1 crisp medium apple', 'Everything bagel seasoning'],
-                'prep_time': '2 mins',
-                'base_cals': 240, 'p': 14, 'c': 25, 'f': 10
-            }
-        ],
-        'dinner': [
-            {
-                'name': 'Wild Atlantic Salmon & Asparagus with Brown Rice',
-                'description': 'Pan-seared salmon fillet glazed with lemon and dill, served with charred asparagus spears and steamed brown rice.',
-                'ingredients': ['180g wild salmon fillet', '1 cup cooked brown rice', '8 spears fresh asparagus', '1 tsp olive oil', 'Lemon wedges & sea salt'],
-                'prep_time': '20 mins',
-                'base_cals': 610, 'p': 44, 'c': 48, 'f': 24
-            },
-            {
-                'name': 'Chicken Breast Stir-Fry with Cashews & Jasmine Rice',
-                'description': 'Diced chicken breast stir-fried with crisp sugar snap peas, carrots, baby corn, ginger soy glaze, and roasted cashews.',
-                'ingredients': ['180g chicken breast', '1 cup cooked jasmine rice', '1.5 cups mixed stir-fry vegetables', '15g roasted cashews', '1 tbsp low-sodium tamari soy sauce'],
-                'prep_time': '18 mins',
-                'base_cals': 580, 'p': 46, 'c': 58, 'f': 16
-            },
-            {
-                'name': 'Hearty Turkey & Bean Chili',
-                'description': 'Slow-simmered lean minced turkey with black beans, kidney beans, crushed fire-roasted tomatoes, and cumin.',
-                'ingredients': ['170g lean ground turkey', '1/2 cup black beans', '1/2 cup kidney beans', '1 cup crushed tomatoes', '1/4 diced onion', 'Cumin, chili flakes, cilantro'],
-                'prep_time': '25 mins',
-                'base_cals': 520, 'p': 48, 'c': 50, 'f': 12
-            }
-        ]
-    },
-    'vegetarian': {
-        'breakfast': [
-            {
-                'name': 'Spiced Paneer Scramble (Bhurji) with Multigrain Roti',
-                'description': 'Fresh low-fat paneer crumbled and sauteed with turmeric, onions, bell peppers, green chilies, served with warm roti.',
-                'ingredients': ['150g low-fat paneer', '2 small multigrain rotis', '1/2 onion & 1/2 tomato diced', '1 cup baby spinach', '1 tsp cold-pressed mustard or olive oil'],
-                'prep_time': '15 mins',
-                'base_cals': 510, 'p': 34, 'c': 46, 'f': 20
-            },
-            {
-                'name': 'Greek Yogurt Berry Parfait with Hemp Hearts',
-                'description': 'Thick protein-dense Greek yogurt with chia seeds, wild blueberries, raw walnuts, and shelled hemp hearts.',
-                'ingredients': ['250g plain Greek yogurt', '3 tbsp shelled hemp seeds', '1/2 cup blueberries', '1 tbsp pumpkin seeds', '1 tsp cinnamon'],
-                'prep_time': '5 mins',
-                'base_cals': 460, 'p': 38, 'c': 32, 'f': 18
-            },
-            {
-                'name': 'Protein Oatmeal with Peanut Butter & Chia',
-                'description': 'Warm oats whipped with plant/whey protein powder, chia seeds, sliced bananas, and rich peanut butter.',
-                'ingredients': ['60g rolled oats', '1 scoop protein powder', '1 tbsp chia seeds', '1.5 tbsp natural peanut butter', '1 cup oat/soy milk'],
-                'prep_time': '8 mins',
-                'base_cals': 520, 'p': 36, 'c': 58, 'f': 16
-            }
-        ],
-        'lunch': [
-            {
-                'name': 'Mediterranean Chickpea & Grilled Halloumi Salad',
-                'description': 'Tossed chickpeas, cucumber, cherry tomatoes, kalamata olives, and warm seared halloumi with lemon-herb vinaigrette.',
-                'ingredients': ['1.5 cups cooked chickpeas', '60g grilled halloumi or paneer', '1 cup diced cucumbers & tomatoes', '1 tbsp extra virgin olive oil', 'Fresh mint and lemon juice'],
-                'prep_time': '15 mins',
-                'base_cals': 560, 'p': 32, 'c': 54, 'f': 22
-            },
-            {
-                'name': 'High-Protein Lentil Dahl with Brown Basmati Rice',
-                'description': 'Golden simmered yellow and red lentils with ginger, cumin, spinach, and a side of nutty brown basmati rice.',
-                'ingredients': ['1.5 cups cooked yellow dal', '1 cup cooked brown basmati rice', '1 cup wilted spinach', '1 tsp ghee or coconut oil', 'Fresh coriander'],
-                'prep_time': '20 mins',
-                'base_cals': 520, 'p': 28, 'c': 76, 'f': 10
-            },
-            {
-                'name': 'Tofu & Edamame Soba Noodle Bowl',
-                'description': 'Crispy pan-seared firm tofu with edamame beans, shredded purple cabbage, soba noodles, and toasted sesame dressing.',
-                'ingredients': ['180g extra-firm tofu', '1/2 cup shelled edamame', '70g dry weight buckwheat soba noodles', '1 cup shredded cabbage', '1 tbsp sesame oil & soy sauce'],
-                'prep_time': '18 mins',
-                'base_cals': 540, 'p': 36, 'c': 56, 'f': 18
-            }
-        ],
-        'snack': [
-            {
-                'name': 'Roasted Spiced Chickpeas & Almonds',
-                'description': 'Crunchy oven-roasted chickpeas tossed in smoked paprika with raw roasted almonds.',
-                'ingredients': ['1/2 cup roasted chickpeas', '20g raw almonds', 'Sea salt & smoked paprika'],
-                'prep_time': '3 mins',
-                'base_cals': 250, 'p': 12, 'c': 28, 'f': 11
-            },
-            {
-                'name': 'Cottage Cheese with Berries & Flax',
-                'description': 'Fresh creamy cottage cheese with strawberries and golden ground flaxseed.',
-                'ingredients': ['1 cup low-fat cottage cheese', '1/2 cup strawberries', '1 tbsp ground flaxseeds'],
-                'prep_time': '2 mins',
-                'base_cals': 230, 'p': 26, 'c': 18, 'f': 6
-            },
-            {
-                'name': 'Soy Milk Shake with Banana & Cacao',
-                'description': 'Chilled organic soy milk blended with dark cacao powder, banana, and a spoon of peanut butter.',
-                'ingredients': ['1.5 cups soy milk', '1 medium banana', '1 tbsp unsweetened cacao', '1 tbsp peanut butter'],
-                'prep_time': '4 mins',
-                'base_cals': 300, 'p': 16, 'c': 38, 'f': 11
-            }
-        ],
-        'dinner': [
-            {
-                'name': 'Grilled Paneer & Quinoa Buddha Bowl',
-                'description': 'Charred spiced paneer cubes over tricolor quinoa with steamed broccoli, bell peppers, and lemon tahini dressing.',
-                'ingredients': ['150g grilled paneer', '1 cup cooked quinoa', '1.5 cups steamed broccoli & peppers', '1 tbsp tahini dressing'],
-                'prep_time': '22 mins',
-                'base_cals': 580, 'p': 36, 'c': 48, 'f': 26
-            },
-            {
-                'name': 'Black Bean & Sweet Potato Enchilada Skillet',
-                'description': 'Simmered black beans, diced sweet potato, sweet corn, salsa verde, topped with melted low-fat mozzarella or feta.',
-                'ingredients': ['1.5 cups cooked black beans', '150g roasted sweet potatoes', '1/2 cup salsa verde', '40g shredded cheese', 'Fresh cilantro & lime'],
-                'prep_time': '25 mins',
-                'base_cals': 510, 'p': 28, 'c': 72, 'f': 12
-            },
-            {
-                'name': 'Creamy Red Lentil & Spinach Curry with Warm Naan',
-                'description': 'Rich coconut-tomato red lentil curry loaded with spinach, served with a portion of whole wheat naan or flatbread.',
-                'ingredients': ['1.5 cups cooked red lentils', '1 cup fresh baby spinach', '2 tbsp light coconut milk', '1 whole wheat naan/roti', 'Ginger, turmeric, garam masala'],
-                'prep_time': '20 mins',
-                'base_cals': 530, 'p': 29, 'c': 74, 'f': 12
-            }
-        ]
-    },
-    'vegan': {
-        'breakfast': [
-            {
-                'name': 'Southwest Tofu Scramble with Avocado & Sprouted Toast',
-                'description': 'Crumbled turmeric tofu sauteed with black beans, nutritional yeast, peppers, served with sprouted grain toast.',
-                'ingredients': ['200g firm tofu crumbled', '1/3 cup black beans', '2 tbsp nutritional yeast', '2 slices sprouted bread', '1/4 avocado'],
-                'prep_time': '12 mins',
-                'base_cals': 480, 'p': 32, 'c': 45, 'f': 18
-            },
-            {
-                'name': 'Chia Seed & Hemp Superfood Pudding',
-                'description': 'Overnight chia pudding made with unsweetened soy milk, pea protein, hemp seeds, and fresh berries.',
-                'ingredients': ['3 tbsp chia seeds', '1 scoop plant protein powder', '1.5 cups unsweetened soy milk', '2 tbsp hemp seeds', '1/2 cup blueberries'],
-                'prep_time': '5 mins',
-                'base_cals': 440, 'p': 35, 'c': 32, 'f': 18
-            }
-        ],
-        'lunch': [
-            {
-                'name': 'Tempeh Grain Bowl with Steamed Greens & Tahini',
-                'description': 'Marinated maple-tamari tempeh strips over farro, massaged kale, roasted beets, and lemon tahini.',
-                'ingredients': ['160g organic tempeh', '1 cup cooked farro or brown rice', '1.5 cups chopped kale', '1.5 tbsp lemon tahini dressing'],
-                'prep_time': '20 mins',
-                'base_cals': 550, 'p': 36, 'c': 54, 'f': 22
-            },
-            {
-                'name': 'Spiced Chickpea & Edamame Crunch Salad',
-                'description': 'Tossed edamame, chickpeas, bell peppers, sunflower seeds, and tangy apple cider vinaigrette.',
-                'ingredients': ['1 cup cooked chickpeas', '1 cup shelled edamame', '1 cup chopped bell peppers & cucumber', '2 tbsp sunflower seeds', '1 tbsp olive oil vinaigrette'],
-                'prep_time': '12 mins',
-                'base_cals': 520, 'p': 32, 'c': 50, 'f': 20
-            }
-        ],
-        'snack': [
-            {
-                'name': 'Pea Protein Shake with Banana & Flax',
-                'description': 'Rich vanilla pea protein shaken with oat milk, a banana, and ground flaxseed.',
-                'ingredients': ['1 scoop pea protein (25g P)', '1.5 cups oat/soy milk', '1 medium banana', '1 tbsp ground flax'],
-                'prep_time': '3 mins',
-                'base_cals': 310, 'p': 29, 'c': 38, 'f': 6
-            },
-            {
-                'name': 'Edamame in Pod with Sea Salt',
-                'description': 'Steamed organic edamame pods sprinkled with coarse flaky sea salt.',
-                'ingredients': ['1.5 cups steamed edamame pods', 'Flaky sea salt'],
-                'prep_time': '5 mins',
-                'base_cals': 210, 'p': 18, 'c': 15, 'f': 8
-            }
-        ],
-        'dinner': [
-            {
-                'name': 'Crispy Sesame Tofu & Broccoli with Jasmine Rice',
-                'description': 'Air-fried sesame crusted tofu cubes tossed with garlic broccoli florets and steamed fragrant jasmine rice.',
-                'ingredients': ['220g extra-firm tofu', '1.5 cups broccoli florets', '1 cup cooked jasmine rice', '1 tbsp toasted sesame seeds & oil', 'Low-sodium soy sauce'],
-                'prep_time': '22 mins',
-                'base_cals': 570, 'p': 34, 'c': 62, 'f': 20
-            },
-            {
-                'name': 'Lentil Bolognese over High-Protein Chickpea Pasta',
-                'description': 'Rich slow-simmered green lentil ragu with crushed Italian tomatoes, served over Banza chickpea pasta.',
-                'ingredients': ['1 cup cooked brown lentils', '75g chickpea pasta', '1 cup marinara sauce', '1 tbsp nutritional yeast', 'Fresh basil'],
-                'prep_time': '25 mins',
-                'base_cals': 540, 'p': 38, 'c': 76, 'f': 9
-            }
-        ]
-    },
-    'keto': {
-        'breakfast': [
-            {
-                'name': 'Keto Avocado & Bacon Omelette',
-                'description': '3 pasture-raised eggs folded with crispy bacon, sharp cheddar cheese, and freshly sliced hass avocado.',
-                'ingredients': ['3 large eggs', '2 strips nitrate-free bacon', '30g sharp cheddar cheese', '1/2 avocado', '1 tbsp grass-fed butter'],
-                'prep_time': '12 mins',
-                'base_cals': 590, 'p': 34, 'c': 4, 'f': 49
-            },
-            {
-                'name': 'Smoked Salmon & Cream Cheese Flaxseed Wrap',
-                'description': 'Premium smoked wild salmon with chive cream cheese, capers, and cucumber in a low-carb flax wrap.',
-                'ingredients': ['120g smoked salmon', '2 tbsp full-fat cream cheese', '1 low-carb tortilla (under 3g net carbs)', 'Cucumbers & capers'],
-                'prep_time': '6 mins',
-                'base_cals': 420, 'p': 32, 'c': 5, 'f': 28
-            }
-        ],
-        'lunch': [
-            {
-                'name': 'Grilled Chicken Caesar Salad with Crispy Bacon',
-                'description': 'Crisp romaine lettuce hearts tossed with grilled chicken, bacon bits, parmesan crisps, and rich olive-oil Caesar dressing.',
-                'ingredients': ['180g grilled chicken breast', '2 cups romaine lettuce', '2 tbsp full-fat Caesar dressing', '30g shaved parmesan', '1 strip crumbled bacon'],
-                'prep_time': '15 mins',
-                'base_cals': 560, 'p': 50, 'c': 4, 'f': 37
-            }
-        ],
-        'snack': [
-            {
-                'name': 'Macadamia Nuts & String Cheese',
-                'description': 'Raw buttery macadamia nuts paired with whole milk mozzarella string cheese.',
-                'ingredients': ['28g raw macadamia nuts', '1 mozzarella string cheese'],
-                'prep_time': '1 min',
-                'base_cals': 280, 'p': 9, 'c': 4, 'f': 26
-            }
-        ],
-        'dinner': [
-            {
-                'name': 'Pan-Seared Ribeye Steak with Garlic Butter Mushrooms & Asparagus',
-                'description': 'Juicy grass-fed ribeye seared with garlic herb butter, served alongside sauteed cremini mushrooms and asparagus.',
-                'ingredients': ['200g ribeye steak', '1 tbsp grass-fed butter', '1 cup sliced cremini mushrooms', '6 spears asparagus', 'Fresh rosemary & sea salt'],
-                'prep_time': '20 mins',
-                'base_cals': 640, 'p': 46, 'c': 5, 'f': 48
-            }
-        ]
-    }
-}
+# Culinary database categorized by South Indian dietary preferences
+MEAL_RECIPES = {'standard': {'breakfast': [{'name': 'Steamed Idlis & High-Protein Dal Sambar with Boiled Eggs', 'description': '3 soft steamed idlis served with thick toor dal vegetable sambar, roasted coconut-mint chutney, and 2 pasture-raised boiled eggs.', 'ingredients': ['3 steamed idlis', '1.5 cups toor dal vegetable sambar', '2 boiled eggs', '2 tbsp coconut mint chutney', 'Fresh curry leaves & mustard temper'], 'prep_time': '12 mins', 'base_cals': 490, 'p': 28, 'c': 58, 'f': 14}, {'name': 'Crisp Moong Dal Pesarattu with Kerala Egg Roast', 'description': 'Protein-dense whole green gram dosa served with Kerala-style spiced onion-tomato boiled egg roast.', 'ingredients': ['2 moong dal pesarattus', '2 boiled eggs in spiced onion-tomato masala', '1 tbsp ginger chutney (inji puli)', '1 tsp cold-pressed coconut oil'], 'prep_time': '15 mins', 'base_cals': 520, 'p': 34, 'c': 48, 'f': 18}, {'name': 'Ven Pongal with Moong Dal & Chicken Pepper Sukka', 'description': 'Traditional savory rice and yellow moong dal porridge tempered with black pepper and cumin, served with tender chicken pepper sukka.', 'ingredients': ['1 cup ven pongal (rice + moong dal)', '130g lean chicken breast pepper sukka', '1 tsp A2 cow ghee', 'Cashews, curry leaves & crushed pepper'], 'prep_time': '15 mins', 'base_cals': 530, 'p': 38, 'c': 54, 'f': 16}], 'lunch': [{'name': 'Chettinad Spiced Chicken Curry with Brown Ponni Rice', 'description': 'Fragrant freshly ground Chettinad chicken breast curry served with steamed brown rice, beetroot poriyal, and soothing pepper rasam.', 'ingredients': ['180g skinless chicken breast', '1 cup cooked brown Ponni rice', '1 cup beetroot & carrot poriyal', '1 cup traditional pepper rasam', '1 tsp cold-pressed sesame oil'], 'prep_time': '22 mins', 'base_cals': 570, 'p': 46, 'c': 56, 'f': 15}, {'name': 'Kerala Meen Pollichathu (Pan-Seared Fish) with Matta Rice', 'description': 'Spiced fish fillet coated in shallots and tomato masala, wrapped in banana leaf, served with nutrient-rich Kerala red matta rice and cabbage thoran.', 'ingredients': ['180g seer fish / ayila (mackerel) or tilapia', '1 cup cooked Kerala matta rice', '1 cup cabbage thoran with grated coconut', '1 cup moru curry (buttermilk curry)'], 'prep_time': '20 mins', 'base_cals': 550, 'p': 42, 'c': 54, 'f': 16}, {'name': 'Andhra Style Pepper Chicken with Steamed Rice & Keerai Kootu', 'description': 'Fiery black pepper chicken breast toss served alongside warm steamed rice, spinach-moong dal kootu, and cucumber curd raitha.', 'ingredients': ['170g chicken breast strips', '1 cup steamed Ponni rice', '1 cup keerai (spinach) moong dal kootu', '1/2 cup fresh cucumber curd raitha'], 'prep_time': '20 mins', 'base_cals': 560, 'p': 48, 'c': 52, 'f': 14}], 'snack': [{'name': 'Sundal (Tempered Black Chickpeas) & Neer Mor', 'description': 'Boiled black chana tempered with mustard seeds, curry leaves, and shredded coconut, paired with chilled spiced buttermilk.', 'ingredients': ['1 cup boiled black chana (kala chana)', '1.5 tbsp freshly grated coconut', '1 glass spiced neer mor (buttermilk with crushed ginger & green chili)', 'Curry leaves & hing'], 'prep_time': '5 mins', 'base_cals': 260, 'p': 14, 'c': 34, 'f': 7}, {'name': 'Roasted Spiced Kadalai (Chana) with 2 Boiled Eggs & Filter Coffee', 'description': 'Crunchy roasted chana with chaat spices, two boiled eggs seasoned with black pepper, and unsweetened South Indian filter coffee.', 'ingredients': ['40g roasted chana', '2 boiled eggs with pepper and pink salt', '1 cup South Indian filter coffee (unsweetened, toned milk)'], 'prep_time': '4 mins', 'base_cals': 280, 'p': 22, 'c': 20, 'f': 11}, {'name': 'Tender Coconut Water & Spiced Egg Podimas', 'description': 'Fresh natural tender coconut water paired with a 2-egg scramble sauteed with shallots, curry leaves, and green chilies.', 'ingredients': ['2 large eggs scrambled (podimas)', '1 fresh tender coconut water', 'Handful of curry leaves, shallots & green chili', '1 tsp coconut oil'], 'prep_time': '6 mins', 'base_cals': 240, 'p': 16, 'c': 15, 'f': 12}], 'dinner': [{'name': 'Whole Wheat Chapatis with Chicken Keema Matar & Kachumber', 'description': '2 soft phulkas / chapatis served with spiced minced chicken breast and green peas curry, accompanied by sliced onions and cucumber.', 'ingredients': ['2 whole wheat chapatis', '180g lean chicken keema with green peas', 'Fresh cucumber and onion salad with lemon squeeze', '1 tsp ghee'], 'prep_time': '20 mins', 'base_cals': 520, 'p': 44, 'c': 48, 'f': 14}, {'name': 'Kerala Egg Curry with Appam / Multigrain Dosa', 'description': 'Lightly spiced coconut milk and shallot egg curry served with 2 crispy lace appams or multigrain dosas.', 'ingredients': ['3 boiled eggs in roasted spices & light coconut gravy', '2 steamed appams or multigrain dosas', 'Fresh coriander & curry leaves'], 'prep_time': '18 mins', 'base_cals': 490, 'p': 26, 'c': 46, 'f': 20}, {'name': 'Tandoori Spiced Fish Tikka with Curd Rice & Pomegranate', 'description': 'Herb-marinated grilled fish fillet served with protein-rich probiotic curd rice tempered with mustard seeds and pomegranate.', 'ingredients': ['180g fish fillet (tilapia/salmon/seer fish)', '3/4 cup curd rice (brown rice + low-fat dahi)', '1 tbsp pomegranate seeds', 'Mint coriander dip'], 'prep_time': '22 mins', 'base_cals': 540, 'p': 42, 'c': 45, 'f': 16}]}, 'vegetarian': {'breakfast': [{'name': 'High-Protein Paneer Podi Dosa with Sambar', 'description': 'Crisp multigrain dosa stuffed with spiced low-fat crumbled paneer and roasted gun powder (idli podi), served with vegetable toor dal sambar.', 'ingredients': ['1 crisp multigrain dosa', '120g low-fat paneer bhurji', '1.5 cups toor dal vegetable sambar', '1 tbsp mint coconut chutney', '1 tsp sesame oil'], 'prep_time': '12 mins', 'base_cals': 510, 'p': 32, 'c': 50, 'f': 18}, {'name': 'Steamed Idlis & Soya Chunks Keema Sambar', 'description': '3 steamed soft idlis served with protein-enriched toor dal sambar simmered with high-protein soya chunks and fresh drumsticks.', 'ingredients': ['3 steamed idlis', '40g soya chunks simmered in sambar', '1.5 cups vegetable sambar', '1 tbsp tomato onion chutney'], 'prep_time': '14 mins', 'base_cals': 480, 'p': 30, 'c': 62, 'f': 8}, {'name': 'Pesarattu (Green Gram Dosa) with Low-Fat Paneer & Ginger Pachadi', 'description': 'Andhra whole moong dal crepe stuffed with grated paneer and onions, accompanied by allam pachadi (tangy ginger chutney).', 'ingredients': ['2 green moong dal pesarattus', '100g grated low-fat paneer filling', '2 tbsp tangy allam (ginger) chutney', 'Green chilies & cumin'], 'prep_time': '12 mins', 'base_cals': 520, 'p': 34, 'c': 52, 'f': 16}], 'lunch': [{'name': 'Soya Chunks & Paneer South Indian Kurma with Brown Rice', 'description': 'Hearty South Indian coconut and fennel spiced curry loaded with tender soya chunks and paneer cubes, served with steamed brown rice and carrot poriyal.', 'ingredients': ['40g dry soya chunks (boiled)', '100g low-fat paneer', '1 cup cooked brown rice', '1 cup carrot-beans poriyal', 'South Indian kurma masala with poppy seeds & fennel'], 'prep_time': '20 mins', 'base_cals': 560, 'p': 38, 'c': 62, 'f': 16}, {'name': 'Bisi Bele Bath with Sprouted Moong, Paneer & Curd', 'description': 'Karnataka classic spiced lentil-rice pot dish cooked with toor dal, sprouted green gram, vegetables, topped with roasted paneer cubes and homemade curd.', 'ingredients': ['1.5 cups prepared bisi bele bath', '80g pan-seared paneer cubes', '1/2 cup fresh homemade low-fat dahi (curd)', '1 tsp ghee', 'Roasted cashews & curry leaves'], 'prep_time': '20 mins', 'base_cals': 540, 'p': 32, 'c': 68, 'f': 16}, {'name': 'Dal Keerai Kootu with Brown Rice, Vazhaikkai Roast & Curd', 'description': 'Slow-cooked spinach and yellow moong dal kootu, accompanied by steamed brown rice, spiced raw banana (vazhaikkai) stir fry, and fresh curd.', 'ingredients': ['1.5 cups keerai (spinach) & moong dal kootu', '1 cup cooked brown rice', '1 cup spiced raw banana roast', '1/2 cup homemade curd'], 'prep_time': '18 mins', 'base_cals': 520, 'p': 28, 'c': 74, 'f': 12}], 'snack': [{'name': 'Spiced Kala Chana Sundal with Coconut & Roasted Peanuts', 'description': 'Traditional temple-style black chickpea sundal tossed with mustard seeds, asafoetida, curry leaves, and crushed peanuts.', 'ingredients': ['1 cup boiled kala chana', '20g roasted peanuts', '1.5 tbsp freshly grated coconut', 'Green chillies & lemon juice'], 'prep_time': '4 mins', 'base_cals': 270, 'p': 14, 'c': 32, 'f': 9}, {'name': 'Spiced Neer Mor (Buttermilk) & Roasted Paneer Bites', 'description': 'Chilled spiced buttermilk with ginger and curry leaves, accompanied by air-fried chaat masala paneer cubes.', 'ingredients': ['1 glass spiced neer mor (diluted probiotic curd)', '80g air-fried or seared paneer cubes', 'Chaat masala & black salt'], 'prep_time': '5 mins', 'base_cals': 250, 'p': 20, 'c': 8, 'f': 14}, {'name': 'Sprouted Green Moong Kosambari with Pomegranate', 'description': 'Crunchy Karnataka salad made of sprouted green gram, grated carrots, cucumbers, pomegranate seeds, and fresh lemon-mustard tempering.', 'ingredients': ['1 cup sprouted moong beans', '1/2 cup diced cucumber & grated carrot', '2 tbsp pomegranate seeds', '1 tsp cold-pressed coconut oil temper'], 'prep_time': '5 mins', 'base_cals': 220, 'p': 14, 'c': 34, 'f': 4}], 'dinner': [{'name': 'Ragi Mudde with High-Protein Dal Sambar & Curd', 'description': 'Traditional Karnataka steamed finger millet (ragi) ball packed with calcium and slow-burning carbs, paired with thick toor dal vegetable sambar and fresh curd.', 'ingredients': ['1 medium ragi mudde (finger millet ball)', '1.5 cups thick toor dal vegetable sambar', '1/2 cup low-fat curd', 'Cucumber & onion slices'], 'prep_time': '18 mins', 'base_cals': 510, 'p': 26, 'c': 76, 'f': 10}, {'name': 'Whole Wheat Phulkas with Paneer Chettinad & Sprouts Salad', 'description': '2 soft whole wheat phulkas served with spicy Chettinad paneer curry and a crunchy sprouted bean salad.', 'ingredients': ['2 whole wheat phulkas', '140g low-fat paneer cooked in Chettinad masala', '1/2 cup mixed sprouts salad', '1 tsp ghee'], 'prep_time': '20 mins', 'base_cals': 540, 'p': 34, 'c': 50, 'f': 20}, {'name': 'Probiotic Curd Rice with Tempered Soya Bhurji', 'description': 'Comforting South Indian curd rice tempered with mustard, curry leaves, and ginger, topped with spiced crumbled high-protein soya chunks.', 'ingredients': ['1 cup brown curd rice with pomegranate', '50g cooked spiced soya granules bhurji', 'Ginger, green chili & mustard tempering'], 'prep_time': '12 mins', 'base_cals': 490, 'p': 32, 'c': 58, 'f': 12}]}, 'vegan': {'breakfast': [{'name': 'Sprouted Moong Pesarattu with Vegetable Sambar', 'description': 'Crispy green gram dosa naturally packed with plant protein, served with freshly simmered toor dal sambar and ginger chutney.', 'ingredients': ['2 whole moong pesarattus', '1.5 cups toor dal vegetable sambar', '1 tbsp allam ginger chutney', 'Chopped onions & cumin'], 'prep_time': '12 mins', 'base_cals': 480, 'p': 28, 'c': 62, 'f': 10}, {'name': 'Steamed Ragi Idlis with High-Protein Dal & Tomato Chutney', 'description': '3 finger millet and urad dal steamed idlis rich in iron and calcium, served with yellow moong dal and tangy roasted tomato chutney.', 'ingredients': ['3 ragi idlis', '1.5 cups thick toor & moong dal', '2 tbsp roasted onion-tomato chutney', 'Curry leaves & mustard temper'], 'prep_time': '14 mins', 'base_cals': 460, 'p': 26, 'c': 66, 'f': 8}], 'lunch': [{'name': 'Kerala Kadala Curry with Steamed Matta Rice & Cabbage Thoran', 'description': 'Authentic black chickpea curry simmered with roasted coconut paste and Malabar spices, served with red matta rice and cabbage thoran.', 'ingredients': ['1.5 cups boiled black chickpeas (kadala)', '1 cup cooked Kerala matta rice', '1 cup cabbage and coconut thoran', 'Curry leaves, shallots & mustard seeds'], 'prep_time': '20 mins', 'base_cals': 560, 'p': 30, 'c': 80, 'f': 14}, {'name': 'South Indian Soya Chunks & Tofu Kurma with Steamed Rice', 'description': 'Protein-dense firm tofu and soya chunks in a fragrant coconut-fennel gravy, served with warm Ponni rice, pepper rasam, and cucumber.', 'ingredients': ['120g firm tofu cubes', '30g soya chunks', '1 cup steamed rice', '1 cup tomato-pepper rasam', 'Coriander & curry leaves'], 'prep_time': '18 mins', 'base_cals': 540, 'p': 36, 'c': 64, 'f': 14}], 'snack': [{'name': 'Temple-Style White & Black Chana Sundal with Tender Coconut', 'description': 'Steamed chickpeas tossed with mustard, hing, curry leaves, and grated fresh coconut, paired with pure tender coconut water.', 'ingredients': ['1 cup boiled chickpeas (chana)', '1.5 tbsp fresh coconut', '1 cup natural tender coconut water', 'Pinch of sea salt & lemon'], 'prep_time': '4 mins', 'base_cals': 260, 'p': 13, 'c': 38, 'f': 6}, {'name': 'Roasted Spiced Peanuts & Makhana with Ginger Lemon Chai', 'description': 'Crunchy fox nuts (makhana) and roasted peanuts tossed in turmeric and chaat masala, paired with black ginger tea.', 'ingredients': ['25g roasted peanuts', '25g roasted makhana (foxnuts)', '1 cup spiced black tea with fresh crushed ginger', 'Chaat masala'], 'prep_time': '4 mins', 'base_cals': 240, 'p': 10, 'c': 24, 'f': 12}], 'dinner': [{'name': 'Finger Millet (Ragi Mudde) with Drumstick Dal Kootu', 'description': 'Traditional steamed finger millet ball served with iron-rich spinach, drumstick and toor dal kootu, with a side of raw onion and cucumber.', 'ingredients': ['1 ragi mudde', '1.5 cups drumstick & spinach toor dal kootu', 'Fresh cucumber and carrot slices', '1 tsp cold-pressed sesame oil'], 'prep_time': '20 mins', 'base_cals': 490, 'p': 24, 'c': 78, 'f': 8}, {'name': 'Foxtail Millet (Thinai) Khichdi with Mixed Veggies & Tofu', 'description': 'Comforting foxtail millet and yellow moong dal khichdi loaded with carrots, green beans, and seared turmeric tofu cubes.', 'ingredients': ['1.5 cups foxtail millet & moong dal khichdi', '100g pan-seared tofu cubes', '1 tsp cold-pressed coconut oil', 'Roasted cumin & black pepper'], 'prep_time': '22 mins', 'base_cals': 520, 'p': 30, 'c': 68, 'f': 12}]}, 'keto': {'breakfast': [{'name': 'South Indian Egg Podimas (Egg Scramble) with Coconut Chutney', 'description': '3 whole eggs scrambled with shallots, curry leaves, green chilies, and black pepper, accompanied by freshly ground thick coconut chutney.', 'ingredients': ['3 large eggs', '2 tbsp thick coconut chutney (no dal)', '1/2 onion & green chili sauteed in cold-pressed coconut oil', 'Curry leaves & black pepper'], 'prep_time': '10 mins', 'base_cals': 480, 'p': 26, 'c': 6, 'f': 38}, {'name': 'Pepper Paneer Tikka with Mint Coriander Chutney', 'description': 'Generous cubes of fresh paneer marinated in South Indian spices, black pepper, and yogurt, grilled crisp.', 'ingredients': ['180g paneer cubes', '2 tbsp thick hung curd marinade', 'Black pepper, turmeric, cumin', '2 tbsp fresh mint-coriander dip'], 'prep_time': '12 mins', 'base_cals': 520, 'p': 32, 'c': 7, 'f': 40}], 'lunch': [{'name': 'Chettinad Chicken Breast Roast with Cauliflower Poriyal', 'description': 'Tender chicken breast cooked dry in stone-ground Chettinad masala, served with grated cauliflower poriyal sauteed in coconut oil and mustard.', 'ingredients': ['200g chicken breast strips', '2 cups riced cauliflower poriyal', '1.5 tbsp cold-pressed coconut oil', 'Chettinad spices, curry leaves & shallots'], 'prep_time': '20 mins', 'base_cals': 540, 'p': 52, 'c': 8, 'f': 32}, {'name': 'Kerala Malabar Fish Curry with Coconut Cream & Cucumber Salad', 'description': 'Wild seer fish or salmon simmered in thick coconut milk, kokum (kudampuli), and green chilies, paired with crisp cucumber and shredded coconut salad.', 'ingredients': ['190g fish steak (seer fish/salmon)', '1/2 cup thick coconut milk gravy', '1.5 cups diced cucumber with lemon and curry leaf temper'], 'prep_time': '18 mins', 'base_cals': 560, 'p': 44, 'c': 7, 'f': 38}], 'snack': [{'name': 'Roasted Salted Almonds & Spiced Neer Mor', 'description': 'Handful of roasted almonds paired with a tall glass of diluted spiced buttermilk with ginger and curry leaves.', 'ingredients': ['30g roasted almonds', '1 glass spiced neer mor (thin buttermilk)', 'Crushed ginger, salt & curry leaves'], 'prep_time': '2 mins', 'base_cals': 240, 'p': 9, 'c': 6, 'f': 20}], 'dinner': [{'name': 'Kerala Style Chicken Stew (Coconut Milk) with Sauteed Greens', 'description': 'Succulent chicken simmered in aromatic whole spices, ginger, and coconut milk, served with a big bowl of sauteed spinach (keerai poriyal).', 'ingredients': ['200g chicken thighs or breast', '1/2 cup coconut milk', '2 cups keerai (spinach) sauteed in coconut oil with shallots'], 'prep_time': '20 mins', 'base_cals': 580, 'p': 48, 'c': 9, 'f': 38}, {'name': 'Tawa Fried Spiced Paneer & Cabbage Thoran', 'description': 'Thick slices of paneer seared in South Indian chili and turmeric masala, accompanied by warm cabbage and coconut thoran.', 'ingredients': ['170g paneer slices', '1.5 cups cabbage thoran', '1 tbsp cold-pressed coconut oil', 'Mustard seeds & red chili flakes'], 'prep_time': '15 mins', 'base_cals': 530, 'p': 30, 'c': 10, 'f': 41}]}}
 
 
 def calculate_user_targets(user, custom_calories=None):
@@ -677,25 +377,25 @@ def ask_ai_coach(user, query):
         goal = user.goal or 'maintaining'
         if goal == 'cutting':
             snack_picks = (
-                "• **Option 1 (Light & Crisp):** 2 whole brown rice cakes with 1 tbsp peanut butter & sea salt (~160 kcal, 22g carbs, 4g protein).\n"
-                "• **Option 2 (High Protein Satiety):** 150g non-fat Greek yogurt with 1/2 cup blueberries and cinnamon (~130 kcal, 17g protein, 14g carbs).\n"
-                "• **Option 3 (Quick Energy):** 1 medium crisp apple with 1 string cheese (~160 kcal, 20g carbs, 7g protein)."
+                "• **Option 1 (Light Sundal):** 1 cup boiled kala chana sundal with grated coconut & curry leaves (~180 kcal, 24g carbs, 12g protein).\n"
+                "• **Option 2 (Banana & Tender Coconut):** 1 ripe banana with a glass of fresh tender coconut water (~160 kcal, 35g carbs, 2g protein).\n"
+                "• **Option 3 (Neer Mor & Boiled Egg):** Spiced buttermilk with 1 boiled egg & pinch of roasted cumin (~130 kcal, 5g carbs, 8g protein)."
             )
-            timing = "Consume 45–60 minutes before training. Delivers quick-burning carbohydrates with minimal fat so digestion doesn't slow you down during your caloric deficit."
+            timing = "Consume 45–60 minutes before training. Light, easily digestible South Indian staples that won't weigh you down during your caloric deficit."
         elif goal == 'bulking':
             snack_picks = (
-                "• **Option 1 (Glycogen Saturation):** 60g rolled oats cooked with 1 scoop whey protein, sliced banana & 1.5 tbsp peanut butter (~450 kcal, 36g protein, 55g carbs).\n"
-                "• **Option 2 (Fast Glycogen):** 2 slices toasted sourdough with almond butter, honey drizzle & sliced strawberries (~380 kcal, 10g protein, 65g carbs).\n"
-                "• **Option 3 (Power Fuel):** Whole wheat bagel with light cream cheese & sliced turkey or boiled egg (~350 kcal, 22g protein, 48g carbs)."
+                "• **Option 1 (Idli Power Stack):** 2 steamed idlis with sambar and 2 boiled eggs (~420 kcal, 28g protein, 52g carbs).\n"
+                "• **Option 2 (Ragi Malt Shake):** Ragi malt with jaggery, banana & a scoop of whey protein (~400 kcal, 32g protein, 58g carbs).\n"
+                "• **Option 3 (Peanut Chikki & Banana):** 2 peanut chikkis with 1 ripe banana & filter coffee (~380 kcal, 14g protein, 48g carbs)."
             )
-            timing = "Consume 60–90 minutes before training to flood your muscles with glycogen for heavy lifting volume and muscular pumps."
+            timing = "Consume 60–90 minutes before training to flood your muscles with glycogen from South Indian complex carbs."
         else: # maintaining / general
             snack_picks = (
-                "• **Option 1 (The Classic):** 1 medium ripe banana paired with 1 tbsp natural peanut/almond butter (~190 kcal, 30g carbs, 4g protein).\n"
-                "• **Option 2 (Rice Cake Pump Stack):** 2 brown rice cakes with raw honey and a dash of pink Himalayan salt (~160 kcal, 36g carbs — the sodium elevates muscle fullness).\n"
-                "• **Option 3 (Liquid Fuel):** Whey or plant protein shake blended with 1/2 cup mixed berries and almond milk (~200 kcal, 25g protein, 15g carbs)."
+                "• **Option 1 (Classic South Indian):** 1 ripe banana with a handful of roasted peanuts (~190 kcal, 28g carbs, 6g protein).\n"
+                "• **Option 2 (Filter Coffee & Sundal):** Unsweetened filter coffee with 1 cup white chana sundal (~200 kcal, 26g carbs, 10g protein).\n"
+                "• **Option 3 (Quick Fuel):** 2 steamed idlis with coconut chutney & tender coconut water (~220 kcal, 38g carbs, 6g protein)."
             )
-            timing = "Consume 45–60 minutes before training for steady blood glucose without digestive heaviness."
+            timing = "Consume 45–60 minutes before training for steady blood glucose from South Indian complex carbs."
 
         # Role-specific adaptation note
         if role_key == 'desk_worker':
@@ -723,10 +423,10 @@ def ask_ai_coach(user, query):
         return (
             f"💪 **Post-Workout Recovery Blueprint ({user.goal.capitalize()}):**\n\n"
             f"• **The Recovery Window:** Consume a nutrient-dense meal within 45–90 minutes post-workout containing 25–40g high-quality protein and complex carbs.\n"
-            f"• **Top Meal 1:** Grilled chicken breast or paneer/tofu bowl with brown basmati rice, steamed broccoli, and olive oil drizzle.\n"
-            f"• **Top Meal 2:** Whey or plant protein shake with a ripe banana and 2 rice cakes or whole wheat toast.\n"
-            f"• **Top Meal 3:** 3-egg scramble (or tofu scramble) with sauteed spinach and roasted sweet potato cubes.\n"
-            f"• **Hydration:** Rehydrate with 500–750ml water to replace fluid lost during the session."
+            f"• **Top Meal 1:** Chettinad chicken breast or paneer curry with steamed brown rice and beetroot poriyal.\n"
+            f"• **Top Meal 2:** 3 steamed idlis with thick sambar and 2 boiled eggs (or soya chunks scramble).\n"
+            f"• **Top Meal 3:** Egg podimas (scrambled eggs) with 2 whole wheat chapatis and dal keerai kootu.\n"
+            f"• **Hydration:** Rehydrate with 500ml tender coconut water or spiced neer mor (buttermilk) to replenish electrolytes."
         )
 
     # Intent 3: Role-specific hacks and lifestyle routines
@@ -768,8 +468,8 @@ def ask_ai_coach(user, query):
             f"🥩 **Protein Strategy for {user.username}:**\n\n"
             f"• Aim for **{macros['protein']}g protein daily** (~2.0-2.2g per kg of bodyweight).\n"
             f"• Distribute across 3-4 meals (~30-45g per feeding) to consistently stimulate muscle protein synthesis.\n"
-            f"• **Top Sources:** Chicken breast, eggs, Greek yogurt, canned tuna, paneer, tofu, lentils, and whey/plant protein powder.\n"
-            f"• *Role tip:* {role_info['tips'][1] if len(role_info['tips']) > 1 else 'Keep high-protein snacks within reach.'}"
+            f"• **Top South Indian Sources:** Eggs (podimas/roast), chicken breast, seer fish/mackerel, paneer, soya chunks, toor dal, moong dal, sundal (chana), curd, and whey/plant protein powder.\n"
+            f"• *Role tip:* {role_info['tips'][1] if len(role_info['tips']) > 1 else 'Keep roasted chana and boiled eggs within reach for quick protein hits.'}"
         )
 
     # Intent 7: Diet & General Meal Planning
@@ -811,7 +511,8 @@ def ask_ai_coach(user, query):
             f"💧 **Hydration Goal:**\n\n"
             f"• As a **{role_info['title']}**, your recommended daily target is **{target} Liters**.\n"
             f"• A 2% drop in hydration can reduce muscular power by up to 15% and cause brain fog.\n"
-            f"• *Action step:* Drink 500ml upon waking, and keep a water bottle within arm's reach."
+            f"• **South Indian Hydration Hacks:** Fresh tender coconut water, spiced neer mor (buttermilk with ginger & curry leaves), warm cumin water (jeera water), and plain water with lemon & pink salt.\n"
+            f"• *Action step:* Drink 500ml water upon waking, sip neer mor after lunch, and have tender coconut post-workout."
         )
 
     # Intent 11: Workouts & Routine (only triggers if NOT pre/post-workout snack)
