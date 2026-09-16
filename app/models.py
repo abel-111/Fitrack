@@ -22,6 +22,8 @@ class User(UserMixin, db.Model):
     role = db.Column(db.String(50), default='general')              # desk_worker / student / athlete / bodybuilder / busy_parent / general
     dietary_preference = db.Column(db.String(30), default='standard') # standard / vegetarian / vegan / keto / high_protein
     activity_level = db.Column(db.String(30), default='moderate')  # sedentary / light / moderate / very_active
+    state = db.Column(db.String(50), default='Tamil Nadu')
+    cuisine_preference = db.Column(db.String(50), default='home_state')  # home_state / other_states / continental / fusion
 
     profile_picture = db.Column(db.String(200), default='default.png')
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
@@ -222,6 +224,8 @@ class UserDietPlan(db.Model):
     goal = db.Column(db.String(30), nullable=False)
     role = db.Column(db.String(50), nullable=False)
     dietary_preference = db.Column(db.String(30), nullable=False)
+    state = db.Column(db.String(50), default='Tamil Nadu')
+    cuisine_preference = db.Column(db.String(50), default='home_state')
     target_calories = db.Column(db.Integer, nullable=False)
     target_protein = db.Column(db.Integer, nullable=False)
     target_carbs = db.Column(db.Integer, nullable=False)
