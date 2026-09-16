@@ -1,17 +1,17 @@
 {% extends "base.html" %}
-{% block title %}AI Coaching Insights — Fitrack{% endblock %}
+{% block title %}Coaching Insights & Guidance — Fitrack{% endblock %}
 {% block content %}
 <div class="page-wrapper">
     <div class="page-header">
-        <h2 class="page-title">✨ AI Coach Diagnostics & Recommendations</h2>
-        <p class="page-subtitle">Real-time coaching intelligence analyzed for {{ current_user.username }} ({{ role_info.title }}).</p>
+        <h2 class="page-title">🌿 Personal Coaching Hub & Guidance</h2>
+        <p class="page-subtitle">Personalized progress analysis, training focus, and South Indian nutrition guidance for {{ current_user.username }} ({{ role_info.title }}).</p>
     </div>
 
-    <!-- AI Daily Priority Directive Banner -->
+    <!-- Daily Priority Banner -->
     <div class="ai-hero-banner" style="margin-bottom:1.8rem;">
         <div class="ai-hero-content">
             <div class="ai-hero-title">
-                <span>🎯</span> Today's AI Coaching Directive
+                <span>🎯</span> Today's Coaching Focus
                 <span class="badge-chip badge-coral">{{ current_user.goal|capitalize }}</span>
                 <span class="badge-chip badge-emerald">Momentum: {{ insights.consistency_score }}%</span>
             </div>
@@ -21,7 +21,7 @@
         </div>
         <div>
             <button class="btn-primary-custom" onclick="document.getElementById('aiCoachFab').click();" type="button">
-                💬 Chat with AI Coach
+                💬 Chat with Coach Raghav
             </button>
         </div>
     </div>
@@ -61,7 +61,7 @@
                 <span class="badge-chip badge-cyan">💧 Essential</span>
             </div>
             <div class="stat-value">{{ insights.hydration_target }} <span style="font-size:14px; color:var(--text-muted);">Liters / day</span></div>
-            <div class="stat-subtext">Optimized for your sedentary vs active energy output</div>
+            <div class="stat-subtext">Includes water, spiced neer mor & tender coconut</div>
             <div class="progress-bar-wrap">
                 <div class="progress-bar-fill progress-bar-cyan" style="width: 80%;"></div>
             </div>
@@ -83,14 +83,14 @@
     <!-- Role Training & Mobility Adaptation -->
     <div class="stat-card" style="margin-bottom:1.8rem;">
         <h3 style="font-size:18px; font-weight:700; color:#fff; display:flex; align-items:center; gap:8px; margin-bottom:10px;">
-            <span>{{ role_info.icon }}</span> Training Adaptation for {{ role_info.title }}
+            <span>{{ role_info.icon }}</span> Training & Mobility Focus for {{ role_info.title }}
         </h3>
         <p style="color:#cbd5e1; font-size:14px; margin-bottom:14px;">{{ insights.workout_focus }}</p>
         
         <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(260px, 1fr)); gap:1rem;">
             {% for tip in insights.role_tips %}
             <div style="background:rgba(255,255,255,0.03); border:1px solid var(--border-subtle); border-radius:var(--radius-sm); padding:12px; font-size:13px; color:#e2e8f0; display:flex; gap:8px;">
-                <span style="color:#a55eea; font-weight:bold;">✔</span>
+                <span style="color:var(--accent-emerald); font-weight:bold;">✔</span>
                 <span>{{ tip }}</span>
             </div>
             {% endfor %}
@@ -103,7 +103,7 @@
             <span>💊</span> Recommended Evidence-Based Supplement Protocol
         </h3>
         <p style="color:var(--text-secondary); font-size:13px; margin-bottom:14px;">
-            Tier-1 scientifically backed supplements to support muscle recovery, cognitive focus, and health.
+            Tier-1 scientifically backed supplements to support muscle recovery, cognitive focus, and health alongside home cooking.
         </p>
 
         <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(240px, 1fr)); gap:1rem;">
