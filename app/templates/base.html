@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{% block title %}Fitrack — AI Fitness & Nutrition{% endblock %}</title>
+    <title>{% block title %}Fitrack — South Indian Fitness & Nutrition{% endblock %}</title>
     <link href="{{ url_for('static', filename='css/style.css') }}" rel="stylesheet">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -13,6 +13,7 @@
         <div class="nav-brand-group">
             <a class="navbar-brand" href="{{ url_for('auth.dashboard') if current_user.is_authenticated else url_for('auth.login') }}">
                 🏋️ Fit<span class="logo-highlight">rack</span>
+                <span class="brand-tagline">South Indian Fitness</span>
             </a>
 
             {% if current_user.is_authenticated %}
@@ -21,7 +22,7 @@
                     Dashboard
                 </a>
                 <a href="{{ url_for('diet.view_plan') }}" class="nav-link {% if request.blueprint == 'diet' %}active{% endif %}">
-                    🥗 AI Diet
+                    🍛 Nutrition Plan
                 </a>
                 <a href="{{ url_for('workouts.plan') }}" class="nav-link {% if request.blueprint == 'workouts' %}active{% endif %}">
                     🏋️ Workouts
@@ -30,10 +31,10 @@
                     📈 Weight
                 </a>
                 <a href="{{ url_for('leaderboard.leaderboard') }}" class="nav-link {% if request.blueprint == 'leaderboard' %}active{% endif %}">
-                    🏆 Leaderboard
+                    🏆 Community
                 </a>
-                <a href="{{ url_for('ai.recommendations') }}" class="nav-link nav-link-ai {% if request.endpoint == 'ai.recommendations' %}active{% endif %}">
-                    ✨ AI Coach
+                <a href="{{ url_for('ai.recommendations') }}" class="nav-link nav-link-coach {% if request.endpoint == 'ai.recommendations' %}active{% endif %}">
+                    🌿 Coach
                 </a>
             </nav>
             {% endif %}
@@ -50,11 +51,11 @@
                     {% endif %}
                 </button>
                 <div class="avatar-dropdown" id="avatarDropdown">
-                    <div class="avatar-dropdown-name">{{ current_user.username }} ({{ current_user.role|capitalize if current_user.role else 'General' }})</div>
+                    <div class="avatar-dropdown-name">{{ current_user.username }} ({{ current_user.get_role_display() }})</div>
                     <a href="{{ url_for('profile.view') }}">⚙️ Profile & Biometrics</a>
-                    <a href="{{ url_for('diet.view_plan') }}">🥗 AI Diet Plan</a>
+                    <a href="{{ url_for('diet.view_plan') }}">🍛 South Indian Meal Plan</a>
                     <a href="{{ url_for('workouts.plan') }}">🏋️ Workout Split</a>
-                    <a href="{{ url_for('ai.recommendations') }}">✨ AI Coach Insights</a>
+                    <a href="{{ url_for('ai.recommendations') }}">🌿 Personal Coach Hub</a>
                     <a href="{{ url_for('leaderboard.leaderboard') }}">🏆 Community</a>
                     <a href="{{ url_for('auth.logout') }}" style="color:#fca5a5;">🚪 Logout</a>
                 </div>
@@ -79,32 +80,32 @@
     {% block content %}{% endblock %}
 
     {% if current_user.is_authenticated %}
-    <!-- Floating AI Coach Assistant -->
-    <button class="ai-coach-fab" id="aiCoachFab" type="button" title="Ask AI Coach">
-        <span>✨</span> Ask AI Coach
+    <!-- Floating Coach Assistant -->
+    <button class="ai-coach-fab" id="aiCoachFab" type="button" title="Chat with Coach Raghav">
+        <span>💬</span> Ask Coach
     </button>
 
     <div class="ai-chat-modal" id="aiChatModal">
         <div class="ai-chat-header">
             <div class="ai-chat-title">
-                <span>🤖</span> FitBot AI Coach
-                <span class="badge-chip badge-ai" style="font-size:10px; padding:2px 7px;">{{ current_user.get_role_display() }}</span>
+                <span>🌿</span> Coach Raghav
+                <span class="badge-chip badge-coach" style="font-size:10px; padding:2px 7px;">South Indian Nutrition Mentor</span>
             </div>
             <button class="ai-chat-close" id="aiChatClose" type="button">&times;</button>
         </div>
         <div class="ai-chat-body" id="aiChatBody">
             <div class="chat-bubble chat-bubble-bot">
-                👋 Hey <strong>{{ current_user.username }}</strong>! I'm your AI Coach optimized for your <strong>{{ current_user.get_role_display() }}</strong> role and <strong>{{ current_user.goal }}</strong> goal. How can I assist you today?
+                Vanakkam <strong>{{ current_user.username }}</strong>! I'm Coach Raghav, your South Indian fitness and nutrition mentor. How can I assist you with your home meals, workouts, or daily habits today?
             </div>
             <div class="chat-quick-chips">
-                <button class="chip-btn" onclick="sendQuickPrompt('What should my daily macros and calories be?')">🥗 My Macros</button>
-                <button class="chip-btn" onclick="sendQuickPrompt('Give me a quick nutrition hack for my role.')">💡 Role Hack</button>
-                <button class="chip-btn" onclick="sendQuickPrompt('Best pre-workout snack for today?')">⚡ Pre-Workout</button>
-                <button class="chip-btn" onclick="sendQuickPrompt('How do I keep my streak alive?')">🔥 Streak Tip</button>
+                <button class="chip-btn" onclick="sendQuickPrompt('What are high-protein South Indian vegetarian meals?')">🧀 High-Protein Veg</button>
+                <button class="chip-btn" onclick="sendQuickPrompt('Can I drink filter coffee while losing weight?')">☕ Filter Coffee</button>
+                <button class="chip-btn" onclick="sendQuickPrompt('Best South Indian pre-workout snack for today?')">⚡ Pre-Workout</button>
+                <button class="chip-btn" onclick="sendQuickPrompt('How should I balance rice, sambar, and poriyal to hit my macros?')">🍛 Rice & Macros</button>
             </div>
         </div>
         <form class="ai-chat-footer" id="aiChatForm" onsubmit="handleChatSubmit(event)">
-            <input type="text" class="ai-chat-input" id="aiChatInput" placeholder="Ask about meals, workouts, recovery..." autocomplete="off">
+            <input type="text" class="ai-chat-input" id="aiChatInput" placeholder="Ask about South Indian meals, filter coffee, workouts..." autocomplete="off">
             <button type="submit" class="ai-chat-send">Send</button>
         </form>
     </div>
@@ -125,7 +126,7 @@
             });
         }
 
-        // AI Chat Floating Widget Logic
+        // Coach Chat Floating Widget Logic
         const aiCoachFab = document.getElementById('aiCoachFab');
         const aiChatModal = document.getElementById('aiChatModal');
         const aiChatClose = document.getElementById('aiChatClose');
@@ -147,7 +148,6 @@
         function appendMessage(text, isUser = false) {
             const bubble = document.createElement('div');
             bubble.className = `chat-bubble ${isUser ? 'chat-bubble-user' : 'chat-bubble-bot'}`;
-            // replace markdown-style bold and bullet lines
             if (!isUser) {
                 let formatted = text
                     .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
@@ -175,7 +175,7 @@
             appendMessage(text, true);
             aiChatInput.value = '';
 
-            const loadingBubble = appendMessage('AI Coach is thinking...', false);
+            const loadingBubble = appendMessage('Coach Raghav is typing...', false);
             loadingBubble.style.opacity = '0.6';
 
             try {
