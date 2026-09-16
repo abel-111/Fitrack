@@ -105,7 +105,37 @@
                         {% endfor %}
                     </select>
                     <small style="color:var(--text-muted); font-size:11.5px; display:block; margin-top:4px;">
-                        Guides recipe selection in your AI Diet Blueprint.
+                        Guides recipe selection in your Meal Plan.
+                    </small>
+                </div>
+
+                <!-- Home State -->
+                <div class="form-group">
+                    <label>Your Home State</label>
+                    <select name="state" class="form-control">
+                        {% for s in south_indian_states %}
+                            <option value="{{ s }}" {% if current_user.state == s %}selected{% endif %}>
+                                {{ s }}
+                            </option>
+                        {% endfor %}
+                    </select>
+                    <small style="color:var(--text-muted); font-size:11.5px; display:block; margin-top:4px;">
+                        Your meal plan will feature authentic dishes from your state.
+                    </small>
+                </div>
+
+                <!-- Cuisine Preference -->
+                <div class="form-group">
+                    <label>Cuisine Style Preference</label>
+                    <select name="cuisine_preference" class="form-control">
+                        {% for cp_key, cp_label in cuisine_preferences %}
+                            <option value="{{ cp_key }}" {% if current_user.cuisine_preference == cp_key %}selected{% endif %}>
+                                {{ cp_label }}
+                            </option>
+                        {% endfor %}
+                    </select>
+                    <small style="color:var(--text-muted); font-size:11.5px; display:block; margin-top:4px;">
+                        Try your home state's classics, explore other states, or go continental.
                     </small>
                 </div>
 
