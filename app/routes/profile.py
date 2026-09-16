@@ -24,6 +24,18 @@ ACTIVITY_LEVELS = [
     ('moderate', 'Moderately Active (3-5 workouts/week)'),
     ('very_active', 'Very Active (6-7 intense workouts/week)')
 ]
+SOUTH_INDIAN_STATES = [
+    'Tamil Nadu',
+    'Kerala',
+    'Karnataka',
+    'Andhra Pradesh',
+    'Telangana',
+]
+CUISINE_PREFERENCES = [
+    ('home_state', '🏠 My Home State Dishes'),
+    ('other_states', '🗺️ Explore Other South Indian States'),
+    ('continental', '🌍 Continental & Healthy Fusion'),
+]
 
 
 def allowed_file(filename):
@@ -49,6 +61,8 @@ def view():
         roles=ROLE_DETAILS,
         dietary_preferences=DIETARY_PREFERENCES,
         activity_levels=ACTIVITY_LEVELS,
+        south_indian_states=SOUTH_INDIAN_STATES,
+        cuisine_preferences=CUISINE_PREFERENCES,
         bmi=bmi,
         bmi_category=bmi_cat,
         bmr=bmr,
@@ -108,6 +122,8 @@ def update_settings():
     role = request.form.get('role')
     dietary_pref = request.form.get('dietary_preference')
     activity_level = request.form.get('activity_level')
+    state = request.form.get('state')
+    cuisine_pref = request.form.get('cuisine_preference')
 
     height_cm = request.form.get('height_cm', type=float)
     weight_kg = request.form.get('weight_kg', type=float)
@@ -125,6 +141,10 @@ def update_settings():
         current_user.dietary_preference = dietary_pref
     if activity_level in [a[0] for a in ACTIVITY_LEVELS]:
         current_user.activity_level = activity_level
+    if state in SOUTH_INDIAN_STATES:
+        current_user.state = state
+    if cuisine_pref in [c[0] for c in CUISINE_PREFERENCES]:
+        current_user.cuisine_preference = cuisine_pref
 
     if height_cm and height_cm > 0:
         current_user.height_cm = height_cm
@@ -138,6 +158,6 @@ def update_settings():
         current_user.gender = gender
 
     db.session.commit()
-    flash('Fitness profile & biometric settings updated!', 'success')
+    flash('Profile & regional preferences updated!', 'success')
     return redirect(url_for('profile.view'))
 
