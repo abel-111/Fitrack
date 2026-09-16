@@ -1,22 +1,23 @@
 {% extends "base.html" %}
-{% block title %}AI Diet & Nutrition — Fitrack{% endblock %}
+{% block title %}South Indian Nutrition & Meals — Fitrack{% endblock %}
 {% block content %}
 <div class="page-wrapper">
-    <!-- Top Hero Banner with Role Intelligence -->
+    <!-- Top Hero Banner with Nutrition Focus -->
     <div class="ai-hero-banner">
         <div class="ai-hero-content">
             <div class="ai-hero-title">
                 <span>{{ role_info.icon }}</span> {{ plan.title }}
-                <span class="badge-chip badge-coral" style="font-size:11px;">{{ current_user.goal|capitalize }}</span>
-                <span class="badge-chip badge-ai" style="font-size:11px;">{{ plan.dietary_preference|capitalize }}</span>
+                <span class="badge-chip" style="font-size:11px;">{{ current_user.goal|capitalize }}</span>
+                <span class="badge-chip" style="font-size:11px;">{{ plan.dietary_preference|capitalize }}</span>
             </div>
             <p class="ai-hero-desc">
-                {{ role_info.summary }} <strong>Nutrition Directive:</strong> {{ role_info.diet_focus }}
+                {{ role_info.summary }} <br>
+                <strong>Daily Nutrition Focus:</strong> {{ role_info.diet_focus }}
             </p>
         </div>
         <div>
-            <button class="btn-ai-custom" onclick="openGenModal()" type="button">
-                ✨ Customize AI Plan
+            <button class="btn-primary-custom" onclick="openGenModal()" type="button">
+                ⚙️ Customize Meal Plan
             </button>
         </div>
     </div>
@@ -38,10 +39,10 @@
         <div class="stat-card">
             <div class="stat-label">
                 <span>Target Protein</span>
-                <span style="color:#ff6b81; font-weight:700;">{{ (plan.target_protein * 400 / plan.target_calories)|round }}%</span>
+                <span style="color:#6d28d9; font-weight:700;">{{ (plan.target_protein * 400 / plan.target_calories)|round }}%</span>
             </div>
             <div class="stat-value">{{ plan.target_protein }} <span style="font-size:14px; color:var(--text-muted);">g</span></div>
-            <div class="stat-subtext">Optimal for muscle repair & satiety</div>
+            <div class="stat-subtext">From dal, paneer, eggs, chicken, fish & sundal</div>
             <div class="progress-bar-wrap">
                 <div class="progress-bar-fill progress-bar-coral" style="width: 85%;"></div>
             </div>
@@ -50,10 +51,10 @@
         <div class="stat-card">
             <div class="stat-label">
                 <span>Target Carbs</span>
-                <span style="color:#48dbfb; font-weight:700;">{{ (plan.target_carbs * 400 / plan.target_calories)|round }}%</span>
+                <span style="color:#0284c7; font-weight:700;">{{ (plan.target_carbs * 400 / plan.target_calories)|round }}%</span>
             </div>
             <div class="stat-value">{{ plan.target_carbs }} <span style="font-size:14px; color:var(--text-muted);">g</span></div>
-            <div class="stat-subtext">Clean energy fueling your daily role</div>
+            <div class="stat-subtext">Brown Ponni rice, ragi mudde, idlis & millets</div>
             <div class="progress-bar-wrap">
                 <div class="progress-bar-fill progress-bar-cyan" style="width: 70%;"></div>
             </div>
@@ -61,11 +62,11 @@
 
         <div class="stat-card">
             <div class="stat-label">
-                <span>Target Fats & Water</span>
-                <span style="color:#fbc531; font-weight:700;">{{ targets.water_liters }}L 💧</span>
+                <span>Healthy Fats & Hydration</span>
+                <span style="color:#d97706; font-weight:700;">{{ targets.water_liters }}L 💧</span>
             </div>
             <div class="stat-value">{{ plan.target_fat }} <span style="font-size:14px; color:var(--text-muted);">g</span></div>
-            <div class="stat-subtext">Hormonal balance & joint longevity</div>
+            <div class="stat-subtext">Cold-pressed sesame/coconut oil & neer mor</div>
             <div class="progress-bar-wrap">
                 <div class="progress-bar-fill progress-bar-purple" style="width: 65%;"></div>
             </div>
@@ -76,7 +77,7 @@
     <div style="display:flex; flex-wrap:wrap; justify-content:space-between; align-items:center; background:var(--bg-surface); border:1px solid var(--border-subtle); border-radius:var(--radius-md); padding:1rem 1.4rem; margin-bottom:1.5rem; gap:1rem;">
         <div style="display:flex; align-items:center; gap:1rem;">
             <div>
-                <span style="font-size:12px; color:var(--text-muted); text-transform:uppercase; font-weight:600;">Daily Meal Adherence</span>
+                <span style="font-size:12px; color:var(--text-muted); text-transform:uppercase; font-weight:600;">Today's Meal Adherence</span>
                 <div style="font-size:18px; font-weight:700; color:#fff;" id="adherenceSummary">
                     {{ completed_meals }} of {{ total_meals }} meals logged (<span id="adherencePct">{{ adherence_pct }}%</span>)
                 </div>
@@ -96,14 +97,29 @@
     </div>
 
     <!-- 4-Meal Plan Grid -->
-    <h3 style="font-size:20px; font-weight:700; margin-bottom:0.8rem;">Today's AI Meal Blueprint</h3>
+    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1rem;">
+        <div>
+            <h3 style="font-size:20px; font-weight:700; color:var(--text-primary); margin:0;">Today's Meal Plan</h3>
+            <p style="font-size:13px; color:var(--text-secondary); margin-top:3px;">Scaled to your exact macros with wholesome regional staples and portion guides.</p>
+        </div>
+        <span class="badge-chip badge-emerald" style="font-size:12px;">Balanced Macros</span>
+    </div>
+
     <div class="meals-grid">
         {% for meal in meals %}
         <div class="meal-card {% if meal.completed %}completed{% endif %}" id="card-{{ meal.id }}">
             <div>
                 <div class="meal-header">
                     <div>
-                        <span class="meal-slot-label">{{ meal.slot_name }}</span>
+                        <div style="display:flex; align-items:center; gap:8px; margin-bottom:4px;">
+                            <span class="meal-slot-label">{{ meal.slot_name }}</span>
+                            {% if meal.badge %}
+                                <span class="badge-chip badge-coral" style="font-size:10.5px; padding:2px 7px;">{{ meal.badge }}</span>
+                            {% endif %}
+                            {% if meal.region %}
+                                <span class="badge-chip badge-cyan" style="font-size:10.5px; padding:2px 7px;">{{ meal.region }}</span>
+                            {% endif %}
+                        </div>
                         <h4 class="meal-name">{{ meal.name }}</h4>
                     </div>
                     <span class="meal-time">🕒 {{ meal.time }}</span>
@@ -114,16 +130,16 @@
                     <span class="macro-pill macro-pill-protein">🥩 {{ meal.protein }}g Protein</span>
                     <span class="macro-pill macro-pill-carb">🌾 {{ meal.carbs }}g Carbs</span>
                     <span class="macro-pill macro-pill-fat">🥑 {{ meal.fat }}g Fat</span>
-                    <span class="macro-pill" style="background:rgba(255,255,255,0.05); color:var(--text-secondary);">⏱ {{ meal.prep_time }}</span>
+                    <span class="macro-pill" style="background:rgba(109,40,217,0.06); color:var(--text-secondary);">⏱ {{ meal.prep_time }}</span>
                 </div>
 
-                <p style="font-size:13px; color:#cbd5e1; margin-bottom:10px;">{{ meal.description }}</p>
+                <p style="font-size:13.5px; color:var(--text-secondary); margin-bottom:12px; line-height:1.5;">{{ meal.description }}</p>
 
                 <div class="meal-role-benefit">
-                    <strong>{{ role_info.icon }} Role Optimization:</strong> {{ meal.role_benefit }}
+                    <strong>Why this fits your day:</strong> {{ meal.role_benefit }}
                 </div>
 
-                <details style="margin-top:8px; cursor:pointer;">
+                <details style="margin-top:10px; cursor:pointer;">
                     <summary style="font-size:12.5px; color:var(--text-muted); font-weight:600;">View Ingredients & Portions</summary>
                     <ul class="ingredients-list">
                         {% for ing in meal.ingredients %}
@@ -150,15 +166,82 @@
         {% endfor %}
     </div>
 
+    <!-- South Indian Nutrition Wisdom & Swaps Section -->
+    <div class="stat-card" style="margin-top:2.5rem; border-left:4px solid var(--accent-emerald);">
+        <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:1rem; flex-wrap:wrap; gap:10px;">
+            <div>
+                <h3 style="font-size:19px; font-weight:700; color:var(--text-primary); display:flex; align-items:center; gap:8px; margin:0;">
+                    <span>🌿</span> 5 Nutrition Rules for Real Fitness Results
+                </h3>
+                <p style="font-size:13px; color:var(--text-secondary); margin-top:4px;">
+                    How to hit high protein, manage carbs, and retain authentic home flavor without extreme diets.
+                </p>
+            </div>
+            <span class="badge-chip badge-emerald">Practical Swaps</span>
+        </div>
+
+        <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(280px, 1fr)); gap:1rem;">
+            <div style="background:rgba(255,255,255,0.02); border:1px solid var(--border-subtle); border-radius:var(--radius-sm); padding:14px;">
+                <div style="display:flex; align-items:center; gap:8px; margin-bottom:6px;">
+                    <span style="font-size:18px;">🍚</span>
+                    <strong style="color:#fff; font-size:14px;">The 1-Cup Rice Rule</strong>
+                </div>
+                <p style="font-size:12.5px; color:#cbd5e1; margin:0; line-height:1.5;">
+                    Never fear rice! Limit cooked Ponni brown or Kerala Red Matta rice to 1 standard cup, and double your bowl of keerai kootu or vegetable poriyal for fiber.
+                </p>
+            </div>
+
+            <div style="background:rgba(255,255,255,0.02); border:1px solid var(--border-subtle); border-radius:var(--radius-sm); padding:14px;">
+                <div style="display:flex; align-items:center; gap:8px; margin-bottom:6px;">
+                    <span style="font-size:18px;">🥘</span>
+                    <strong style="color:#fff; font-size:14px;">Supercharge Sambar & Rasam</strong>
+                </div>
+                <p style="font-size:12.5px; color:#cbd5e1; margin:0; line-height:1.5;">
+                    Add 2 boiled eggs, pan-seared paneer cubes, or boiled soya chunks directly into your bowl of hot vegetable sambar for an effortless 20-30g protein meal.
+                </p>
+            </div>
+
+            <div style="background:rgba(255,255,255,0.02); border:1px solid var(--border-subtle); border-radius:var(--radius-sm); padding:14px;">
+                <div style="display:flex; align-items:center; gap:8px; margin-bottom:6px;">
+                    <span style="font-size:18px;">🌱</span>
+                    <strong style="color:#fff; font-size:14px;">Sundal over Fried Bajjis</strong>
+                </div>
+                <p style="font-size:12.5px; color:#cbd5e1; margin:0; line-height:1.5;">
+                    Make 1 cup of spiced kala chana, green peas, or sprouted moong sundal your regular 4 PM tiffin instead of deep-fried bajjis or medu vadas.
+                </p>
+            </div>
+
+            <div style="background:rgba(255,255,255,0.02); border:1px solid var(--border-subtle); border-radius:var(--radius-sm); padding:14px;">
+                <div style="display:flex; align-items:center; gap:8px; margin-bottom:6px;">
+                    <span style="font-size:18px;">🥛</span>
+                    <strong style="color:#fff; font-size:14px;">Neer Mor: Natural Electrolyte</strong>
+                </div>
+                <p style="font-size:12.5px; color:#cbd5e1; margin:0; line-height:1.5;">
+                    Diluted buttermilk with crushed ginger, curry leaves, and a pinch of pink salt cools the gut, supports digestion, and restores minerals after tough workouts.
+                </p>
+            </div>
+
+            <div style="background:rgba(255,255,255,0.02); border:1px solid var(--border-subtle); border-radius:var(--radius-sm); padding:14px;">
+                <div style="display:flex; align-items:center; gap:8px; margin-bottom:6px;">
+                    <span style="font-size:18px;">☕</span>
+                    <strong style="color:#fff; font-size:14px;">Smart Filter Coffee</strong>
+                </div>
+                <p style="font-size:12.5px; color:#cbd5e1; margin:0; line-height:1.5;">
+                    Enjoy your degree coffee guilt-free! Use toned milk and cut down refined white sugar. Having it 45 mins pre-workout gives a wonderful natural energy lift.
+                </p>
+            </div>
+        </div>
+    </div>
+
     <!-- Role-Specific Nutrition Guidelines Card -->
-    <div class="stat-card" style="margin-top:2.5rem;">
-        <h3 style="font-size:18px; font-weight:700; color:#fff; display:flex; align-items:center; gap:8px; margin-bottom:12px;">
-            <span>💡</span> Nutrition Rules for {{ role_info.title }}
+    <div class="stat-card" style="margin-top:1.5rem;">
+        <h3 style="font-size:18px; font-weight:700; color:var(--text-primary); display:flex; align-items:center; gap:8px; margin-bottom:12px;">
+            <span>💡</span> Nutrition & Lifestyle Guidelines for {{ role_info.title }}
         </h3>
         <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(250px, 1fr)); gap:1rem;">
             {% for tip in role_tips %}
-            <div style="background:rgba(255,255,255,0.03); border:1px solid var(--border-subtle); border-radius:var(--radius-sm); padding:12px 14px; font-size:13.5px; color:#e2e8f0; display:flex; gap:10px; align-items:flex-start;">
-                <span style="color:#a55eea; font-weight:bold; font-size:16px;">•</span>
+            <div style="background:rgba(124,58,237,0.04); border:1px solid var(--border-subtle); border-radius:var(--radius-sm); padding:12px 14px; font-size:13.5px; color:var(--text-primary); display:flex; gap:10px; align-items:flex-start;">
+                <span style="color:var(--brand-primary); font-weight:bold; font-size:16px;">•</span>
                 <span>{{ tip }}</span>
             </div>
             {% endfor %}
@@ -166,17 +249,44 @@
     </div>
 </div>
 
-<!-- Modal: Customize & Generate AI Diet Plan -->
+<!-- Modal: Customize Meal Plan -->
 <div class="modal-overlay" id="genModal">
     <div class="modal-card">
         <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1.5rem;">
-            <h3 style="font-size:20px; font-weight:700; color:#fff; margin:0;">✨ Customize AI Diet Plan</h3>
-            <button type="button" onclick="closeGenModal()" style="background:none; border:none; color:var(--text-muted); font-size:22px; cursor:pointer;">&times;</button>
+            <div>
+                <h3 style="font-size:20px; font-weight:700; color:var(--text-primary); margin:0;">⚙️ Customize My Meal Plan</h3>
+                <p style="font-size:12.5px; color:var(--text-secondary); margin-top:2px;">Choose your state, lifestyle, and cuisine style to get a personalized plan.</p>
+            </div>
+            <button type="button" onclick="closeGenModal()" style="background:none; border:none; color:var(--text-muted); font-size:24px; cursor:pointer;">&times;</button>
         </div>
 
         <form method="POST" action="{{ url_for('diet.generate_new') }}">
             <div class="form-group">
-                <label>Your Current Role / Lifestyle</label>
+                <label>Your Home State</label>
+                <select name="state" class="form-control">
+                    {% for s in south_indian_states %}
+                        <option value="{{ s }}" {% if current_user.state == s %}selected{% endif %}>{{ s }}</option>
+                    {% endfor %}
+                </select>
+                <small style="color:var(--text-muted); font-size:11.5px; display:block; margin-top:4px;">
+                    We'll show you authentic dishes from your state first.
+                </small>
+            </div>
+
+            <div class="form-group">
+                <label>Cuisine Preference</label>
+                <select name="cuisine_preference" class="form-control">
+                    {% for cp_key, cp_label in cuisine_preferences %}
+                        <option value="{{ cp_key }}" {% if current_user.cuisine_preference == cp_key %}selected{% endif %}>{{ cp_label }}</option>
+                    {% endfor %}
+                </select>
+                <small style="color:var(--text-muted); font-size:11.5px; display:block; margin-top:4px;">
+                    Explore your home state's best, other South Indian states, or continental & healthy fusion.
+                </small>
+            </div>
+
+            <div class="form-group">
+                <label>Your Current Lifestyle / Routine</label>
                 <select name="role" class="form-control">
                     {% for r_key, r_data in roles.items() %}
                         <option value="{{ r_key }}" {% if current_user.role == r_key %}selected{% endif %}>
@@ -185,12 +295,12 @@
                     {% endfor %}
                 </select>
                 <small style="color:var(--text-muted); font-size:11.5px; display:block; margin-top:4px;">
-                    Adapts meal schedules, carb timing, and nutrient density to your daily routine.
+                    Adapts meal schedules, carb timing, and nutrient density to your daily schedule.
                 </small>
             </div>
 
             <div class="form-group">
-                <label>Dietary Preference</label>
+                <label>Dietary Style</label>
                 <select name="dietary_preference" class="form-control">
                     {% for pref_key, pref_label in dietary_preferences %}
                         <option value="{{ pref_key }}" {% if plan.dietary_preference == pref_key %}selected{% endif %}>
@@ -201,16 +311,16 @@
             </div>
 
             <div class="form-group">
-                <label>Custom Daily Calorie Target (Optional override)</label>
-                <input type="number" name="custom_calories" class="form-control" placeholder="Leave empty for auto-calculated ({{ targets.calories }} kcal)" min="1200" max="6000">
+                <label>Daily Calorie Target (Optional Override)</label>
+                <input type="number" name="custom_calories" class="form-control" placeholder="Leave blank for calculated target ({{ targets.calories }} kcal)" min="1200" max="6000">
                 <small style="color:var(--text-muted); font-size:11.5px; display:block; margin-top:4px;">
-                    Recommended for your {{ current_user.goal }} goal: {{ targets.calories }} kcal.
+                    Auto-calculated for your {{ current_user.goal }} goal: {{ targets.calories }} kcal.
                 </small>
             </div>
 
             <div style="display:flex; gap:10px; margin-top:1.75rem;">
                 <button type="button" onclick="closeGenModal()" class="btn-secondary-custom" style="flex:1;">Cancel</button>
-                <button type="submit" class="btn-ai-custom" style="flex:1;">Generate Plan</button>
+                <button type="submit" class="btn-primary-custom" style="flex:1;">Save & Update Plan</button>
             </div>
         </form>
     </div>
