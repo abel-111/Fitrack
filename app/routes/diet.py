@@ -7,10 +7,24 @@ from app.services.ai_coach import generate_ai_diet_plan, calculate_user_targets,
 diet_bp = Blueprint('diet', __name__, url_prefix='/diet')
 
 DIETARY_PREFERENCES = [
-    ('standard', '🍗 Standard / Balanced'),
-    ('vegetarian', '🧀 Vegetarian'),
-    ('vegan', '🌱 100% Vegan'),
-    ('keto', '🥑 Keto / Low-Carb')
+    ('standard', '🍗 South Indian Non-Veg (Chicken, Fish, Eggs & Dal)'),
+    ('vegetarian', '🧀 South Indian Vegetarian (Paneer, Soya, Dal & Sprouts)'),
+    ('vegan', '🌱 Pure Plant-Based (Millets, Chana, Soya & Dal)'),
+    ('keto', '🥑 Low-Carb / Keto (Egg Podimas, Fish, Coconut & Greens)')
+]
+
+SOUTH_INDIAN_STATES = [
+    'Tamil Nadu',
+    'Kerala',
+    'Karnataka',
+    'Andhra Pradesh',
+    'Telangana',
+]
+
+CUISINE_PREFERENCES = [
+    ('home_state', '🏠 My Home State Dishes'),
+    ('other_states', '🗺️ Explore Other South Indian States'),
+    ('continental', '🌍 Continental & Healthy Fusion'),
 ]
 
 @diet_bp.route('/', methods=['GET'])
@@ -60,7 +74,9 @@ def view_plan():
         role_info=role_info,
         targets=targets,
         dietary_preferences=DIETARY_PREFERENCES,
-        roles=ROLE_DETAILS
+        roles=ROLE_DETAILS,
+        south_indian_states=SOUTH_INDIAN_STATES,
+        cuisine_preferences=CUISINE_PREFERENCES
     )
 
 
@@ -70,15 +86,27 @@ def generate_new():
     dietary_pref = request.form.get('dietary_preference', current_user.dietary_preference or 'standard')
     role_override = request.form.get('role', current_user.role)
     custom_cals = request.form.get('custom_calories', type=int)
+    state_override = request.form.get('state', current_user.state or 'Tamil Nadu')
+    cuisine_pref = request.form.get('cuisine_preference', current_user.cuisine_preference or 'home_state')
 
     if role_override in ROLE_DETAILS:
         current_user.role = role_override
     if dietary_pref in ['standard', 'vegetarian', 'vegan', 'keto']:
         current_user.dietary_preference = dietary_pref
+    if state_override in SOUTH_INDIAN_STATES:
+        current_user.state = state_override
+    if cuisine_pref in [c[0] for c in CUISINE_PREFERENCES]:
+        current_user.cuisine_preference = cuisine_pref
 
     db.session.commit()
 
-    plan_data = generate_ai_diet_plan(current_user, dietary_preference=dietary_pref, custom_calories=custom_cals)
+    plan_data = generate_ai_diet_plan(
+        current_user,
+        dietary_preference=dietary_pref,
+        custom_calories=custom_cals,
+        state=state_override,
+        cuisine_preference=cuisine_pref
+    )
 
     # Deactivate older plans
     UserDietPlan.query.filter_by(user_id=current_user.id).update({'is_active': False})
@@ -89,6 +117,8 @@ def generate_new():
         goal=plan_data['goal'],
         role=plan_data['role'],
         dietary_preference=plan_data['dietary_preference'],
+        state=state_override,
+        cuisine_preference=cuisine_pref,
         target_calories=plan_data['target_calories'],
         target_protein=plan_data['target_protein'],
         target_carbs=plan_data['target_carbs'],
@@ -100,7 +130,7 @@ def generate_new():
     db.session.add(new_plan)
     db.session.commit()
 
-    flash('Generated new AI Diet Plan tailored to your current role & preferences!', 'success')
+    flash(f'Your {state_override} meal plan has been updated!', 'success')
     return redirect(url_for('diet.view_plan'))
 
 
