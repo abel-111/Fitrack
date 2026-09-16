@@ -2,7 +2,7 @@
 {% block title %}Dashboard — Fitrack{% endblock %}
 {% block content %}
 <div class="page-wrapper">
-    <!-- Hero Banner with Role & AI Coach Insight -->
+    <!-- Hero Banner with Role & Daily Focus -->
     <div class="ai-hero-banner">
         <div class="ai-hero-content">
             <div style="display:flex; align-items:center; gap:10px; margin-bottom:4px; flex-wrap:wrap;">
@@ -14,7 +14,7 @@
                 <span class="badge-chip badge-cyan">{{ current_user.goal|capitalize }}</span>
             </div>
             <p class="ai-hero-desc" style="margin-top:6px;">
-                <strong>✨ AI Daily Focus:</strong> {{ ai_insights.daily_priority }}
+                <strong>🌿 Coach's Daily Focus:</strong> {{ ai_insights.daily_priority }}
             </p>
         </div>
         <div>
@@ -41,7 +41,7 @@
             </div>
             <div class="stat-value">{{ current_streak }} <span style="font-size:14px; color:var(--text-muted);">day{{ 's' if current_streak != 1 }}</span></div>
             <div class="stat-subtext">
-                {% if current_streak > 0 %}Streak is blazing! Keep it going.{% else %}Check in today to start a new streak!{% endif %}
+                {% if current_streak > 0 %}Consistency is building! Keep going.{% else %}Check in today to start your consistency streak!{% endif %}
             </div>
             <div class="progress-bar-wrap">
                 <div class="progress-bar-fill progress-bar-coral" style="width: {{ [current_streak * 14, 100]|min }}%;"></div>
@@ -75,7 +75,7 @@
         <div class="stat-card">
             <div class="stat-label">
                 <span>Daily Nutrition Target</span>
-                <span style="font-size:16px;">🥗</span>
+                <span style="font-size:16px;">🍛</span>
             </div>
             <div class="stat-value">{{ calorie_target }} <span style="font-size:14px; color:var(--text-muted);">kcal</span></div>
             <div class="stat-subtext">{{ macros.protein }}g Protein • {{ macros.carbs }}g Carbs • {{ macros.fat }}g Fat</div>
@@ -88,17 +88,17 @@
     <!-- Interactive Navigation Hub Cards -->
     <h3 style="font-size:18px; font-weight:700; margin-bottom:1rem; color:#fff;">Quick Hub</h3>
     <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(280px, 1fr)); gap:1.25rem;">
-        <!-- AI Diet Card -->
+        <!-- South Indian Nutrition Plan Card -->
         <div class="stat-card" style="border-left: 3px solid #ff4757;">
             <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:8px;">
-                <h4 style="font-size:16px; font-weight:700; color:#fff;">🥗 AI Diet Blueprint</h4>
-                <span class="badge-chip badge-coral">Role Optimized</span>
+                <h4 style="font-size:16px; font-weight:700; color:#fff;">🍛 South Indian Nutrition Plan</h4>
+                <span class="badge-chip badge-coral">Regional Staples</span>
             </div>
             <p style="color:var(--text-secondary); font-size:13px; margin-bottom:14px;">
-                Personalized 4-meal plan with exact portions, macros, and dietary preferences tailored to your {{ role_info.title }} schedule.
+                Personalized 4-meal plan with exact portions, macros, and South Indian staples tailored for your {{ role_info.title }} schedule.
             </p>
             <a href="{{ url_for('diet.view_plan') }}" class="btn-secondary-custom" style="font-size:13px; padding:7px 14px;">
-                View AI Diet Plan →
+                View Today's Meals →
             </a>
         </div>
 
@@ -128,7 +128,7 @@
             </div>
             <p style="color:var(--text-secondary); font-size:13px; margin-bottom:14px;">
                 {% if current_user.weight_kg %}Current: {{ current_user.weight_kg }}kg{% else %}No weight logged yet{% endif %}.
-                Log regularly to view your progress forecast chart.
+                Log regularly to view your progress trend and body recomposition.
             </p>
             <a href="{{ url_for('weight.history') }}" class="btn-secondary-custom" style="font-size:13px; padding:7px 14px;">
                 Log Weight →
@@ -136,10 +136,10 @@
         </div>
 
         <!-- Preferred Days Card -->
-        <div class="stat-card" style="border-left: 3px solid #a55eea;">
+        <div class="stat-card" style="border-left: 3px solid #f59e0b;">
             <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:8px;">
                 <h4 style="font-size:16px; font-weight:700; color:#fff;">🗓 Training Schedule</h4>
-                <span class="badge-chip badge-ai">Weekly</span>
+                <span class="badge-chip badge-emerald">Weekly</span>
             </div>
             <p style="color:var(--text-secondary); font-size:13px; margin-bottom:14px;">
                 {% if preferred_days %}
