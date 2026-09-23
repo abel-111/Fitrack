@@ -1,5 +1,5 @@
 {% extends "base.html" %}
-{% block title %}South Indian Nutrition & Meals — Fitrack{% endblock %}
+{% block title %}Daily Nutrition & Meals — Fitrack{% endblock %}
 {% block content %}
 <div class="page-wrapper">
     <!-- Top Hero Banner with Nutrition Focus -->
@@ -15,10 +15,188 @@
                 <strong>Daily Nutrition Focus:</strong> {{ role_info.diet_focus }}
             </p>
         </div>
-        <div>
-            <button class="btn-primary-custom" onclick="openGenModal()" type="button">
+        <div style="display:flex; gap:8px; flex-wrap:wrap;">
+            <button class="btn-primary-custom" onclick="openFoodLogger()" type="button" style="background:#059669; box-shadow:0 4px 14px rgba(5,150,105,0.25);">
+                ＋ Log What You Eat
+            </button>
+            <button class="btn-secondary-custom" onclick="openGenModal()" type="button">
                 ⚙️ Customize Meal Plan
             </button>
+        </div>
+    </div>
+
+    <!-- DAILY FOOD TRACKER & CALORIE / PROTEIN INTAKE -->
+    <div class="food-tracker-card" id="foodTrackerSection">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1rem; flex-wrap:wrap; gap:10px;">
+            <div>
+                <div style="display:flex; align-items:center; gap:8px;">
+                    <span style="font-size:22px;">🍽️</span>
+                    <h3 style="font-size:20px; font-weight:700; color:var(--text-primary); margin:0;">Daily Food Tracker & Intake</h3>
+                    <span class="badge-chip badge-coral" style="font-size:11px;">Calories & Protein</span>
+                </div>
+                <p style="font-size:13px; color:var(--text-secondary); margin-top:3px;">
+                    Log everything you eat throughout the day. Track real-time calories and protein against your goal.
+                </p>
+            </div>
+            <button type="button" class="btn-primary-custom" onclick="openFoodLogger()" style="padding:7px 16px; font-size:13px;">
+                ＋ Add Food Entry
+            </button>
+        </div>
+
+        <!-- Date Navigator Bar -->
+        <div class="food-date-nav">
+            <div class="food-date-controls">
+                <a href="{{ url_for('diet.view_plan', date=prev_date_str) }}" class="food-date-btn" title="Previous Day">
+                    ← {{ prev_date_str }}
+                </a>
+                {% if not is_today %}
+                <a href="{{ url_for('diet.view_plan') }}" class="food-date-btn" style="background:var(--brand-primary); color:#fff; border-color:var(--brand-primary);">
+                    📅 Jump to Today
+                </a>
+                {% endif %}
+            </div>
+
+            <div class="food-date-badge">
+                <span>📅 {{ food_summary.date_display }}</span>
+                {% if is_today %}
+                    <span class="badge-chip badge-emerald" style="font-size:11px;">Today</span>
+                {% else %}
+                    <span class="badge-chip" style="font-size:11px; background:rgba(109,40,217,0.1); color:var(--brand-primary);">History</span>
+                {% endif %}
+            </div>
+
+            <div class="food-date-controls">
+                <input type="date" id="jumpDateInput" value="{{ selected_date_str }}" class="form-control" style="padding:4px 8px; font-size:12px; height:auto; width:auto;" onchange="window.location.href='{{ url_for('diet.view_plan') }}?date=' + this.value">
+                <a href="{{ url_for('diet.view_plan', date=next_date_str) }}" class="food-date-btn" title="Next Day">
+                    {{ next_date_str }} →
+                </a>
+            </div>
+        </div>
+
+        <!-- Macro Stats Row -->
+        <div class="food-stats-grid">
+            <!-- Calories Tracked Box -->
+            <div class="food-stat-box" style="border-left: 3px solid #ff4757;">
+                <div class="food-stat-top">
+                    <span class="food-stat-title">🔥 Calories Consumed</span>
+                    <span class="badge-chip {% if food_summary.over_calorie_budget %}badge-purple{% else %}badge-coral{% endif %}" style="font-size:11px;">
+                        {{ food_summary.calorie_pct }}%
+                    </span>
+                </div>
+                <div class="food-stat-numbers">
+                    <span class="food-stat-val">{{ food_summary.total_calories }}</span>
+                    <span class="food-stat-sub">/ {{ food_summary.calorie_target }} kcal</span>
+                </div>
+                <div class="progress-bar-wrap" style="height:8px; margin:4px 0 6px;">
+                    <div class="progress-bar-fill {% if food_summary.over_calorie_budget %}progress-bar-purple{% else %}progress-bar-coral{% endif %}" style="width: {{ food_summary.calorie_pct }}%;"></div>
+                </div>
+                <div class="food-stat-desc">
+                    {% if food_summary.over_calorie_budget %}
+                        <span style="color:#6d28d9; font-weight:700;">⚠️ {{ food_summary.total_calories - food_summary.calorie_target }} kcal over daily budget</span>
+                    {% else %}
+                        <span>🔥 <strong>{{ food_summary.remaining_calories }} kcal</strong> remaining today</span>
+                    {% endif %}
+                </div>
+            </div>
+
+            <!-- Protein Tracked Box -->
+            <div class="food-stat-box" style="border-left: 3px solid #059669;">
+                <div class="food-stat-top">
+                    <span class="food-stat-title">🥩 Protein Consumed</span>
+                    <span class="badge-chip badge-emerald" style="font-size:11px;">
+                        {{ food_summary.protein_pct }}%
+                    </span>
+                </div>
+                <div class="food-stat-numbers">
+                    <span class="food-stat-val">{{ food_summary.total_protein }}g</span>
+                    <span class="food-stat-sub">/ {{ food_summary.protein_target }}g</span>
+                </div>
+                <div class="progress-bar-wrap" style="height:8px; margin:4px 0 6px;">
+                    <div class="progress-bar-fill progress-bar-emerald" style="width: {{ food_summary.protein_pct }}%;"></div>
+                </div>
+                <div class="food-stat-desc">
+                    {% if food_summary.remaining_protein == 0 %}
+                        <span style="color:#059669; font-weight:700;">✓ Protein target reached! Excellent muscle fuel.</span>
+                    {% else %}
+                        <span>🥩 <strong>{{ food_summary.remaining_protein }}g</strong> needed to reach target</span>
+                    {% endif %}
+                </div>
+            </div>
+
+            <!-- Carbs & Fat Tracked Box -->
+            <div class="food-stat-box" style="border-left: 3px solid #0284c7;">
+                <div class="food-stat-top">
+                    <span class="food-stat-title">🌾 Carbs & Healthy Fats</span>
+                    <span class="badge-chip badge-cyan" style="font-size:11px;">Macros</span>
+                </div>
+                <div class="food-stat-numbers" style="gap:14px;">
+                    <div>
+                        <div style="font-size:11px; color:var(--text-muted); text-transform:uppercase;">Carbs</div>
+                        <span style="font-size:20px; font-weight:700; color:#0284c7;">{{ food_summary.total_carbs }}g</span>
+                    </div>
+                    <div>
+                        <div style="font-size:11px; color:var(--text-muted); text-transform:uppercase;">Fats</div>
+                        <span style="font-size:20px; font-weight:700; color:#d97706;">{{ food_summary.total_fat }}g</span>
+                    </div>
+                </div>
+                <div class="food-stat-desc" style="margin-top:10px;">
+                    Total logged foods: <strong>{{ food_summary.count }}</strong> item{{ 's' if food_summary.count != 1 }}
+                </div>
+            </div>
+        </div>
+
+        <!-- 4-Meal Logs Grid (Breakfast, Lunch, Snack, Dinner) -->
+        <h4 style="font-size:16px; font-weight:700; color:var(--text-primary); margin-bottom:0.75rem;">
+            Food Logged by Meal
+        </h4>
+        <div class="meal-logs-grid">
+            {% for m_key, m_data in food_summary.meals.items() %}
+            <div class="meal-log-box">
+                <div>
+                    <div class="meal-log-header">
+                        <div class="meal-log-title">
+                            <span>{{ m_data.icon }}</span> {{ m_data.label }}
+                        </div>
+                        <div style="display:flex; gap:6px; align-items:center;">
+                            <span class="badge-macro-cals">{{ m_data.calories }} kcal</span>
+                            <span class="badge-macro-prot">{{ m_data.protein }}g P</span>
+                        </div>
+                    </div>
+
+                    {% if m_data.food_items %}
+                    <ul class="meal-items-list">
+                        {% for item in m_data.food_items %}
+                        <li class="food-log-item">
+                            <div class="food-log-info">
+                                <div class="food-log-name">{{ item.food_name }}</div>
+                                <div class="food-log-meta">
+                                    <span>{{ item.quantity }}x ({{ item.serving_size }})</span>
+                                    {% if item.carbs > 0 %}<span>• {{ item.carbs|round(1) }}g C</span>{% endif %}
+                                    {% if item.fat > 0 %}<span>• {{ item.fat|round(1) }}g F</span>{% endif %}
+                                </div>
+                            </div>
+                            <div class="food-log-macros">
+                                <span class="badge-macro-cals">{{ item.calories|round }} kcal</span>
+                                <span class="badge-macro-prot">{{ item.protein|round(1) }}g P</span>
+                                <form method="POST" action="{{ url_for('diet.delete_food_log', log_id=item.id) }}" style="margin:0;" onsubmit="return confirm('Remove {{ item.food_name }} from your log?');">
+                                    <button type="submit" class="food-delete-btn" title="Remove food item">✕</button>
+                                </form>
+                            </div>
+                        </li>
+                        {% endfor %}
+                    </ul>
+                    {% else %}
+                    <div class="meal-empty-hint">
+                        No {{ m_data.label.lower() }} logged yet.
+                    </div>
+                    {% endif %}
+                </div>
+
+                <button type="button" class="btn-add-meal-item" onclick="openFoodLogger('{{ m_key }}')">
+                    ＋ Add to {{ m_data.label }}
+                </button>
+            </div>
+            {% endfor %}
         </div>
     </div>
 
@@ -78,7 +256,7 @@
         <div style="display:flex; align-items:center; gap:1rem;">
             <div>
                 <span style="font-size:12px; color:var(--text-muted); text-transform:uppercase; font-weight:600;">Today's Meal Adherence</span>
-                <div style="font-size:18px; font-weight:700; color:#fff;" id="adherenceSummary">
+                <div style="font-size:18px; font-weight:700; color:var(--text-primary);" id="adherenceSummary">
                     {{ completed_meals }} of {{ total_meals }} meals logged (<span id="adherencePct">{{ adherence_pct }}%</span>)
                 </div>
             </div>
@@ -96,10 +274,85 @@
         </form>
     </div>
 
+    <!-- WHAT TYPE OF FOOD IS NEEDED TODAY? (REGIONAL CUISINE FOCUS: KERALA, TAMIL NADU, NORTH INDIAN) -->
+    <div class="stat-card" style="margin-bottom: 2rem; border-top: 4px solid #7c3aed; background: var(--bg-surface);">
+        <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:1rem; flex-wrap:wrap; gap:12px;">
+            <div>
+                <div style="display:flex; align-items:center; gap:8px;">
+                    <span style="font-size:22px;">🍛</span>
+                    <h3 style="font-size:20px; font-weight:700; color:var(--text-primary); margin:0;">What Type of Food is Needed Today?</h3>
+                    <span class="badge-chip badge-coral" style="font-size:11px;">Regional Nutrition Guide</span>
+                </div>
+                <p style="font-size:13.5px; color:var(--text-secondary); margin-top:5px; max-width:820px; line-height:1.5;">
+                    Explore what foods your body needs today to reach your <strong>{{ current_user.goal|capitalize }}</strong> target.
+                    Discover chef-curated menus across <strong>Kerala Style</strong>, <strong>Tamil Nadu Style</strong>, and <strong>North Indian Style</strong> — with special emphasis on authentic Kerala and Tamil Nadu traditions.
+                </p>
+            </div>
+            <div style="display:flex; gap:8px; flex-wrap:wrap;">
+                <button type="button" class="regional-tab-btn active" id="tabBtnKerala" onclick="switchRegionalCuisine('kerala')">
+                    🌴 Kerala Style <span class="badge-chip badge-emerald" style="font-size:10px; margin-left:4px;">Deep Focus</span>
+                </button>
+                <button type="button" class="regional-tab-btn" id="tabBtnTamil" onclick="switchRegionalCuisine('tamil_nadu')">
+                    🌶️ Tamil Nadu Style <span class="badge-chip badge-coral" style="font-size:10px; margin-left:4px;">Deep Focus</span>
+                </button>
+                <button type="button" class="regional-tab-btn" id="tabBtnNorth" onclick="switchRegionalCuisine('north_indian')">
+                    🌾 North Indian Style
+                </button>
+                <button type="button" class="regional-tab-btn" id="tabBtnContinental" onclick="switchRegionalCuisine('continental')">
+                    🍝 Continental Style
+                </button>
+            </div>
+        </div>
+
+        {% for c_key, c_info in regional_recommendations.items() %}
+        <div class="regional-cuisine-panel" id="panel-{{ c_key }}" style="display: {% if c_key == 'kerala' %}block{% else %}none{% endif %};">
+            <div style="background: rgba(124, 58, 237, 0.04); border: 1px solid var(--border-subtle); border-radius: var(--radius-md); padding: 14px 18px; margin-bottom: 1.25rem; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px;">
+                <div>
+                    <div style="display:flex; align-items:center; gap:8px; margin-bottom:4px;">
+                        <span style="font-size:20px;">{{ c_info.icon }}</span>
+                        <strong style="color:var(--text-primary); font-size:16px;">{{ c_info.title }}</strong>
+                        <span class="badge-chip" style="font-size:11px; background:rgba(124, 58, 237, 0.12); color:var(--brand-primary); font-weight:600;">{{ c_info.highlight }}</span>
+                    </div>
+                    <p style="font-size:13px; color:var(--text-secondary); margin:0;">
+                        {{ c_info.tagline }}
+                    </p>
+                </div>
+                <div style="background:#fff; border:1px solid var(--border-subtle); border-radius:var(--radius-sm); padding:8px 14px; font-size:12.5px; color:var(--text-secondary); max-width:420px; line-height:1.4;">
+                    <strong style="color:var(--brand-primary);">💡 Why this style today:</strong> {{ c_info.why_today }}
+                </div>
+            </div>
+
+            <!-- Regional Dishes Grid -->
+            <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(260px, 1fr)); gap:1rem;">
+                {% for m in c_info.meals %}
+                <div style="background: var(--bg-surface-elevated); border: 1px solid var(--border-subtle); border-radius: var(--radius-md); padding: 14px; display: flex; flex-direction: column; justify-content: space-between;">
+                    <div>
+                        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:6px;">
+                            <span style="font-size:11px; font-weight:700; text-transform:uppercase; color:var(--text-muted); letter-spacing:0.5px;">{{ m.slot }}</span>
+                            <span class="badge-chip badge-cyan" style="font-size:10.5px;">Today's Pick</span>
+                        </div>
+                        <h4 style="font-size:14.5px; font-weight:700; color:var(--text-primary); margin-bottom:6px; line-height:1.35;">{{ m.dish }}</h4>
+                        <div style="font-size:12px; font-weight:600; color:var(--brand-primary); margin-bottom:8px;">
+                            {{ m.macros }}
+                        </div>
+                        <p style="font-size:12.5px; color:var(--text-secondary); margin-bottom:8px; line-height:1.45;">
+                            {{ m.description }}
+                        </p>
+                    </div>
+                    <div style="background:rgba(5, 150, 105, 0.08); border-left:3px solid var(--accent-emerald); border-radius:4px; padding:6px 8px; font-size:11.5px; color:#065f46; line-height:1.35; margin-top:8px;">
+                        <strong>Key Benefit:</strong> {{ m.pro_tip }}
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+
     <!-- 4-Meal Plan Grid -->
     <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1rem;">
         <div>
-            <h3 style="font-size:20px; font-weight:700; color:var(--text-primary); margin:0;">Today's Meal Plan</h3>
+            <h3 style="font-size:20px; font-weight:700; color:var(--text-primary); margin:0;">Today's Active Meal Plan</h3>
             <p style="font-size:13px; color:var(--text-secondary); margin-top:3px;">Scaled to your exact macros with wholesome regional staples and portion guides.</p>
         </div>
         <span class="badge-chip badge-emerald" style="font-size:12px;">Balanced Macros</span>
@@ -155,12 +408,21 @@
                         {% if meal.completed %}✓ Logged as eaten{% else %}Pending meal{% endif %}
                     </span>
                 </span>
-                <button type="button" 
-                        class="check-meal-btn {% if meal.completed %}is-checked{% endif %}" 
-                        id="btn-{{ meal.id }}" 
-                        onclick="toggleMeal('{{ meal.id }}')">
-                    <span id="check-icon-{{ meal.id }}">{% if meal.completed %}✓ Eaten{% else %}○ Mark Eaten{% endif %}</span>
-                </button>
+                <div style="display:flex; gap:8px; align-items:center;">
+                    <form method="POST" action="{{ url_for('diet.log_plan_meal') }}" style="margin:0;">
+                        <input type="hidden" name="meal_id" value="{{ meal.id }}">
+                        <input type="hidden" name="date" value="{{ selected_date_str }}">
+                        <button type="submit" class="log-plan-meal-btn" title="Add this meal to today's Food Tracker">
+                            <span>＋ Log to Tracker</span>
+                        </button>
+                    </form>
+                    <button type="button" 
+                            class="check-meal-btn {% if meal.completed %}is-checked{% endif %}" 
+                            id="btn-{{ meal.id }}" 
+                            onclick="toggleMeal('{{ meal.id }}')">
+                        <span id="check-icon-{{ meal.id }}">{% if meal.completed %}✓ Eaten{% else %}○ Mark Eaten{% endif %}</span>
+                    </button>
+                </div>
             </div>
         </div>
         {% endfor %}
@@ -184,9 +446,9 @@
             <div style="background:rgba(255,255,255,0.02); border:1px solid var(--border-subtle); border-radius:var(--radius-sm); padding:14px;">
                 <div style="display:flex; align-items:center; gap:8px; margin-bottom:6px;">
                     <span style="font-size:18px;">🍚</span>
-                    <strong style="color:#fff; font-size:14px;">The 1-Cup Rice Rule</strong>
+                    <strong style="color:var(--text-primary); font-size:14px;">The 1-Cup Rice Rule</strong>
                 </div>
-                <p style="font-size:12.5px; color:#cbd5e1; margin:0; line-height:1.5;">
+                <p style="font-size:12.5px; color:var(--text-secondary); margin:0; line-height:1.5;">
                     Never fear rice! Limit cooked Ponni brown or Kerala Red Matta rice to 1 standard cup, and double your bowl of keerai kootu or vegetable poriyal for fiber.
                 </p>
             </div>
@@ -194,9 +456,9 @@
             <div style="background:rgba(255,255,255,0.02); border:1px solid var(--border-subtle); border-radius:var(--radius-sm); padding:14px;">
                 <div style="display:flex; align-items:center; gap:8px; margin-bottom:6px;">
                     <span style="font-size:18px;">🥘</span>
-                    <strong style="color:#fff; font-size:14px;">Supercharge Sambar & Rasam</strong>
+                    <strong style="color:var(--text-primary); font-size:14px;">Supercharge Sambar & Rasam</strong>
                 </div>
-                <p style="font-size:12.5px; color:#cbd5e1; margin:0; line-height:1.5;">
+                <p style="font-size:12.5px; color:var(--text-secondary); margin:0; line-height:1.5;">
                     Add 2 boiled eggs, pan-seared paneer cubes, or boiled soya chunks directly into your bowl of hot vegetable sambar for an effortless 20-30g protein meal.
                 </p>
             </div>
@@ -204,9 +466,9 @@
             <div style="background:rgba(255,255,255,0.02); border:1px solid var(--border-subtle); border-radius:var(--radius-sm); padding:14px;">
                 <div style="display:flex; align-items:center; gap:8px; margin-bottom:6px;">
                     <span style="font-size:18px;">🌱</span>
-                    <strong style="color:#fff; font-size:14px;">Sundal over Fried Bajjis</strong>
+                    <strong style="color:var(--text-primary); font-size:14px;">Sundal over Fried Bajjis</strong>
                 </div>
-                <p style="font-size:12.5px; color:#cbd5e1; margin:0; line-height:1.5;">
+                <p style="font-size:12.5px; color:var(--text-secondary); margin:0; line-height:1.5;">
                     Make 1 cup of spiced kala chana, green peas, or sprouted moong sundal your regular 4 PM tiffin instead of deep-fried bajjis or medu vadas.
                 </p>
             </div>
@@ -214,9 +476,9 @@
             <div style="background:rgba(255,255,255,0.02); border:1px solid var(--border-subtle); border-radius:var(--radius-sm); padding:14px;">
                 <div style="display:flex; align-items:center; gap:8px; margin-bottom:6px;">
                     <span style="font-size:18px;">🥛</span>
-                    <strong style="color:#fff; font-size:14px;">Neer Mor: Natural Electrolyte</strong>
+                    <strong style="color:var(--text-primary); font-size:14px;">Neer Mor: Natural Electrolyte</strong>
                 </div>
-                <p style="font-size:12.5px; color:#cbd5e1; margin:0; line-height:1.5;">
+                <p style="font-size:12.5px; color:var(--text-secondary); margin:0; line-height:1.5;">
                     Diluted buttermilk with crushed ginger, curry leaves, and a pinch of pink salt cools the gut, supports digestion, and restores minerals after tough workouts.
                 </p>
             </div>
@@ -224,9 +486,9 @@
             <div style="background:rgba(255,255,255,0.02); border:1px solid var(--border-subtle); border-radius:var(--radius-sm); padding:14px;">
                 <div style="display:flex; align-items:center; gap:8px; margin-bottom:6px;">
                     <span style="font-size:18px;">☕</span>
-                    <strong style="color:#fff; font-size:14px;">Smart Filter Coffee</strong>
+                    <strong style="color:var(--text-primary); font-size:14px;">Smart Filter Coffee</strong>
                 </div>
-                <p style="font-size:12.5px; color:#cbd5e1; margin:0; line-height:1.5;">
+                <p style="font-size:12.5px; color:var(--text-secondary); margin:0; line-height:1.5;">
                     Enjoy your degree coffee guilt-free! Use toned milk and cut down refined white sugar. Having it 45 mins pre-workout gives a wonderful natural energy lift.
                 </p>
             </div>
@@ -326,12 +588,337 @@
     </div>
 </div>
 
+<!-- Modal: Add Food / Log What You Eat -->
+<div class="modal-overlay" id="foodLogModal" style="display:none;">
+    <div class="modal-card" style="max-width: 650px; max-height: 90vh; overflow-y: auto;">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1rem;">
+            <div>
+                <h3 style="font-size:20px; font-weight:700; color:var(--text-primary); margin:0;">🍽️ Add What You Eat</h3>
+                <p style="font-size:12.5px; color:var(--text-secondary); margin-top:2px;">Track your calories and protein by selecting common foods or typing custom items.</p>
+            </div>
+            <button type="button" onclick="closeFoodLogger()" style="background:none; border:none; color:var(--text-muted); font-size:24px; cursor:pointer;">&times;</button>
+        </div>
+
+        <!-- Mode Tabs: Preset Search vs Custom Entry -->
+        <div class="logger-tabs">
+            <button type="button" class="logger-tab-btn active" id="tabPresetBtn" onclick="switchLoggerTab('preset')">
+                🔍 Common Foods Database
+            </button>
+            <button type="button" class="logger-tab-btn" id="tabCustomBtn" onclick="switchLoggerTab('custom')">
+                ✏️ Custom Food Entry
+            </button>
+        </div>
+
+        <!-- TAB 1: PRESET FOOD SEARCH & SELECT -->
+        <div id="loggerPresetPanel">
+            <form method="POST" action="{{ url_for('diet.add_food_log') }}" id="presetFoodForm">
+                <input type="hidden" name="date" value="{{ selected_date_str }}">
+                <input type="hidden" name="food_name" id="selectedFoodName">
+                <input type="hidden" name="serving_size" id="selectedFoodServing">
+                <input type="hidden" name="calories" id="selectedFoodCals">
+                <input type="hidden" name="protein" id="selectedFoodProt">
+                <input type="hidden" name="carbs" id="selectedFoodCarbs">
+                <input type="hidden" name="fat" id="selectedFoodFat">
+                <input type="hidden" name="is_per_unit" value="false">
+
+                <!-- Meal Slot Selection -->
+                <div class="form-group" style="margin-bottom:12px;">
+                    <label style="font-size:13px; font-weight:600; color:var(--text-primary);">Meal Slot</label>
+                    <select name="meal_type" id="presetMealSlot" class="form-control" style="font-weight:600;">
+                        <option value="breakfast">🌅 Breakfast</option>
+                        <option value="lunch">☀️ Lunch</option>
+                        <option value="snack" selected>☕ Evening Tiffin / Snack</option>
+                        <option value="dinner">🌙 Dinner</option>
+                    </select>
+                </div>
+
+                <!-- Live Search Box -->
+                <div class="form-group" style="margin-bottom:10px;">
+                    <input type="text" id="presetSearchInput" class="form-control" placeholder="Search food (e.g. egg, chicken, idli, rice, paneer, whey)..." oninput="filterPresetFoods()" autocomplete="off">
+                </div>
+
+                <!-- Category Filter Pills -->
+                <div class="category-chips-row">
+                    {% for c_id, c_name in food_categories %}
+                        <button type="button" class="cat-chip {% if loop.first %}active{% endif %}" onclick="selectFoodCategory('{{ c_id }}', this)">
+                            {{ c_name }}
+                        </button>
+                    {% endfor %}
+                </div>
+
+                <!-- Preset Food Grid -->
+                <div class="preset-food-list" id="presetFoodList">
+                    {% for f in common_foods %}
+                    <div class="preset-food-card" 
+                         data-id="{{ f.id }}"
+                         data-name="{{ f.name }}"
+                         data-serving="{{ f.serving_size }}"
+                         data-cals="{{ f.calories }}"
+                         data-prot="{{ f.protein }}"
+                         data-carbs="{{ f.carbs }}"
+                         data-fat="{{ f.fat }}"
+                         data-cat="{{ f.category }}"
+                         data-tags="{{ f.tags|join(' ') }}"
+                         onclick="selectPresetFood('{{ f.id }}')">
+                        <div>
+                            <div class="preset-food-title"><span>{{ f.icon }}</span> {{ f.name }}</div>
+                            <div class="preset-food-serving">{{ f.serving_size }}</div>
+                        </div>
+                        <div class="preset-food-macros">
+                            <span class="badge-macro-cals">{{ f.calories }} kcal</span>
+                            <span class="badge-macro-prot">{{ f.protein }}g P</span>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+
+                <!-- Selection Configuration & Multiplier -->
+                <div id="selectionConfigBox" style="background:var(--bg-surface-elevated); border:1px solid var(--border-subtle); border-radius:var(--radius-md); padding:12px 14px; margin-bottom:1rem; display:none;">
+                    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px; flex-wrap:wrap; gap:8px;">
+                        <div>
+                            <div style="font-size:11px; text-transform:uppercase; color:var(--brand-primary); font-weight:700;">Selected Food</div>
+                            <strong style="font-size:15px; color:var(--text-primary);" id="previewSelectedName">—</strong>
+                            <div style="font-size:12px; color:var(--text-muted);" id="previewSelectedServing">1 serving</div>
+                        </div>
+                        <div style="display:flex; align-items:center; gap:8px;">
+                            <span style="font-size:12px; color:var(--text-secondary); font-weight:600;">Quantity:</span>
+                            <div class="stepper-row">
+                                <button type="button" class="stepper-btn" onclick="changeQty(-0.5)">−</button>
+                                <input type="number" name="quantity" id="presetQtyInput" class="stepper-input" value="1.0" min="0.1" step="0.5" oninput="recalcPresetTotals()">
+                                <button type="button" class="stepper-btn" onclick="changeQty(0.5)">+</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Recalculated Macros preview -->
+                    <div class="macro-calc-box">
+                        <div class="macro-calc-item">
+                            <div class="label">Total Calories</div>
+                            <div class="val" id="calcCals">0 <span style="font-size:11px;">kcal</span></div>
+                        </div>
+                        <div class="macro-calc-item">
+                            <div class="label">Total Protein</div>
+                            <div class="val" id="calcProt" style="color:#059669;">0 <span style="font-size:11px;">g</span></div>
+                        </div>
+                        <div class="macro-calc-item">
+                            <div class="label">Carbs</div>
+                            <div class="val" id="calcCarbs" style="color:#0284c7;">0 <span style="font-size:11px;">g</span></div>
+                        </div>
+                        <div class="macro-calc-item">
+                            <div class="label">Fats</div>
+                            <div class="val" id="calcFat" style="color:#d97706;">0 <span style="font-size:11px;">g</span></div>
+                        </div>
+                    </div>
+                </div>
+
+                <div style="display:flex; gap:10px;">
+                    <button type="button" onclick="closeFoodLogger()" class="btn-secondary-custom" style="flex:1;">Cancel</button>
+                    <button type="submit" id="btnSubmitPreset" class="btn-primary-custom" style="flex:2;" disabled>
+                        ＋ Log Selected Food
+                    </button>
+                </div>
+            </form>
+        </div>
+
+        <!-- TAB 2: CUSTOM FOOD ENTRY -->
+        <div id="loggerCustomPanel" style="display:none;">
+            <form method="POST" action="{{ url_for('diet.add_food_log') }}">
+                <input type="hidden" name="date" value="{{ selected_date_str }}">
+                <input type="hidden" name="is_per_unit" value="false">
+
+                <div class="form-group">
+                    <label>Meal Slot</label>
+                    <select name="meal_type" id="customMealSlot" class="form-control">
+                        <option value="breakfast">🌅 Breakfast</option>
+                        <option value="lunch">☀️ Lunch</option>
+                        <option value="snack" selected>☕ Evening Tiffin / Snack</option>
+                        <option value="dinner">🌙 Dinner</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label>Food Item Name</label>
+                    <input type="text" name="food_name" class="form-control" placeholder="e.g. Sambar Rice with 2 Boiled Eggs, Protein Smoothie..." required>
+                </div>
+
+                <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px;">
+                    <div class="form-group">
+                        <label>Portion / Serving Size</label>
+                        <input type="text" name="serving_size" class="form-control" placeholder="e.g. 1 plate, 1 bowl, 200g" value="1 serving">
+                    </div>
+                    <div class="form-group">
+                        <label>Quantity / Number of Servings</label>
+                        <input type="number" name="quantity" class="form-control" value="1.0" min="0.1" step="0.5">
+                    </div>
+                </div>
+
+                <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px;">
+                    <div class="form-group">
+                        <label>Calories (kcal) *</label>
+                        <input type="number" name="calories" class="form-control" placeholder="e.g. 350" min="0" step="1" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Protein (grams) *</label>
+                        <input type="number" name="protein" class="form-control" placeholder="e.g. 24" min="0" step="0.5" required>
+                    </div>
+                </div>
+
+                <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px;">
+                    <div class="form-group">
+                        <label>Carbs (grams, optional)</label>
+                        <input type="number" name="carbs" class="form-control" placeholder="e.g. 45" min="0" step="0.5">
+                    </div>
+                    <div class="form-group">
+                        <label>Fat (grams, optional)</label>
+                        <input type="number" name="fat" class="form-control" placeholder="e.g. 8" min="0" step="0.5">
+                    </div>
+                </div>
+
+                <div style="display:flex; gap:10px; margin-top:1.5rem;">
+                    <button type="button" onclick="closeFoodLogger()" class="btn-secondary-custom" style="flex:1;">Cancel</button>
+                    <button type="submit" class="btn-primary-custom" style="flex:2;">✓ Save & Log Food</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
 <script>
     function openGenModal() {
         document.getElementById('genModal').style.display = 'flex';
     }
     function closeGenModal() {
         document.getElementById('genModal').style.display = 'none';
+    }
+
+    /* --- FOOD LOGGER FUNCTIONS --- */
+    let currentSelectedFood = null;
+    let currentCategoryFilter = 'all';
+
+    function openFoodLogger(mealSlot) {
+        if (mealSlot) {
+            const slotSelect = document.getElementById('presetMealSlot');
+            const customSlotSelect = document.getElementById('customMealSlot');
+            if (slotSelect) slotSelect.value = mealSlot;
+            if (customSlotSelect) customSlotSelect.value = mealSlot;
+        }
+        document.getElementById('foodLogModal').style.display = 'flex';
+        // Auto-select first food if none selected
+        if (!currentSelectedFood) {
+            const firstCard = document.querySelector('.preset-food-card');
+            if (firstCard) {
+                firstCard.click();
+            }
+        }
+    }
+
+    function closeFoodLogger() {
+        document.getElementById('foodLogModal').style.display = 'none';
+    }
+
+    function switchLoggerTab(tab) {
+        const presetPanel = document.getElementById('loggerPresetPanel');
+        const customPanel = document.getElementById('loggerCustomPanel');
+        const tabPresetBtn = document.getElementById('tabPresetBtn');
+        const tabCustomBtn = document.getElementById('tabCustomBtn');
+
+        if (tab === 'preset') {
+            presetPanel.style.display = 'block';
+            customPanel.style.display = 'none';
+            tabPresetBtn.classList.add('active');
+            tabCustomBtn.classList.remove('active');
+        } else {
+            presetPanel.style.display = 'none';
+            customPanel.style.display = 'block';
+            tabCustomBtn.classList.add('active');
+            tabPresetBtn.classList.remove('active');
+        }
+    }
+
+    function selectFoodCategory(catId, btnEl) {
+        currentCategoryFilter = catId;
+        document.querySelectorAll('.cat-chip').forEach(c => c.classList.remove('active'));
+        if (btnEl) btnEl.classList.add('active');
+        filterPresetFoods();
+    }
+
+    function filterPresetFoods() {
+        const query = (document.getElementById('presetSearchInput').value || '').toLowerCase().trim();
+        const cards = document.querySelectorAll('.preset-food-card');
+
+        cards.forEach(card => {
+            const name = (card.getAttribute('data-name') || '').toLowerCase();
+            const cat = (card.getAttribute('data-cat') || '').toLowerCase();
+            const tags = (card.getAttribute('data-tags') || '').toLowerCase();
+
+            const matchesCategory = (currentCategoryFilter === 'all' || cat === currentCategoryFilter);
+            const matchesQuery = !query || name.includes(query) || tags.includes(query) || cat.includes(query);
+
+            if (matchesCategory && matchesQuery) {
+                card.style.display = 'flex';
+            } else {
+                card.style.display = 'none';
+            }
+        });
+    }
+
+    function selectPresetFood(foodId) {
+        const cards = document.querySelectorAll('.preset-food-card');
+        cards.forEach(c => c.classList.remove('selected'));
+
+        const card = document.querySelector(`.preset-food-card[data-id="${foodId}"]`);
+        if (!card) return;
+
+        card.classList.add('selected');
+
+        currentSelectedFood = {
+            id: foodId,
+            name: card.getAttribute('data-name'),
+            serving: card.getAttribute('data-serving'),
+            cals: parseFloat(card.getAttribute('data-cals')) || 0,
+            prot: parseFloat(card.getAttribute('data-prot')) || 0,
+            carbs: parseFloat(card.getAttribute('data-carbs')) || 0,
+            fat: parseFloat(card.getAttribute('data-fat')) || 0,
+        };
+
+        document.getElementById('selectionConfigBox').style.display = 'block';
+        document.getElementById('previewSelectedName').textContent = currentSelectedFood.name;
+        document.getElementById('previewSelectedServing').textContent = currentSelectedFood.serving;
+
+        document.getElementById('btnSubmitPreset').disabled = false;
+
+        recalcPresetTotals();
+    }
+
+    function changeQty(delta) {
+        const qtyInput = document.getElementById('presetQtyInput');
+        let val = parseFloat(qtyInput.value) || 1.0;
+        val = Math.max(0.5, Math.round((val + delta) * 10) / 10);
+        qtyInput.value = val;
+        recalcPresetTotals();
+    }
+
+    function recalcPresetTotals() {
+        if (!currentSelectedFood) return;
+        const qty = Math.max(0.1, parseFloat(document.getElementById('presetQtyInput').value) || 1.0);
+
+        const totalCals = Math.round(currentSelectedFood.cals * qty);
+        const totalProt = Math.round((currentSelectedFood.prot * qty) * 10) / 10;
+        const totalCarbs = Math.round((currentSelectedFood.carbs * qty) * 10) / 10;
+        const totalFat = Math.round((currentSelectedFood.fat * qty) * 10) / 10;
+
+        document.getElementById('calcCals').innerHTML = `${totalCals} <span style="font-size:11px;">kcal</span>`;
+        document.getElementById('calcProt').innerHTML = `${totalProt} <span style="font-size:11px;">g</span>`;
+        document.getElementById('calcCarbs').innerHTML = `${totalCarbs} <span style="font-size:11px;">g</span>`;
+        document.getElementById('calcFat').innerHTML = `${totalFat} <span style="font-size:11px;">g</span>`;
+
+        // Update hidden form inputs
+        document.getElementById('selectedFoodName').value = currentSelectedFood.name;
+        document.getElementById('selectedFoodServing').value = currentSelectedFood.serving;
+        document.getElementById('selectedFoodCals').value = totalCals;
+        document.getElementById('selectedFoodProt').value = totalProt;
+        document.getElementById('selectedFoodCarbs').value = totalCarbs;
+        document.getElementById('selectedFoodFat').value = totalFat;
     }
 
     async function toggleMeal(mealId) {
@@ -366,6 +953,33 @@
             }
         } catch (err) {
             console.error('Failed to toggle meal:', err);
+        }
+    }
+
+    function switchRegionalCuisine(cuisineKey) {
+        // Hide all panels
+        const panels = document.querySelectorAll('.regional-cuisine-panel');
+        panels.forEach(p => p.style.display = 'none');
+
+        // Deactivate all buttons
+        const tabBtns = document.querySelectorAll('.regional-tab-btn');
+        tabBtns.forEach(b => b.classList.remove('active'));
+
+        // Show targeted panel
+        const targetPanel = document.getElementById('panel-' + cuisineKey);
+        if (targetPanel) {
+            targetPanel.style.display = 'block';
+        }
+
+        // Activate active button
+        if (cuisineKey === 'kerala') {
+            document.getElementById('tabBtnKerala')?.classList.add('active');
+        } else if (cuisineKey === 'tamil_nadu') {
+            document.getElementById('tabBtnTamil')?.classList.add('active');
+        } else if (cuisineKey === 'north_indian') {
+            document.getElementById('tabBtnNorth')?.classList.add('active');
+        } else if (cuisineKey === 'continental') {
+            document.getElementById('tabBtnContinental')?.classList.add('active');
         }
     }
 </script>

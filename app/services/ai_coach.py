@@ -1345,12 +1345,182 @@ def ask_ai_coach(user, query):
     # Fallback greeting & helpful prompts
     else:
         return (
-            f"Vanakkam {user.username}! I'm Coach Raghav, your South Indian fitness and nutrition mentor.\n\n"
-            f"I'm here to help you get great results while enjoying wholesome home food. What can I help you with?\n\n"
-            f"• ☕ **Filter Coffee & Fitness:** How to enjoy it without hindering goals\n"
-            f"• 🍛 **Rice & Macro Balance:** How to eat rice without guilt\n"
-            f"• 🧀 **Vegetarian High Protein:** Top South Indian protein hacks\n"
-            f"• ⚡ **Pre-Workout Fuel:** Best snacks before the gym\n"
-            f"• 🥗 **Daily Targets:** Your calories, protein, and meal ideas\n\n"
+            f"Vanakkam {user.username}! I'm Coach Raghav, your personal fitness and nutrition mentor.\n\n"
+            f"I'm here to help you get great results while enjoying wholesome regional food (Kerala, Tamil Nadu, North Indian and beyond). What can I help you with?\n\n"
+            f"• 🌴 **Kerala & Tamil Nadu Meal Styles:** Top traditional dishes & macro hacks\n"
+            f"• ☕ **Filter Coffee & Energy:** How to enjoy it around your workouts\n"
+            f"• 🏋️ **Progressive Overload:** Next weight targets for your bench, squats & rows\n"
+            f"• 🧀 **High-Protein Staples:** Best choices for veg and non-veg diets\n"
+            f"• 🥗 **Daily Targets:** Your calories, protein, and personalized meal ideas\n\n"
             f"Feel free to ask me anything about meals, workouts, or daily habits!"
         )
+
+
+def get_regional_food_recommendations_today(user, dietary_preference=None):
+    """
+    Returns today's curated regional food recommendations comparing:
+    - Kerala Style (Heavily Featured)
+    - Tamil Nadu Style (Heavily Featured)
+    - North Indian Style
+    Each with morning tiffin, lunch feast, evening snack, and dinner with macros, portioning and health benefits.
+    """
+    pref = dietary_preference or getattr(user, 'dietary_preference', 'standard') or 'standard'
+    is_veg = pref in ('vegetarian', 'vegan')
+    is_low_carb = pref == 'keto'
+
+    data = {
+        'kerala': {
+            'title': 'Kerala Style Food',
+            'tagline': 'High Micronutrient Coastal & Coconut Infusions with Red Matta Rice & Steamed Staples',
+            'icon': '🌴',
+            'highlight': 'Deep Focus • Kerala Cuisine',
+            'color': '#059669',
+            'why_today': 'Rich in slow-digesting antioxidants from red matta rice, healthy medium-chain fats from cold-pressed coconut oil, and clean protein from fish or kadala curry.',
+            'meals': [
+                {
+                    'slot': 'Breakfast',
+                    'dish': 'Steamed Puttu with Kadala Curry & Nendran Banana' if not is_low_carb else 'Kerala Egg Roast with Coconut Poriyal',
+                    'macros': '🔥 510 kcal • 24g Protein • 68g Carbs • 14g Fat' if not is_low_carb else '🔥 450 kcal • 28g Protein • 8g Carbs • 34g Fat',
+                    'description': 'Classic steamed rice & grated coconut puttu cylinders paired with roasted coconut and whole black chickpea gravy.',
+                    'pro_tip': 'Kadala (kala chana) gives steady morning amino acids and low-GI energy.'
+                },
+                {
+                    'slot': 'Lunch',
+                    'dish': 'Kerala Matta Sadya Plate (Avial, Olan, Thoran & Sambar)' if is_veg else 'Meen Pollichathu with Kerala Red Matta Rice & Cabbage Thoran',
+                    'macros': '🔥 560 kcal • 32g Protein • 72g Carbs • 16g Fat' if is_veg else '🔥 580 kcal • 46g Protein • 58g Carbs • 16g Fat',
+                    'description': 'Red matta rice paired with vegetable avial in fresh curd, coconut ash-gourd olan, and pan-seared spiced fish in banana leaf wrap.',
+                    'pro_tip': 'Kerala Matta rice contains 3x more magnesium and zinc than polished white rice.'
+                },
+                {
+                    'slot': 'Evening Tiffin',
+                    'dish': 'Pazham Puzhungiyathu (Steamed Nendran) with Tender Coconut Water' if not is_low_carb else 'Roasted Spicy Coconut Podi Paneer Cubes with Neer Mor',
+                    'macros': '🔥 220 kcal • 6g Protein • 42g Carbs • 3g Fat' if not is_low_carb else '🔥 260 kcal • 18g Protein • 6g Carbs • 18g Fat',
+                    'description': 'Naturally sweet steamed plantain or roasted coconut cubes paired with electrolyte-rich tender coconut water.',
+                    'pro_tip': 'Natural potassium and enzymes relieve afternoon muscle fatigue before workout.'
+                },
+                {
+                    'slot': 'Dinner',
+                    'dish': 'Lace Appams with Stew (Vegetable or Chicken/Egg) & Coconut Milk',
+                    'macros': '🔥 490 kcal • 34g Protein • 52g Carbs • 16g Fat' if not is_veg else '🔥 470 kcal • 22g Protein • 62g Carbs • 15g Fat',
+                    'description': 'Fermented crispy-edged lace appams simmered with aromatic shallot, ginger, and curry leaf stew.',
+                    'pro_tip': 'Fermented appam batter aids gut biome digestion before bedtime.'
+                }
+            ]
+        },
+        'tamil_nadu': {
+            'title': 'Tamil Nadu Style Food',
+            'tagline': 'Bold Pepper, Toor Dal Paruppu, Chettinad Spices & Calcium-Rich Millets',
+            'icon': '🌶️',
+            'highlight': 'Deep Focus • Tamil Nadu Cuisine',
+            'color': '#ff4757',
+            'why_today': 'Perfect balance of plant proteins from toor dal and sundal, black pepper for nutrient absorption (piperine), and iron-rich green keerai.',
+            'meals': [
+                {
+                    'slot': 'Breakfast',
+                    'dish': 'Mixed Dal Adai with Protein-Packed Avial' if is_veg else 'Kavil Idli / Ragi Idlis with Chettinad Egg Sambar',
+                    'macros': '🔥 510 kcal • 28g Protein • 62g Carbs • 15g Fat' if is_veg else '🔥 490 kcal • 32g Protein • 56g Carbs • 14g Fat',
+                    'description': 'Crisp multi-lentil crepes (chana, toor, moong dal) cooked with curry leaves and paired with homemade vegetable avial.',
+                    'pro_tip': 'Combining 3 lentils delivers a complete amino acid profile without any processed protein powder.'
+                },
+                {
+                    'slot': 'Lunch',
+                    'dish': 'Tamil Nadu Paruppu Meals — Ponni Rice, Keerai Poriyal & Pepper Rasam' if is_veg else 'Chettinad Pepper Chicken Sukka with Brown Rice & Dal Kootu',
+                    'macros': '🔥 560 kcal • 30g Protein • 76g Carbs • 14g Fat' if is_veg else '🔥 590 kcal • 48g Protein • 54g Carbs • 16g Fat',
+                    'description': 'Traditional banana leaf spread: 1 cup Ponni rice, fresh spinach keerai poriyal, thick toor dal, and fiery milagu rasam.',
+                    'pro_tip': 'Tamil pepper rasam improves gastric enzyme secretion and digestion.'
+                },
+                {
+                    'slot': 'Evening Tiffin',
+                    'dish': 'Kala Chana / Sprouted Moong Sundal with Filter Coffee',
+                    'macros': '🔥 260 kcal • 14g Protein • 34g Carbs • 6g Fat',
+                    'description': 'Spiced boiled chickpeas tossed with mustard, curry leaves, ginger, and fresh grated coconut alongside degree filter coffee.',
+                    'pro_tip': 'Sundal is the ultimate zero-junk Tamil fitness snack—14g pure fiber & protein.'
+                },
+                {
+                    'slot': 'Dinner',
+                    'dish': 'Whole Wheat Chapati / Milagu Rasam Sadam with Paneer or Egg Podimas',
+                    'macros': '🔥 490 kcal • 32g Protein • 52g Carbs • 15g Fat',
+                    'description': 'Warm spiced scramble of 2 eggs or fresh paneer with shallots, crushed pepper, and warm phulkas or light rasam rice.',
+                    'pro_tip': 'Light and anti-inflammatory pepper broth ensures restful sleep.'
+                }
+            ]
+        },
+        'north_indian': {
+            'title': 'North Indian Style Food',
+            'tagline': 'Hearty Whole-Wheat Rotis, Paneer Bhurji, Soya Chaap & Slow-Simmered Dals',
+            'icon': '🌾',
+            'highlight': 'Wholesome North Indian Option',
+            'color': '#7c3aed',
+            'why_today': 'Rich in complex wheat gluten fiber, dairy-based caseins (paneer & dahi), and legume proteins (rajma, chole, and yellow moong dal).',
+            'meals': [
+                {
+                    'slot': 'Breakfast',
+                    'dish': 'Paneer Bhurji with 2 Whole Wheat Phulkas' if is_veg else 'Spiced 3-Egg Bhurji with Multigrain Roti',
+                    'macros': '🔥 480 kcal • 28g Protein • 44g Carbs • 20g Fat' if is_veg else '🔥 470 kcal • 32g Protein • 38g Carbs • 18g Fat',
+                    'description': 'Fresh crumbled cottage cheese or eggs tossed with cumin, chopped onions, tomatoes, and fresh coriander, served with warm dry phulkas.',
+                    'pro_tip': 'Paneer provides slow-digesting casein protein that curbs hunger for 4-5 hours.'
+                },
+                {
+                    'slot': 'Lunch',
+                    'dish': 'Punjabi Rajma Chawal with Cucumber Mint Raita' if is_veg else 'Tandoori Murgh / Chicken Curry with 2 Phulkas & Dal Tadka',
+                    'macros': '🔥 540 kcal • 26g Protein • 78g Carbs • 12g Fat' if is_veg else '🔥 570 kcal • 46g Protein • 52g Carbs • 16g Fat',
+                    'description': 'Slow-simmered red kidney beans in roasted ginger-garlic gravy served with steamed basmati rice and cooling dahi raita.',
+                    'pro_tip': 'Rajma is packed with soluble fiber which stabilizes blood glucose spikes.'
+                },
+                {
+                    'slot': 'Evening Tiffin',
+                    'dish': 'Roasted Chana Chaat / Sprouted Chole with Green Chutney',
+                    'macros': '🔥 240 kcal • 13g Protein • 34g Carbs • 5g Fat',
+                    'description': 'Crunchy roasted chickpeas with diced tomatoes, onions, lemon juice, chaat masala, and mint-coriander chutney.',
+                    'pro_tip': 'High in resistant starch, ideal pre-workout fuel.'
+                },
+                {
+                    'slot': 'Dinner',
+                    'dish': 'Yellow Moong Dal Tadka with Paneer Tikka & Phulka' if is_veg else 'Grilled Chicken Tikka with Dal Palak & 2 Phulkas',
+                    'macros': '🔥 480 kcal • 30g Protein • 50g Carbs • 16g Fat' if is_veg else '🔥 510 kcal • 45g Protein • 42g Carbs • 15g Fat',
+                    'description': 'Light yellow lentil soup tempered with cumin and garlic, paired with spiced grilled paneer or chicken and fresh spinach dal.',
+                    'pro_tip': 'Moong dal is easiest on the stomach for night-time gut recovery.'
+                }
+            ]
+        },
+        'continental': {
+            'title': 'Continental Style Food',
+            'tagline': 'Mediterranean Grills, Baked Proteins, Fresh Salads & Whole Grain Pastas',
+            'icon': '🍝',
+            'highlight': 'Global Fusion • Continental Cuisine',
+            'color': '#e17055',
+            'why_today': 'Lean grilled proteins, olive oil-based healthy fats, complex carbs from whole grains, and micronutrient-dense salads for optimal recovery and performance.',
+            'meals': [
+                {
+                    'slot': 'Breakfast',
+                    'dish': 'Greek Yogurt Parfait with Granola, Berries & Honey' if is_veg else 'Herb Scrambled Eggs on Sourdough Toast with Avocado',
+                    'macros': '🔥 460 kcal • 22g Protein • 54g Carbs • 16g Fat' if is_veg else '🔥 480 kcal • 30g Protein • 38g Carbs • 22g Fat',
+                    'description': 'Creamy Greek yogurt layered with crunchy oat granola, mixed berries, and a drizzle of raw honey.' if is_veg else 'Farm-fresh scrambled eggs with fresh herbs, served on toasted sourdough with smashed avocado and cherry tomatoes.',
+                    'pro_tip': 'Greek yogurt has 2x the protein of regular yogurt and supports gut health with probiotics.'
+                },
+                {
+                    'slot': 'Lunch',
+                    'dish': 'Mediterranean Quinoa Bowl with Grilled Halloumi & Hummus' if is_veg else 'Grilled Chicken Caesar Salad with Whole Wheat Croutons',
+                    'macros': '🔥 540 kcal • 28g Protein • 62g Carbs • 18g Fat' if is_veg else '🔥 560 kcal • 46g Protein • 32g Carbs • 24g Fat',
+                    'description': 'Fluffy quinoa tossed with roasted bell peppers, olives, cucumber, cherry tomatoes, and pan-seared halloumi cheese.' if is_veg else 'Crisp romaine lettuce with herb-marinated grilled chicken breast, shaved parmesan, and a light lemon-anchovy dressing.',
+                    'pro_tip': 'Quinoa is a complete protein source with all 9 essential amino acids — rare for a plant food.'
+                },
+                {
+                    'slot': 'Evening Snack',
+                    'dish': 'Baked Sweet Potato Wedges with Tzatziki Dip' if not is_low_carb else 'Caprese Skewers with Balsamic Glaze & Mixed Nuts',
+                    'macros': '🔥 230 kcal • 8g Protein • 38g Carbs • 5g Fat' if not is_low_carb else '🔥 250 kcal • 14g Protein • 8g Carbs • 18g Fat',
+                    'description': 'Oven-baked crispy sweet potato wedges seasoned with rosemary and paprika, paired with cool cucumber-yogurt tzatziki.' if not is_low_carb else 'Fresh mozzarella, cherry tomatoes, and basil drizzled with aged balsamic alongside a handful of roasted almonds.',
+                    'pro_tip': 'Sweet potatoes are rich in beta-carotene and provide sustained energy without blood sugar spikes.'
+                },
+                {
+                    'slot': 'Dinner',
+                    'dish': 'Whole Wheat Penne Arrabbiata with Grilled Zucchini & Parmesan' if is_veg else 'Pan-Seared Salmon Fillet with Roasted Vegetables & Brown Rice',
+                    'macros': '🔥 490 kcal • 24g Protein • 64g Carbs • 14g Fat' if is_veg else '🔥 530 kcal • 42g Protein • 38g Carbs • 20g Fat',
+                    'description': 'Al dente whole wheat penne in spicy tomato-garlic sauce with charred zucchini ribbons and fresh basil.' if is_veg else 'Omega-3 rich salmon seared to perfection with a medley of roasted Mediterranean vegetables and nutty brown rice.',
+                    'pro_tip': 'Salmon provides 2g+ of omega-3 fatty acids per serving — essential for reducing workout inflammation.'
+                }
+            ]
+        }
+    }
+    return data
+
