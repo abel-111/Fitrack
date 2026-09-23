@@ -74,52 +74,80 @@
 
         <div class="stat-card">
             <div class="stat-label">
-                <span>Daily Nutrition Target</span>
+                <span>Daily Calories & Protein</span>
                 <span style="font-size:16px;">🍛</span>
             </div>
-            <div class="stat-value">{{ calorie_target }} <span style="font-size:14px; color:var(--text-muted);">kcal</span></div>
-            <div class="stat-subtext">{{ macros.protein }}g Protein • {{ macros.carbs }}g Carbs • {{ macros.fat }}g Fat</div>
-            <div class="progress-bar-wrap">
-                <div class="progress-bar-fill progress-bar-cyan" style="width: 85%;"></div>
+            <div class="stat-value">{{ today_food.total_calories }} <span style="font-size:14px; color:var(--text-muted);">/ {{ calorie_target }} kcal</span></div>
+            <div class="stat-subtext">🥩 <strong>{{ today_food.total_protein }}g</strong> / {{ macros.protein }}g Protein ({{ today_food.protein_pct }}%)</div>
+            <div class="progress-bar-wrap" title="{{ today_food.total_calories }} of {{ calorie_target }} kcal">
+                <div class="progress-bar-fill {% if today_food.over_calorie_budget %}progress-bar-purple{% else %}progress-bar-cyan{% endif %}" style="width: {{ today_food.calorie_pct }}%;"></div>
             </div>
         </div>
     </div>
 
     <!-- Interactive Navigation Hub Cards -->
-    <h3 style="font-size:18px; font-weight:700; margin-bottom:1rem; color:#fff;">Quick Hub</h3>
+    <h3 style="font-size:18px; font-weight:700; margin-bottom:1rem; color:var(--text-primary);">Quick Hub</h3>
     <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(280px, 1fr)); gap:1.25rem;">
-        <!-- South Indian Nutrition Plan Card -->
+        <!-- Nutrition Plan Card -->
         <div class="stat-card" style="border-left: 3px solid #ff4757;">
             <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:8px;">
-                <h4 style="font-size:16px; font-weight:700; color:#fff;">🍛 South Indian Nutrition Plan</h4>
-                <span class="badge-chip badge-coral">Regional Staples</span>
+                <h4 style="font-size:16px; font-weight:700; color:var(--text-primary);">🍛 Food Tracker & Meal Plan</h4>
+                <span class="badge-chip badge-coral">{{ today_food.count }} Logged</span>
+            </div>
+            <div style="background:rgba(124,58,237,0.06); border:1px solid var(--border-subtle); border-radius:6px; padding:6px 10px; margin-bottom:10px; font-size:12.5px;">
+                Today: <strong style="color:var(--text-primary);">{{ today_food.total_calories }} kcal</strong> • <strong style="color:var(--brand-primary);">{{ today_food.total_protein }}g Protein</strong>
+                {% if today_food.remaining_protein > 0 %}
+                    <span style="color:var(--text-muted); font-size:11.5px;">({{ today_food.remaining_protein }}g protein to target)</span>
+                {% else %}
+                    <span style="color:#059669; font-weight:600; font-size:11.5px;">✓ Protein hit!</span>
+                {% endif %}
             </div>
             <p style="color:var(--text-secondary); font-size:13px; margin-bottom:14px;">
-                Personalized 4-meal plan with exact portions, macros, and South Indian staples tailored for your {{ role_info.title }} schedule.
+                Log what you eat to track your daily calories & protein, or follow your personalized meal plan.
             </p>
-            <a href="{{ url_for('diet.view_plan') }}" class="btn-secondary-custom" style="font-size:13px; padding:7px 14px;">
-                View Today's Meals →
-            </a>
+            <div style="display:flex; gap:8px;">
+                <a href="{{ url_for('diet.view_plan') }}" class="btn-primary-custom" style="font-size:12.5px; padding:6px 14px;">
+                    ＋ Log What You Eat
+                </a>
+                <a href="{{ url_for('diet.view_plan') }}" class="btn-secondary-custom" style="font-size:12.5px; padding:6px 12px;">
+                    View Meals →
+                </a>
+            </div>
         </div>
 
         <!-- Workout Plan Card -->
         <div class="stat-card" style="border-left: 3px solid #00d2d3;">
             <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:8px;">
-                <h4 style="font-size:16px; font-weight:700; color:#fff;">🏋️ Workout Routine</h4>
-                <span class="badge-chip badge-cyan">{{ current_user.fitness_level|capitalize }}</span>
+                <h4 style="font-size:16px; font-weight:700; color:var(--text-primary);">🏋️ Workout & Lift Tracker</h4>
+                <span class="badge-chip badge-cyan">{% if today_workout and today_workout.total_exercises > 0 %}{{ today_workout.total_exercises }} Logged{% else %}{{ current_user.fitness_level|capitalize }}{% endif %}</span>
             </div>
+            {% if today_workout and today_workout.total_exercises > 0 %}
+                <div style="background:rgba(124,58,237,0.08); border:1px solid rgba(124,58,237,0.25); border-radius:6px; padding:6px 10px; margin-bottom:10px; font-size:12.5px;">
+                    Today: <strong style="color:var(--text-primary);">{{ today_workout.total_exercises }} Exercises</strong> • <strong style="color:var(--brand-primary);">{{ today_workout.total_sets }} Sets</strong> ({{ today_workout.total_volume }} kg vol)
+                </div>
+            {% elif latest_lift %}
+                <div style="background:rgba(5,150,105,0.08); border:1px solid rgba(5,150,105,0.25); border-radius:6px; padding:6px 10px; margin-bottom:10px; font-size:12.5px;">
+                    Lifted: <strong style="color:var(--text-primary);">{{ latest_lift.exercise_name }} {{ latest_lift.weight }}{{ latest_lift.unit }}</strong> 
+                    → Next Goal: <strong style="color:#059669;">{{ latest_lift.target_next_weight }}{{ latest_lift.unit }} 🎯</strong>
+                </div>
+            {% endif %}
             <p style="color:var(--text-secondary); font-size:13px; margin-bottom:14px;">
-                Custom resistance split with role-specific mobility warm-ups, progressive overload tracking, and form cues.
+                Track what you did today with sets, reps, volume, and automatic progressive overload next goals!
             </p>
-            <a href="{{ url_for('workouts.plan') }}" class="btn-secondary-custom" style="font-size:13px; padding:7px 14px;">
-                Start Workout →
-            </a>
+            <div style="display:flex; gap:8px;">
+                <a href="{{ url_for('workouts.plan') }}" class="btn-primary-custom" style="font-size:12.5px; padding:6px 14px;">
+                    ＋ Log What You Did
+                </a>
+                <a href="{{ url_for('workouts.plan') }}" class="btn-secondary-custom" style="font-size:12.5px; padding:6px 12px;">
+                    View Tracker →
+                </a>
+            </div>
         </div>
 
         <!-- Weight Tracking Card -->
         <div class="stat-card" style="border-left: 3px solid #10b981;">
             <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:8px;">
-                <h4 style="font-size:16px; font-weight:700; color:#fff;">📈 Weight & BMI</h4>
+                <h4 style="font-size:16px; font-weight:700; color:var(--text-primary);">📈 Weight & BMI</h4>
                 {% if bmi %}
                     <span class="badge-chip badge-emerald">BMI {{ bmi }}</span>
                 {% else %}
@@ -138,12 +166,12 @@
         <!-- Preferred Days Card -->
         <div class="stat-card" style="border-left: 3px solid #f59e0b;">
             <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:8px;">
-                <h4 style="font-size:16px; font-weight:700; color:#fff;">🗓 Training Schedule</h4>
+                <h4 style="font-size:16px; font-weight:700; color:var(--text-primary);">🗓 Training Schedule</h4>
                 <span class="badge-chip badge-emerald">Weekly</span>
             </div>
             <p style="color:var(--text-secondary); font-size:13px; margin-bottom:14px;">
                 {% if preferred_days %}
-                    Scheduled days: <strong style="color:#fff;">{{ preferred_days|join(', ') }}</strong>
+                    Scheduled days: <strong style="color:var(--text-primary);">{{ preferred_days|join(', ') }}</strong>
                 {% else %}
                     No preferred days selected yet. Choose the days you hit the gym!
                 {% endif %}

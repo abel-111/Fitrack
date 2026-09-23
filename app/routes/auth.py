@@ -67,16 +67,19 @@ def logout():
 @login_required
 def dashboard():
     from app.services.ai_coach import ROLE_DETAILS, get_user_ai_recommendations
-    from app.models import UserDietPlan
+    from app.models import UserDietPlan, LiftLog
 
     role_key = current_user.role if current_user.role in ROLE_DETAILS else 'general'
     role_info = ROLE_DETAILS[role_key]
     ai_insights = get_user_ai_recommendations(current_user)
     active_plan = UserDietPlan.query.filter_by(user_id=current_user.id, is_active=True).first()
+    latest_lift = LiftLog.query.filter_by(user_id=current_user.id).order_by(LiftLog.logged_at.desc()).first()
 
     bmi, bmi_cat = current_user.calculate_bmi()
     calorie_target = current_user.get_calorie_target()
     macros = current_user.get_target_macros()
+    today_food = current_user.get_daily_food_summary()
+    today_workout = current_user.get_daily_workout_summary()
 
     return render_template(
         'dashboard.html',
@@ -91,7 +94,10 @@ def dashboard():
         bmi=bmi,
         bmi_category=bmi_cat,
         calorie_target=calorie_target,
-        macros=macros
+        macros=macros,
+        latest_lift=latest_lift,
+        today_food=today_food,
+        today_workout=today_workout
     )
 
 
