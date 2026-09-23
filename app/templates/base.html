@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{% block title %}Fitrack — South Indian Fitness & Nutrition{% endblock %}</title>
+    <title>{% block title %}Fitrack — Smart Fitness & Nutrition{% endblock %}</title>
     <link href="{{ url_for('static', filename='css/style.css') }}" rel="stylesheet">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -13,7 +13,6 @@
         <div class="nav-brand-group">
             <a class="navbar-brand" href="{{ url_for('auth.dashboard') if current_user.is_authenticated else url_for('auth.login') }}">
                 🏋️ Fit<span class="logo-highlight">rack</span>
-                <span class="brand-tagline">South Indian Fitness</span>
             </a>
 
             {% if current_user.is_authenticated %}
@@ -22,7 +21,7 @@
                     Dashboard
                 </a>
                 <a href="{{ url_for('diet.view_plan') }}" class="nav-link {% if request.blueprint == 'diet' %}active{% endif %}">
-                    🍛 Nutrition Plan
+                    🍛 Food & Nutrition
                 </a>
                 <a href="{{ url_for('workouts.plan') }}" class="nav-link {% if request.blueprint == 'workouts' %}active{% endif %}">
                     🏋️ Workouts
@@ -53,7 +52,7 @@
                 <div class="avatar-dropdown" id="avatarDropdown">
                     <div class="avatar-dropdown-name">{{ current_user.username }} ({{ current_user.get_role_display() }})</div>
                     <a href="{{ url_for('profile.view') }}">⚙️ Profile & Biometrics</a>
-                    <a href="{{ url_for('diet.view_plan') }}">🍛 South Indian Meal Plan</a>
+                    <a href="{{ url_for('diet.view_plan') }}">🍛 Nutrition & Meal Plan</a>
                     <a href="{{ url_for('workouts.plan') }}">🏋️ Workout Split</a>
                     <a href="{{ url_for('ai.recommendations') }}">🌿 Personal Coach Hub</a>
                     <a href="{{ url_for('leaderboard.leaderboard') }}">🏆 Community</a>
@@ -89,13 +88,13 @@
         <div class="ai-chat-header">
             <div class="ai-chat-title">
                 <span>🌿</span> Coach Raghav
-                <span class="badge-chip badge-coach" style="font-size:10px; padding:2px 7px;">South Indian Nutrition Mentor</span>
+                <span class="badge-chip badge-coach" style="font-size:10px; padding:2px 7px;">Personal Fitness & Nutrition Mentor</span>
             </div>
             <button class="ai-chat-close" id="aiChatClose" type="button">&times;</button>
         </div>
         <div class="ai-chat-body" id="aiChatBody">
             <div class="chat-bubble chat-bubble-bot">
-                Vanakkam <strong>{{ current_user.username }}</strong>! I'm Coach Raghav, your South Indian fitness and nutrition mentor. How can I assist you with your home meals, workouts, or daily habits today?
+                Vanakkam <strong>{{ current_user.username }}</strong>! I'm Coach Raghav, your personal fitness and nutrition mentor. How can I assist you with your home meals, workouts, or daily habits today?
             </div>
             <div class="chat-quick-chips">
                 <button class="chip-btn" onclick="sendQuickPrompt('What are high-protein South Indian vegetarian meals?')">🧀 High-Protein Veg</button>
