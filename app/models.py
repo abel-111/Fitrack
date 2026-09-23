@@ -30,8 +30,11 @@ class User(UserMixin, db.Model):
 
     attendances = db.relationship('Attendance', backref='user', lazy=True)
     weight_logs = db.relationship('WeightLog', backref='user', lazy=True)
+    lift_logs = db.relationship('LiftLog', backref='user', lazy=True, order_by='desc(LiftLog.logged_at)')
     preferred_days = db.relationship('PreferredDay', backref='user', lazy=True)
     diet_plans = db.relationship('UserDietPlan', backref='user', lazy=True, order_by='desc(UserDietPlan.created_at)')
+    food_logs = db.relationship('FoodLog', backref='user', lazy=True, order_by='desc(FoodLog.logged_at)')
+    workout_logs = db.relationship('WorkoutLog', backref='user', lazy=True, order_by='desc(WorkoutLog.logged_at)')
 
     ROLE_LABELS = {
         'desk_worker': '💼 Desk Worker',
@@ -195,6 +198,133 @@ class User(UserMixin, db.Model):
         days = {pd.day_of_week for pd in self.preferred_days}
         return [d for d in self.DAY_ORDER if d in days]
 
+    def get_daily_food_summary(self, target_date=None):
+        """
+        Calculates total calories, protein, carbs, fat consumed on target_date (default today),
+        and compares with user's targets. Returns grouped logs by meal type.
+        """
+        if target_date is None:
+            target_date = date.today()
+        elif isinstance(target_date, str):
+            try:
+                target_date = datetime.strptime(target_date, '%Y-%m-%d').date()
+            except ValueError:
+                target_date = date.today()
+
+        logs = FoodLog.query.filter_by(user_id=self.id, date=target_date).order_by(FoodLog.logged_at.asc()).all()
+
+        total_cals = sum(l.calories for l in logs)
+        total_protein = sum(l.protein for l in logs)
+        total_carbs = sum(l.carbs for l in logs)
+        total_fat = sum(l.fat for l in logs)
+
+        targets = self.get_target_macros()
+        cals_target = targets.get('calories', 2000)
+        protein_target = targets.get('protein', 130)
+
+        cals_pct = min(100, round((total_cals / cals_target * 100))) if cals_target > 0 else 0
+        protein_pct = min(100, round((total_protein / protein_target * 100))) if protein_target > 0 else 0
+
+        rem_cals = max(0, round(cals_target - total_cals))
+        rem_protein = max(0.0, round(protein_target - total_protein, 1))
+
+        meals = {
+            'breakfast': {'key': 'breakfast', 'label': 'Breakfast', 'icon': '🌅', 'food_items': [], 'calories': 0.0, 'protein': 0.0},
+            'lunch': {'key': 'lunch', 'label': 'Lunch', 'icon': '☀️', 'food_items': [], 'calories': 0.0, 'protein': 0.0},
+            'snack': {'key': 'snack', 'label': 'Evening Tiffin / Snack', 'icon': '☕', 'food_items': [], 'calories': 0.0, 'protein': 0.0},
+            'dinner': {'key': 'dinner', 'label': 'Dinner', 'icon': '🌙', 'food_items': [], 'calories': 0.0, 'protein': 0.0},
+        }
+
+        for l in logs:
+            m_type = (l.meal_type or 'snack').lower()
+            if m_type not in meals:
+                m_type = 'snack'
+            meals[m_type]['food_items'].append(l)
+            meals[m_type]['calories'] += l.calories
+            meals[m_type]['protein'] += l.protein
+
+        for m in meals.values():
+            m['calories'] = round(m['calories'])
+            m['protein'] = round(m['protein'], 1)
+
+        return {
+            'date': target_date,
+            'date_str': target_date.strftime('%Y-%m-%d'),
+            'date_display': target_date.strftime('%A, %b %d'),
+            'is_today': target_date == date.today(),
+            'total_calories': round(total_cals),
+            'total_protein': round(total_protein, 1),
+            'total_carbs': round(total_carbs, 1),
+            'total_fat': round(total_fat, 1),
+            'calorie_target': cals_target,
+            'protein_target': protein_target,
+            'calorie_pct': cals_pct,
+            'protein_pct': protein_pct,
+            'remaining_calories': rem_cals,
+            'remaining_protein': rem_protein,
+            'over_calorie_budget': total_cals > cals_target,
+            'logs': logs,
+            'meals': meals,
+            'count': len(logs)
+        }
+
+    def get_daily_workout_summary(self, target_date=None):
+        """
+        Calculates total exercises, sets, volume lifted, duration on target_date (default today),
+        and returns grouped workout logs by muscle / workout category.
+        """
+        if target_date is None:
+            target_date = date.today()
+        elif isinstance(target_date, str):
+            try:
+                target_date = datetime.strptime(target_date, '%Y-%m-%d').date()
+            except ValueError:
+                target_date = date.today()
+
+        logs = WorkoutLog.query.filter_by(user_id=self.id, date=target_date).order_by(WorkoutLog.logged_at.asc()).all()
+
+        total_exercises = len(logs)
+        total_sets = sum(l.sets for l in logs)
+        total_volume = sum(l.get_total_volume() for l in logs)
+        total_duration = sum((l.duration_mins or 0) for l in logs)
+
+        categories = {
+            'chest': {'key': 'chest', 'label': 'Chest & Triceps', 'icon': '🏋️', 'exercises': [], 'total_sets': 0, 'total_volume': 0.0},
+            'back': {'key': 'back', 'label': 'Back & Biceps', 'icon': '🚣', 'exercises': [], 'total_sets': 0, 'total_volume': 0.0},
+            'legs': {'key': 'legs', 'label': 'Legs & Glutes', 'icon': '🦵', 'exercises': [], 'total_sets': 0, 'total_volume': 0.0},
+            'shoulders': {'key': 'shoulders', 'label': 'Shoulders & Traps', 'icon': '🥥', 'exercises': [], 'total_sets': 0, 'total_volume': 0.0},
+            'arms': {'key': 'arms', 'label': 'Arms & Forearms', 'icon': '💪', 'exercises': [], 'total_sets': 0, 'total_volume': 0.0},
+            'core': {'key': 'core', 'label': 'Core & Abs', 'icon': '🧘', 'exercises': [], 'total_sets': 0, 'total_volume': 0.0},
+            'cardio': {'key': 'cardio', 'label': 'Cardio & Conditioning', 'icon': '🏃', 'exercises': [], 'total_sets': 0, 'total_volume': 0.0},
+            'custom': {'key': 'custom', 'label': 'Custom & Functional', 'icon': '⚡', 'exercises': [], 'total_sets': 0, 'total_volume': 0.0},
+        }
+
+        for l in logs:
+            cat_key = (l.category or 'custom').lower()
+            if cat_key not in categories:
+                cat_key = 'custom'
+            categories[cat_key]['exercises'].append(l)
+            categories[cat_key]['total_sets'] += (l.sets or 0)
+            categories[cat_key]['total_volume'] += l.get_total_volume()
+
+        for c in categories.values():
+            c['total_volume'] = round(c['total_volume'], 1)
+
+        return {
+            'date': target_date,
+            'date_str': target_date.strftime('%Y-%m-%d'),
+            'date_display': target_date.strftime('%A, %b %d'),
+            'is_today': target_date == date.today(),
+            'total_exercises': total_exercises,
+            'total_sets': total_sets,
+            'total_volume': round(total_volume, 1),
+            'total_duration': total_duration,
+            'categories': categories,
+            'logs': logs,
+            'has_workouts': total_exercises > 0
+        }
+
+
 
 
 class Attendance(db.Model):
@@ -234,3 +364,119 @@ class UserDietPlan(db.Model):
     role_tips = db.Column(db.Text, nullable=True)     # JSON-encoded or newline-separated tips
     is_active = db.Column(db.Boolean, default=True)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
+
+
+class LiftLog(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    exercise_name = db.Column(db.String(100), nullable=False)
+    weight = db.Column(db.Float, nullable=False)
+    unit = db.Column(db.String(10), default='kg')  # 'kg' or 'lbs'
+    reps = db.Column(db.Integer, default=10)
+    target_next_weight = db.Column(db.Float, nullable=False)
+    notes = db.Column(db.String(200), nullable=True)
+    logged_at = db.Column(db.DateTime, default=datetime.utcnow)
+
+    @staticmethod
+    def calculate_next_target(weight, unit='kg', exercise_name=''):
+        """
+        Calculates progressive overload next session goal.
+        Rule: If he bench presses 50kg -> next section bench 55kg (or in lbs: 100 lbs -> 110 lbs / +10 lbs).
+        For compound lifts (bench, squat, deadlift, overhead press, rows), increment is 5kg / 10 lbs.
+        For smaller isolation movements, increment is 2.5kg / 5 lbs.
+        """
+        name_lower = (exercise_name or '').lower()
+        is_lbs = (unit or 'kg').lower() == 'lbs'
+
+        is_compound = any(c in name_lower for c in ['bench', 'squat', 'deadlift', 'press', 'row'])
+
+        if is_lbs:
+            increment = 10.0 if is_compound else 5.0
+        else:
+            increment = 5.0 if is_compound else 2.5
+
+        return round(weight + increment, 1)
+
+
+class FoodLog(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    date = db.Column(db.Date, nullable=False, default=date.today, index=True)
+    meal_type = db.Column(db.String(30), nullable=False, default='snack')  # breakfast, lunch, snack, dinner
+    food_name = db.Column(db.String(150), nullable=False)
+    serving_size = db.Column(db.String(100), default='1 serving')
+    quantity = db.Column(db.Float, default=1.0)
+    calories = db.Column(db.Float, nullable=False, default=0.0)
+    protein = db.Column(db.Float, nullable=False, default=0.0)
+    carbs = db.Column(db.Float, default=0.0)
+    fat = db.Column(db.Float, default=0.0)
+    logged_at = db.Column(db.DateTime, default=datetime.utcnow)
+
+    MEAL_LABELS = {
+        'breakfast': ('Breakfast', '🌅'),
+        'lunch': ('Lunch', '☀️'),
+        'snack': ('Evening Tiffin / Snack', '☕'),
+        'dinner': ('Dinner', '🌙')
+    }
+
+    def get_meal_label(self):
+        info = self.MEAL_LABELS.get(self.meal_type, ('Snack', '☕'))
+        return f"{info[1]} {info[0]}"
+
+
+class WorkoutLog(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    date = db.Column(db.Date, nullable=False, default=date.today, index=True)
+    category = db.Column(db.String(40), nullable=False, default='custom')  # chest, back, legs, shoulders, arms, core, cardio, custom
+    exercise_name = db.Column(db.String(150), nullable=False)
+    sets = db.Column(db.Integer, default=3)
+    reps = db.Column(db.Integer, default=10)
+    weight = db.Column(db.Float, default=0.0)
+    unit = db.Column(db.String(10), default='kg')  # 'kg' or 'lbs'
+    duration_mins = db.Column(db.Integer, default=0)
+    calories_burned = db.Column(db.Float, default=0.0)
+    target_next_weight = db.Column(db.Float, nullable=True)
+    notes = db.Column(db.String(250), nullable=True)
+    is_custom = db.Column(db.Boolean, default=False)
+    logged_at = db.Column(db.DateTime, default=datetime.utcnow)
+
+    CATEGORY_META = {
+        'chest': ('Chest & Triceps', '🏋️'),
+        'back': ('Back & Biceps', '🚣'),
+        'legs': ('Legs & Glutes', '🦵'),
+        'shoulders': ('Shoulders & Traps', '🥥'),
+        'arms': ('Arms & Forearms', '💪'),
+        'core': ('Core & Abs', '🧘'),
+        'cardio': ('Cardio & Conditioning', '🏃'),
+        'custom': ('Custom & Functional', '⚡'),
+    }
+
+    def get_category_label(self):
+        info = self.CATEGORY_META.get(self.category, ('Custom & Functional', '⚡'))
+        return f"{info[1]} {info[0]}"
+
+    def get_total_volume(self):
+        w = self.weight or 0.0
+        s = self.sets or 1
+        r = self.reps or 1
+        return round(w * s * r, 1)
+
+    @staticmethod
+    def calculate_next_target(weight, unit='kg', exercise_name=''):
+        """
+        Progressive overload rule:
+        For compound lifts (bench, squat, deadlift, overhead press, rows), increment is 5kg / 10 lbs.
+        For smaller isolation movements, increment is 2.5kg / 5 lbs.
+        """
+        if weight is None or weight <= 0:
+            return 0.0
+        name_lower = (exercise_name or '').lower()
+        is_lbs = (unit or 'kg').lower() == 'lbs'
+        is_compound = any(c in name_lower for c in ['bench', 'squat', 'deadlift', 'press', 'row', 'pull-up', 'dips', 'lunge'])
+        if is_lbs:
+            increment = 10.0 if is_compound else 5.0
+        else:
+            increment = 5.0 if is_compound else 2.5
+        return round(weight + increment, 1)
+
