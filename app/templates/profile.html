@@ -36,36 +36,36 @@
             </div>
 
             <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-bottom:12px;">
-                <div style="background:rgba(255,255,255,0.03); border:1px solid var(--border-subtle); border-radius:var(--radius-sm); padding:10px;">
+                <div style="background:var(--bg-surface-elevated); border:1px solid var(--border-subtle); border-radius:var(--radius-sm); padding:10px;">
                     <span style="font-size:11px; color:var(--text-muted); text-transform:uppercase; font-weight:600;">Body Mass Index</span>
-                    <div style="font-size:18px; font-weight:700; color:#fff; margin-top:2px;">
-                        {% if bmi %}{{ bmi }} <span style="font-size:12px; font-weight:normal; color:#48dbfb;">({{ bmi_category }})</span>{% else %}Not set{% endif %}
+                    <div style="font-size:18px; font-weight:700; color:var(--text-primary); margin-top:2px;">
+                        {% if bmi %}{{ bmi }} <span style="font-size:12px; font-weight:normal; color:var(--brand-primary);">({{ bmi_category }})</span>{% else %}Not set{% endif %}
                     </div>
                 </div>
 
-                <div style="background:rgba(255,255,255,0.03); border:1px solid var(--border-subtle); border-radius:var(--radius-sm); padding:10px;">
+                <div style="background:var(--bg-surface-elevated); border:1px solid var(--border-subtle); border-radius:var(--radius-sm); padding:10px;">
                     <span style="font-size:11px; color:var(--text-muted); text-transform:uppercase; font-weight:600;">Daily Calorie Goal</span>
-                    <div style="font-size:18px; font-weight:700; color:#fff; margin-top:2px;">
+                    <div style="font-size:18px; font-weight:700; color:var(--text-primary); margin-top:2px;">
                         {{ calorie_target }} <span style="font-size:12px; font-weight:normal; color:var(--text-muted);">kcal</span>
                     </div>
                 </div>
 
-                <div style="background:rgba(255,255,255,0.03); border:1px solid var(--border-subtle); border-radius:var(--radius-sm); padding:10px;">
+                <div style="background:var(--bg-surface-elevated); border:1px solid var(--border-subtle); border-radius:var(--radius-sm); padding:10px;">
                     <span style="font-size:11px; color:var(--text-muted); text-transform:uppercase; font-weight:600;">Basal Metabolic Rate</span>
-                    <div style="font-size:16px; font-weight:600; color:#fff; margin-top:2px;">
+                    <div style="font-size:16px; font-weight:600; color:var(--text-primary); margin-top:2px;">
                         {{ bmr }} <span style="font-size:11px; color:var(--text-muted);">kcal</span>
                     </div>
                 </div>
 
-                <div style="background:rgba(255,255,255,0.03); border:1px solid var(--border-subtle); border-radius:var(--radius-sm); padding:10px;">
+                <div style="background:var(--bg-surface-elevated); border:1px solid var(--border-subtle); border-radius:var(--radius-sm); padding:10px;">
                     <span style="font-size:11px; color:var(--text-muted); text-transform:uppercase; font-weight:600;">Total Daily TDEE</span>
-                    <div style="font-size:16px; font-weight:600; color:#fff; margin-top:2px;">
+                    <div style="font-size:16px; font-weight:600; color:var(--text-primary); margin-top:2px;">
                         {{ tdee }} <span style="font-size:11px; color:var(--text-muted);">kcal</span>
                     </div>
                 </div>
             </div>
 
-            <div style="background:rgba(165,94,234,0.08); border:1px solid rgba(165,94,234,0.25); border-radius:var(--radius-sm); padding:10px 12px; font-size:12.5px; color:#e2d2fe;">
+            <div style="background:rgba(124,58,237,0.08); border:1px solid rgba(124,58,237,0.25); border-radius:var(--radius-sm); padding:10px 12px; font-size:12.5px; color:var(--text-secondary);">
                 <strong>Macro Blueprint:</strong> {{ macros.protein }}g Protein • {{ macros.carbs }}g Carbs • {{ macros.fat }}g Healthy Fats
             </div>
         </div>
@@ -73,7 +73,7 @@
 
     <!-- Main Settings Form -->
     <div class="stat-card" style="margin-bottom:2rem;">
-        <h3 style="font-size:18px; font-weight:700; color:#fff; margin-bottom:1.5rem; display:flex; align-items:center; gap:8px;">
+        <h3 style="font-size:18px; font-weight:700; color:var(--text-primary); margin-bottom:1.5rem; display:flex; align-items:center; gap:8px;">
             <span>⚙️</span> Fitness Persona & Physical Metrics
         </h3>
 
@@ -222,7 +222,7 @@
         <form method="POST" action="{{ url_for('profile.update_days') }}">
             <div style="display:flex; flex-wrap:wrap; gap:10px; margin-bottom:1.25rem;">
                 {% for day in days %}
-                <label style="display:flex; align-items:center; gap:8px; background:var(--bg-surface-elevated); border:1px solid var(--border-subtle); border-radius:var(--radius-sm); padding:10px 16px; font-size:13.5px; color:#fff; cursor:pointer; transition:all 0.2s ease;">
+                <label style="display:flex; align-items:center; gap:8px; background:var(--bg-surface-elevated); border:1px solid var(--border-subtle); border-radius:var(--radius-sm); padding:10px 16px; font-size:13.5px; color:var(--text-primary); cursor:pointer; transition:all 0.2s ease;">
                     <input type="checkbox" name="days" value="{{ day }}" {% if day in selected_days %}checked{% endif %} style="accent-color:var(--brand-primary); cursor:pointer;">
                     <strong>{{ day }}</strong>
                 </label>
@@ -236,7 +236,7 @@
 <!-- Crop modal -->
 <div id="cropModal" class="modal-overlay">
     <div class="modal-card">
-        <h3 style="color:#fff; font-size:18px; font-weight:700; margin:0 0 1rem;">Crop Profile Photo</h3>
+        <h3 style="color:var(--text-primary); font-size:18px; font-weight:700; margin:0 0 1rem;">Crop Profile Photo</h3>
         <div style="max-height:300px; overflow:hidden; border-radius:var(--radius-sm);">
             <img id="cropImage" style="max-width:100%; display:block;">
         </div>
