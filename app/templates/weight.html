@@ -60,7 +60,7 @@
 
     <!-- Chart Card -->
     <div class="stat-card" style="margin-bottom: 2rem;">
-        <h3 style="font-size:16px; font-weight:700; color:#fff; margin-bottom:12px;">Progress Curve</h3>
+        <h3 style="font-size:16px; font-weight:700; color:var(--text-primary); margin-bottom:12px;">Progress Curve</h3>
         {% if has_logs %}
             <svg viewBox="0 0 600 200" style="width:100%; height:auto; filter:drop-shadow(0 4px 12px rgba(255, 71, 87, 0.25));">
                 <defs>
@@ -91,7 +91,7 @@
 
     <!-- Log Form -->
     <div class="stat-card" style="margin-bottom: 2rem;">
-        <h3 style="font-size:16px; font-weight:700; color:#fff; margin-bottom:12px;">Log Today's Weight</h3>
+        <h3 style="font-size:16px; font-weight:700; color:var(--text-primary); margin-bottom:12px;">Log Today's Weight</h3>
         <form method="POST" action="{{ url_for('weight.log_weight') }}" style="display:flex; gap:12px; align-items:flex-end; max-width:400px;">
             <div class="form-group" style="margin-bottom:0; flex:1;">
                 <label>Weight (kg)</label>
@@ -103,7 +103,7 @@
 
     <!-- Table -->
     <div class="stat-card">
-        <h3 style="font-size:16px; font-weight:700; color:#fff; margin-bottom:12px;">Logging History</h3>
+        <h3 style="font-size:16px; font-weight:700; color:var(--text-primary); margin-bottom:12px;">Logging History</h3>
         {% if logs %}
         <table class="custom-table">
             <thead>
@@ -118,7 +118,7 @@
                 <tr id="row-{{ log.id }}">
                     <td>{{ log.logged_at.strftime('%d %b %Y, %H:%M') }}</td>
                     <td id="display-{{ log.id }}">
-                        <strong style="color:#fff;">{{ log.weight_kg }}</strong> kg
+                        <strong style="color:var(--text-primary);">{{ log.weight_kg }}</strong> kg
                     </td>
                     <td>
                         <div id="actions-{{ log.id }}">
