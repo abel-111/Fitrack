@@ -1,6 +1,9 @@
-from flask import Blueprint, render_template
+from flask import Blueprint, render_template, request, redirect, url_for, flash, abort, jsonify
 from flask_login import login_required, current_user
+from datetime import datetime, date, timedelta
+from app.models import db, LiftLog, WorkoutLog
 from app.services.ai_coach import ROLE_DETAILS
+from app.services.workout_database import COMMON_EXERCISES, WORKOUT_CATEGORIES, search_exercises
 
 workouts_bp = Blueprint('workouts', __name__, url_prefix='/workouts')
 
@@ -229,6 +232,26 @@ def plan():
     warmup = ROLE_WARMUPS[role]
     role_info = ROLE_DETAILS.get(role, ROLE_DETAILS['general'])
 
+    # Parse requested date for workout tracking (defaults to today)
+    date_str = request.args.get('date')
+    selected_date = date.today()
+    if date_str:
+        try:
+            selected_date = datetime.strptime(date_str, '%Y-%m-%d').date()
+        except ValueError:
+            selected_date = date.today()
+
+    prev_date = selected_date - timedelta(days=1)
+    next_date = selected_date + timedelta(days=1)
+    is_today = (selected_date == date.today())
+
+    # Get user's logged workout summary for this date (mirrors diet.html food_summary)
+    workout_summary = current_user.get_daily_workout_summary(selected_date)
+
+    # Query recent lift logs for legacy/chart view
+    lifts = LiftLog.query.filter_by(user_id=current_user.id).order_by(LiftLog.logged_at.desc()).limit(20).all()
+    latest_bench = LiftLog.query.filter_by(user_id=current_user.id).filter(LiftLog.exercise_name.ilike('%bench%')).order_by(LiftLog.logged_at.desc()).first()
+
     return render_template(
         'workouts.html',
         level=level,
@@ -240,6 +263,328 @@ def plan():
         reps=scheme['reps'],
         rest=scheme['rest'],
         note=GOAL_NOTES[goal],
-        warmup=warmup
+        warmup=warmup,
+        lifts=lifts,
+        latest_bench=latest_bench,
+        workout_summary=workout_summary,
+        workout_categories=WORKOUT_CATEGORIES,
+        common_exercises=COMMON_EXERCISES,
+        selected_date_str=selected_date.strftime('%Y-%m-%d'),
+        prev_date_str=prev_date.strftime('%Y-%m-%d'),
+        next_date_str=next_date.strftime('%Y-%m-%d'),
+        is_today=is_today
     )
+
+
+@workouts_bp.route('/log/add', methods=['POST'])
+@login_required
+def add_workout_log():
+    """
+    Log a workout / exercise entry (preset or custom), with sets, reps, weight,
+    intensity, duration, and progressive overload calculations.
+    """
+    is_json = request.is_json
+    data = request.get_json(silent=True) if is_json else request.form
+
+    exercise_name = (data.get('exercise_name') or '').strip()
+    custom_exercise = (data.get('custom_exercise') or '').strip()
+    is_custom_flag = str(data.get('is_custom', '')).lower() in ('true', '1', 'yes')
+
+    if (exercise_name.lower() == 'custom' or not exercise_name) and custom_exercise:
+        exercise_name = custom_exercise
+        is_custom_flag = True
+    elif custom_exercise and not exercise_name:
+        exercise_name = custom_exercise
+        is_custom_flag = True
+
+    category = (data.get('category') or 'custom').strip().lower()
+    valid_categories = {'chest', 'back', 'legs', 'shoulders', 'arms', 'core', 'cardio', 'custom'}
+    if category not in valid_categories:
+        category = 'custom'
+
+    # Date parsing
+    date_str = data.get('date')
+    target_date = date.today()
+    if date_str:
+        try:
+            target_date = datetime.strptime(date_str, '%Y-%m-%d').date()
+        except ValueError:
+            target_date = date.today()
+
+    try:
+        sets = max(1, int(data.get('sets') or 3))
+    except (ValueError, TypeError):
+        sets = 3
+
+    try:
+        reps = max(1, int(data.get('reps') or 10))
+    except (ValueError, TypeError):
+        reps = 10
+
+    try:
+        weight = float(data.get('weight') or 0.0)
+    except (ValueError, TypeError):
+        weight = 0.0
+
+    try:
+        duration_mins = max(0, int(data.get('duration_mins') or 0))
+    except (ValueError, TypeError):
+        duration_mins = 0
+
+    unit = (data.get('unit') or 'kg').strip().lower()
+    if unit not in ('kg', 'lbs'):
+        unit = 'kg'
+
+    notes = (data.get('notes') or '').strip()
+
+    if not exercise_name:
+        if is_json:
+            return jsonify({'error': 'Please provide an exercise or workout name.'}), 400
+        flash('Please provide an exercise or workout name.', 'warning')
+        return redirect(url_for('workouts.plan', date=target_date.strftime('%Y-%m-%d')))
+
+    # Calculate progressive overload target
+    target_next_weight = WorkoutLog.calculate_next_target(weight, unit, exercise_name) if weight > 0 else None
+
+    # Estimate calories burned (~5 kcal per minute or ~7 kcal per heavy set)
+    estimated_cals = round((duration_mins * 7.0) if duration_mins > 0 else (sets * 8.5), 1)
+
+    new_log = WorkoutLog(
+        user_id=current_user.id,
+        date=target_date,
+        category=category,
+        exercise_name=exercise_name,
+        sets=sets,
+        reps=reps,
+        weight=weight,
+        unit=unit,
+        duration_mins=duration_mins,
+        calories_burned=estimated_cals,
+        target_next_weight=target_next_weight,
+        notes=notes,
+        is_custom=is_custom_flag
+    )
+    db.session.add(new_log)
+
+    # Sync with LiftLog if a positive weight was lifted so overall lift records update
+    if weight > 0:
+        lift_entry = LiftLog(
+            user_id=current_user.id,
+            exercise_name=exercise_name,
+            weight=weight,
+            unit=unit,
+            reps=reps,
+            target_next_weight=target_next_weight,
+            notes=notes
+        )
+        db.session.add(lift_entry)
+
+    db.session.commit()
+
+    if is_json:
+        summary = current_user.get_daily_workout_summary(target_date)
+        return jsonify({
+            'success': True,
+            'message': f'Logged {exercise_name} ({sets} sets × {reps} reps @ {weight}{unit})!',
+            'log_id': new_log.id,
+            'summary': {
+                'total_exercises': summary['total_exercises'],
+                'total_sets': summary['total_sets'],
+                'total_volume': summary['total_volume']
+            }
+        })
+
+    flash(
+        f"✓ Logged '{exercise_name}' ({sets} sets × {reps} reps" +
+        (f" @ {weight}{unit}" if weight > 0 else "") +
+        (f" • Next target: {target_next_weight}{unit} 🎯" if target_next_weight else "") + ")!",
+        'success'
+    )
+    return redirect(url_for('workouts.plan', date=target_date.strftime('%Y-%m-%d')))
+
+
+@workouts_bp.route('/log/delete/<int:log_id>', methods=['POST'])
+@login_required
+def delete_workout_log(log_id):
+    """Delete a workout log entry."""
+    entry = WorkoutLog.query.filter_by(id=log_id, user_id=current_user.id).first()
+    if not entry:
+        if request.is_json:
+            return jsonify({'error': 'Workout log not found'}), 404
+        flash('Workout entry not found.', 'warning')
+        return redirect(url_for('workouts.plan'))
+
+    log_date_str = entry.date.strftime('%Y-%m-%d')
+    ex_name = entry.exercise_name
+    db.session.delete(entry)
+    db.session.commit()
+
+    if request.is_json:
+        summary = current_user.get_daily_workout_summary(log_date_str)
+        return jsonify({
+            'success': True,
+            'message': f'Removed {ex_name}',
+            'summary': {
+                'total_exercises': summary['total_exercises'],
+                'total_sets': summary['total_sets'],
+                'total_volume': summary['total_volume']
+            }
+        })
+
+    flash(f"Removed '{ex_name}' from your workout log.", 'info')
+    return redirect(url_for('workouts.plan', date=log_date_str))
+
+
+@workouts_bp.route('/log/quick-add', methods=['POST'])
+@login_required
+def quick_add_plan_exercise():
+    """Quick-log an exercise directly from the scheduled split routine into the daily tracker."""
+    exercise_name = (request.form.get('exercise_name') or '').strip()
+    category = (request.form.get('category') or 'custom').strip().lower()
+    date_str = request.form.get('date')
+
+    target_date = date.today()
+    if date_str:
+        try:
+            target_date = datetime.strptime(date_str, '%Y-%m-%d').date()
+        except ValueError:
+            target_date = date.today()
+
+    if not exercise_name:
+        flash('Exercise name missing.', 'warning')
+        return redirect(url_for('workouts.plan', date=target_date.strftime('%Y-%m-%d')))
+
+    try:
+        sets = max(1, int(request.form.get('sets') or 3))
+    except (ValueError, TypeError):
+        sets = 3
+
+    try:
+        reps = max(1, int(request.form.get('reps') or 10))
+    except (ValueError, TypeError):
+        reps = 10
+
+    try:
+        weight = float(request.form.get('weight') or 0.0)
+    except (ValueError, TypeError):
+        weight = 0.0
+
+    unit = (request.form.get('unit') or 'kg').strip().lower()
+    target_next = WorkoutLog.calculate_next_target(weight, unit, exercise_name) if weight > 0 else None
+
+    new_log = WorkoutLog(
+        user_id=current_user.id,
+        date=target_date,
+        category=category,
+        exercise_name=exercise_name,
+        sets=sets,
+        reps=reps,
+        weight=weight,
+        unit=unit,
+        target_next_weight=target_next,
+        notes='Quick logged from scheduled routine',
+        is_custom=False
+    )
+    db.session.add(new_log)
+    if weight > 0:
+        db.session.add(LiftLog(
+            user_id=current_user.id,
+            exercise_name=exercise_name,
+            weight=weight,
+            unit=unit,
+            reps=reps,
+            target_next_weight=target_next,
+            notes='Logged from workout tracker'
+        ))
+    db.session.commit()
+
+    flash(f"Logged '{exercise_name}' to today's workout tracker!", 'success')
+    return redirect(url_for('workouts.plan', date=target_date.strftime('%Y-%m-%d')))
+
+
+@workouts_bp.route('/api/exercises', methods=['GET'])
+@login_required
+def api_exercises():
+    """Live search and filter API for exercises."""
+    q = request.args.get('q', '').strip()
+    cat = request.args.get('category', 'all').strip()
+    results = search_exercises(query=q, category=cat, limit=35)
+    return jsonify({'exercises': results})
+
+
+@workouts_bp.route('/lift/log', methods=['POST'])
+@login_required
+def log_lift():
+    """Legacy lift logging endpoint, redirecting into new workflow."""
+    exercise_name = request.form.get('exercise_name', '').strip()
+    custom_exercise = request.form.get('custom_exercise', '').strip()
+    if exercise_name == 'Custom' and custom_exercise:
+        exercise_name = custom_exercise
+
+    weight = request.form.get('weight', type=float)
+    unit = request.form.get('unit', 'kg').strip().lower()
+    if unit not in ('kg', 'lbs'):
+        unit = 'kg'
+    reps = request.form.get('reps', type=int) or 10
+    notes = request.form.get('notes', '').strip()
+
+    if not exercise_name:
+        flash('Please select or specify an exercise name.', 'warning')
+        return redirect(url_for('workouts.plan'))
+
+    if weight is None or weight <= 0:
+        flash('Please enter a valid weight lifted.', 'danger')
+        return redirect(url_for('workouts.plan'))
+
+    target_next = LiftLog.calculate_next_target(weight, unit, exercise_name)
+
+    lift_entry = LiftLog(
+        user_id=current_user.id,
+        exercise_name=exercise_name,
+        weight=weight,
+        unit=unit,
+        reps=reps,
+        target_next_weight=target_next,
+        notes=notes
+    )
+    db.session.add(lift_entry)
+
+    # Also record in WorkoutLog
+    name_lower = exercise_name.lower()
+    cat = 'chest' if 'bench' in name_lower or 'press' in name_lower else (
+        'back' if 'deadlift' in name_lower or 'row' in name_lower or 'lat' in name_lower else (
+            'legs' if 'squat' in name_lower or 'leg' in name_lower else 'custom'
+        )
+    )
+    workout_entry = WorkoutLog(
+        user_id=current_user.id,
+        date=date.today(),
+        category=cat,
+        exercise_name=exercise_name,
+        sets=3,
+        reps=reps,
+        weight=weight,
+        unit=unit,
+        target_next_weight=target_next,
+        notes=notes,
+        is_custom=True
+    )
+    db.session.add(workout_entry)
+    db.session.commit()
+
+    flash(f"Logged {exercise_name} ({weight}{unit} × {reps})! Your next target is {target_next}{unit} 🎯", 'success')
+    return redirect(url_for('workouts.plan'))
+
+
+@workouts_bp.route('/lift/<int:lift_id>/delete', methods=['POST'])
+@login_required
+def delete_lift(lift_id):
+    entry = LiftLog.query.get_or_404(lift_id)
+    if entry.user_id != current_user.id:
+        abort(403)
+    db.session.delete(entry)
+    db.session.commit()
+    flash('Lift entry removed.', 'info')
+    return redirect(url_for('workouts.plan'))
+
 
