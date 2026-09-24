@@ -3,12 +3,15 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{% block title %}Fitrack — Smart Fitness & Nutrition{% endblock %}</title>
-    <link href="{{ url_for('static', filename='css/style.css') }}" rel="stylesheet">
+    <title>{% block title %}Fitrack — Smart Fitness &amp; Nutrition{% endblock %}</title>
+    <meta name="description" content="{% block meta_description %}Fitrack — AI-powered fitness tracking, South Indian meal planning, progressive workouts and personal coaching.{% endblock %}">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="{{ url_for('static', filename='css/style.css') }}" rel="stylesheet">
 </head>
 <body>
+    <!-- ===================== NAVBAR ===================== -->
     <div class="navbar-custom">
         <div class="nav-brand-group">
             <a class="navbar-brand" href="{{ url_for('auth.dashboard') if current_user.is_authenticated else url_for('auth.login') }}">
@@ -21,7 +24,7 @@
                     Dashboard
                 </a>
                 <a href="{{ url_for('diet.view_plan') }}" class="nav-link {% if request.blueprint == 'diet' %}active{% endif %}">
-                    🍛 Food & Nutrition
+                    🍛 Food
                 </a>
                 <a href="{{ url_for('workouts.plan') }}" class="nav-link {% if request.blueprint == 'workouts' %}active{% endif %}">
                     🏋️ Workouts
@@ -39,8 +42,13 @@
             {% endif %}
         </div>
 
-        {% if current_user.is_authenticated %}
         <div class="nav-right-group">
+            {% if current_user.is_authenticated %}
+            <!-- Hamburger (mobile) -->
+            <button class="hamburger-btn" id="hamburgerBtn" type="button" aria-label="Open menu">
+                <span></span><span></span><span></span>
+            </button>
+
             <div class="avatar-menu">
                 <button class="avatar-btn" id="avatarBtn" type="button" title="{{ current_user.username }}">
                     {% if current_user.profile_picture and current_user.profile_picture != 'default.png' %}
@@ -51,18 +59,37 @@
                 </button>
                 <div class="avatar-dropdown" id="avatarDropdown">
                     <div class="avatar-dropdown-name">{{ current_user.username }} ({{ current_user.get_role_display() }})</div>
-                    <a href="{{ url_for('profile.view') }}">⚙️ Profile & Biometrics</a>
-                    <a href="{{ url_for('diet.view_plan') }}">🍛 Nutrition & Meal Plan</a>
+                    <a href="{{ url_for('profile.view') }}">⚙️ Profile &amp; Biometrics</a>
+                    <a href="{{ url_for('diet.view_plan') }}">🍛 Nutrition &amp; Meal Plan</a>
                     <a href="{{ url_for('workouts.plan') }}">🏋️ Workout Split</a>
                     <a href="{{ url_for('ai.recommendations') }}">🌿 Personal Coach Hub</a>
                     <a href="{{ url_for('leaderboard.leaderboard') }}">🏆 Community</a>
-                    <a href="{{ url_for('auth.logout') }}" style="color:#fca5a5;">🚪 Logout</a>
+                    <a href="{{ url_for('auth.logout') }}" style="color:#ef4444;">🚪 Logout</a>
                 </div>
             </div>
+            {% endif %}
         </div>
-        {% endif %}
     </div>
 
+    <!-- Mobile Nav Overlay -->
+    {% if current_user.is_authenticated %}
+    <div class="mobile-nav" id="mobileNav">
+        <div class="mobile-nav-panel" id="mobileNavPanel">
+            <button class="mobile-nav-close" id="mobileNavClose" type="button">&times;</button>
+            <a href="{{ url_for('auth.dashboard') }}" class="nav-link {% if request.endpoint == 'auth.dashboard' %}active{% endif %}">Dashboard</a>
+            <a href="{{ url_for('diet.view_plan') }}" class="nav-link {% if request.blueprint == 'diet' %}active{% endif %}">🍛 Food &amp; Nutrition</a>
+            <a href="{{ url_for('workouts.plan') }}" class="nav-link {% if request.blueprint == 'workouts' %}active{% endif %}">🏋️ Workouts</a>
+            <a href="{{ url_for('weight.history') }}" class="nav-link {% if request.blueprint == 'weight' %}active{% endif %}">📈 Weight</a>
+            <a href="{{ url_for('leaderboard.leaderboard') }}" class="nav-link {% if request.blueprint == 'leaderboard' %}active{% endif %}">🏆 Community</a>
+            <a href="{{ url_for('ai.recommendations') }}" class="nav-link nav-link-coach {% if request.endpoint == 'ai.recommendations' %}active{% endif %}">🌿 Coach</a>
+            <hr style="border-color: var(--border-subtle); margin: 0.5rem 0;">
+            <a href="{{ url_for('profile.view') }}" class="nav-link">⚙️ Profile</a>
+            <a href="{{ url_for('auth.logout') }}" class="nav-link" style="color:#ef4444;">🚪 Logout</a>
+        </div>
+    </div>
+    {% endif %}
+
+    <!-- Flash Messages -->
     <div style="max-width: 1200px; margin: 0.8rem auto 0; padding: 0 1.8rem;">
         {% with messages = get_flashed_messages(with_categories=true) %}
             {% if messages %}
@@ -79,7 +106,7 @@
     {% block content %}{% endblock %}
 
     {% if current_user.is_authenticated %}
-    <!-- Floating Coach Assistant -->
+    <!-- ===================== FLOATING COACH WIDGET ===================== -->
     <button class="ai-coach-fab" id="aiCoachFab" type="button" title="Chat with Coach Raghav">
         <span>💬</span> Ask Coach
     </button>
@@ -88,7 +115,7 @@
         <div class="ai-chat-header">
             <div class="ai-chat-title">
                 <span>🌿</span> Coach Raghav
-                <span class="badge-chip badge-coach" style="font-size:10px; padding:2px 7px;">Personal Fitness & Nutrition Mentor</span>
+                <span class="badge-chip badge-coach" style="font-size:10px; padding:2px 7px;">Personal Mentor</span>
             </div>
             <button class="ai-chat-close" id="aiChatClose" type="button">&times;</button>
         </div>
@@ -100,17 +127,17 @@
                 <button class="chip-btn" onclick="sendQuickPrompt('What are high-protein South Indian vegetarian meals?')">🧀 High-Protein Veg</button>
                 <button class="chip-btn" onclick="sendQuickPrompt('Can I drink filter coffee while losing weight?')">☕ Filter Coffee</button>
                 <button class="chip-btn" onclick="sendQuickPrompt('Best South Indian pre-workout snack for today?')">⚡ Pre-Workout</button>
-                <button class="chip-btn" onclick="sendQuickPrompt('How should I balance rice, sambar, and poriyal to hit my macros?')">🍛 Rice & Macros</button>
+                <button class="chip-btn" onclick="sendQuickPrompt('How should I balance rice, sambar, and poriyal to hit my macros?')">🍛 Rice &amp; Macros</button>
             </div>
         </div>
         <form class="ai-chat-footer" id="aiChatForm" onsubmit="handleChatSubmit(event)">
-            <input type="text" class="ai-chat-input" id="aiChatInput" placeholder="Ask about South Indian meals, filter coffee, workouts..." autocomplete="off">
+            <input type="text" class="ai-chat-input" id="aiChatInput" placeholder="Ask about meals, workouts, habits..." autocomplete="off">
             <button type="submit" class="ai-chat-send">Send</button>
         </form>
     </div>
 
     <script>
-        // Avatar dropdown logic
+        // Avatar dropdown
         const avatarBtn = document.getElementById('avatarBtn');
         const avatarDropdown = document.getElementById('avatarDropdown');
         if (avatarBtn && avatarDropdown) {
@@ -125,34 +152,41 @@
             });
         }
 
-        // Coach Chat Floating Widget Logic
-        const aiCoachFab = document.getElementById('aiCoachFab');
+        // Mobile nav
+        const hamburgerBtn = document.getElementById('hamburgerBtn');
+        const mobileNav    = document.getElementById('mobileNav');
+        const mobileNavClose = document.getElementById('mobileNavClose');
+        if (hamburgerBtn && mobileNav) {
+            hamburgerBtn.addEventListener('click', () => mobileNav.classList.add('open'));
+            mobileNavClose.addEventListener('click', () => mobileNav.classList.remove('open'));
+            mobileNav.addEventListener('click', (e) => {
+                if (e.target === mobileNav) mobileNav.classList.remove('open');
+            });
+        }
+
+        // Coach Chat Widget
+        const aiCoachFab  = document.getElementById('aiCoachFab');
         const aiChatModal = document.getElementById('aiChatModal');
         const aiChatClose = document.getElementById('aiChatClose');
-        const aiChatBody = document.getElementById('aiChatBody');
+        const aiChatBody  = document.getElementById('aiChatBody');
         const aiChatInput = document.getElementById('aiChatInput');
 
         if (aiCoachFab && aiChatModal) {
             aiCoachFab.addEventListener('click', () => {
                 aiChatModal.classList.toggle('open');
-                if (aiChatModal.classList.contains('open')) {
-                    aiChatInput.focus();
-                }
+                if (aiChatModal.classList.contains('open')) aiChatInput.focus();
             });
-            aiChatClose.addEventListener('click', () => {
-                aiChatModal.classList.remove('open');
-            });
+            aiChatClose.addEventListener('click', () => aiChatModal.classList.remove('open'));
         }
 
         function appendMessage(text, isUser = false) {
             const bubble = document.createElement('div');
             bubble.className = `chat-bubble ${isUser ? 'chat-bubble-user' : 'chat-bubble-bot'}`;
             if (!isUser) {
-                let formatted = text
+                bubble.innerHTML = text
                     .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
                     .replace(/\*(.*?)\*/g, '<em>$1</em>')
                     .replace(/\n/g, '<br>');
-                bubble.innerHTML = formatted;
             } else {
                 bubble.textContent = text;
             }
@@ -174,7 +208,7 @@
             appendMessage(text, true);
             aiChatInput.value = '';
 
-            const loadingBubble = appendMessage('Coach Raghav is typing...', false);
+            const loadingBubble = appendMessage('Coach Raghav is typing…', false);
             loadingBubble.style.opacity = '0.6';
 
             try {
@@ -186,11 +220,10 @@
                 const data = await response.json();
                 if (data.success && data.response) {
                     loadingBubble.style.opacity = '1';
-                    let formatted = data.response
+                    loadingBubble.innerHTML = data.response
                         .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
                         .replace(/\*(.*?)\*/g, '<em>$1</em>')
                         .replace(/\n/g, '<br>');
-                    loadingBubble.innerHTML = formatted;
                 } else {
                     loadingBubble.textContent = data.error || 'Sorry, could not process that request.';
                 }

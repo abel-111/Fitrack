@@ -3,7 +3,7 @@
 {% block content %}
 <div class="page-wrapper">
     <!-- Header Banner -->
-    <div class="ai-hero-banner" style="margin-bottom:1.8rem;">
+    <div class="ai-hero-banner" style="margin-bottom:1.4rem;">
         <div class="ai-hero-content">
             <div class="ai-hero-title">
                 <span>🏋️</span> {{ level|capitalize }} Routine
@@ -11,40 +11,37 @@
                 <span class="badge-chip badge-ai">{{ role_info.title }}</span>
             </div>
             <p class="ai-hero-desc">
-                <strong>Training Parameters:</strong> {{ sets }} working sets × {{ reps }} reps • Rest interval: <strong>{{ rest }}</strong> between sets.
-                <br>
-                <em>{{ note }}</em>
+                <strong>Training Parameters:</strong> {{ sets }} working sets × {{ reps }} reps • Rest: <strong>{{ rest }}</strong>
+                <br><em>{{ note }}</em>
             </p>
         </div>
-        <div style="display:flex; gap:8px; flex-wrap:wrap;">
-            <button class="btn-primary-custom" onclick="openWorkoutLogger()" type="button" style="background:#7c3aed; box-shadow:0 4px 14px rgba(124,58,237,0.25);">
-                ＋ Log What You Did
+        <div class="flex-actions">
+            <button class="btn-primary-custom" onclick="openWorkoutLogger()" type="button" style="background:#7c3aed;">
+                ＋ Log Workout
             </button>
             <a href="{{ url_for('profile.view') }}" class="btn-secondary-custom" style="font-size:13px;">
-                ⚙️ Change Split / Level
+                ⚙️ Change Split
             </a>
         </div>
     </div>
 
-    <!-- DAILY WORKOUT TRACKER & CUSTOM LOG ("What You Did Today") -->
+    <!-- DAILY WORKOUT TRACKER -->
     <div class="workout-tracker-card" id="workoutTrackerSection">
-        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1rem; flex-wrap:wrap; gap:10px;">
-            <div>
-                <div style="display:flex; align-items:center; gap:8px;">
-                    <span style="font-size:22px;">🏋️‍♂️</span>
-                    <h3 style="font-size:20px; font-weight:700; color:var(--text-primary); margin:0;">Daily Workout Tracker: What You Did Today</h3>
-                    <span class="badge-chip badge-coral" style="font-size:11px;">Custom Workouts & Overload</span>
+        <div class="tracker-header">
+            <div class="tracker-header-left">
+                <div class="tracker-title-row">
+                    <span class="emoji-xl">🏋️‍♂️</span>
+                    <h3 class="tracker-title">Daily Workout Tracker</h3>
+                    <span class="badge-chip badge-coral text-xs">Custom Workouts &amp; Overload</span>
                 </div>
-                <p style="font-size:13px; color:var(--text-secondary); margin-top:3px;">
-                    Log what you did today. Track custom exercises, sets, reps, total volume lifted, and your next progressive overload target—just like the food tracker!
-                </p>
+                <p class="tracker-desc">Log what you did today — custom exercises, sets, reps, volume &amp; progressive overload targets.</p>
             </div>
-            <button type="button" class="btn-primary-custom" onclick="openWorkoutLogger()" style="padding:7px 18px; font-size:13px; display:inline-flex; align-items:center; gap:6px;">
-                ＋ Add Workout Entry
+            <button type="button" class="btn-primary-custom" onclick="openWorkoutLogger()" style="padding:7px 16px; font-size:13px;">
+                ＋ Add Entry
             </button>
         </div>
 
-        <!-- Date Navigator Bar -->
+        <!-- Date Navigator -->
         <div class="food-date-nav">
             <div class="food-date-controls">
                 <a href="{{ url_for('workouts.plan', date=prev_date_str) }}" class="food-date-btn" title="Previous Day">
@@ -52,20 +49,18 @@
                 </a>
                 {% if not is_today %}
                 <a href="{{ url_for('workouts.plan') }}" class="food-date-btn" style="background:var(--brand-primary); color:#fff; border-color:var(--brand-primary);">
-                    📅 Jump to Today
+                    📅 Today
                 </a>
                 {% endif %}
             </div>
-
             <div class="food-date-badge">
                 <span>📅 {{ workout_summary.date_display }}</span>
                 {% if is_today %}
-                    <span class="badge-chip badge-emerald" style="font-size:11px;">Today</span>
+                    <span class="badge-chip badge-emerald text-xs">Today</span>
                 {% else %}
-                    <span class="badge-chip" style="font-size:11px; background:rgba(109,40,217,0.1); color:var(--brand-primary);">History</span>
+                    <span class="badge-chip text-xs" style="background:rgba(109,40,217,0.1); color:var(--brand-primary);">History</span>
                 {% endif %}
             </div>
-
             <div class="food-date-controls">
                 <input type="date" id="jumpWorkoutDateInput" value="{{ selected_date_str }}" class="form-control" style="padding:4px 8px; font-size:12px; height:auto; width:auto;" onchange="window.location.href='{{ url_for('workouts.plan') }}?date=' + this.value">
                 <a href="{{ url_for('workouts.plan', date=next_date_str) }}" class="food-date-btn" title="Next Day">
@@ -74,80 +69,67 @@
             </div>
         </div>
 
-        <!-- Workout Stats Row -->
+        <!-- Stats Row -->
         <div class="food-stats-grid">
-            <!-- Exercises & Sets Box -->
             <div class="food-stat-box" style="border-left: 3px solid #7c3aed;">
                 <div class="food-stat-top">
-                    <span class="food-stat-title">🏋️ Exercises & Sets</span>
-                    <span class="badge-chip badge-purple" style="font-size:11px;">
-                        {{ workout_summary.total_sets }} Total Sets
-                    </span>
+                    <span class="food-stat-title">🏋️ Exercises &amp; Sets</span>
+                    <span class="badge-chip badge-purple text-xs">{{ workout_summary.total_sets }} Sets</span>
                 </div>
                 <div class="food-stat-numbers">
                     <span class="food-stat-val">{{ workout_summary.total_exercises }}</span>
-                    <span class="food-stat-sub">exercise{{ 's' if workout_summary.total_exercises != 1 }} completed</span>
+                    <span class="food-stat-sub">exercise{{ 's' if workout_summary.total_exercises != 1 }}</span>
                 </div>
                 <div class="progress-bar-wrap" style="height:8px; margin:4px 0 6px;">
                     <div class="progress-bar-fill progress-bar-purple" style="width: {{ [workout_summary.total_sets * 8, 100]|min }}%;"></div>
                 </div>
                 <div class="food-stat-desc">
                     {% if workout_summary.total_exercises > 0 %}
-                        <span>🔥 <strong>{{ workout_summary.total_sets }} working sets</strong> pushed today. Great consistency!</span>
+                        🔥 <strong>{{ workout_summary.total_sets }} working sets</strong> pushed today!
                     {% else %}
-                        <span>Log what you did today to track your volume & progressive overload.</span>
+                        Log exercises to track volume &amp; overload.
                     {% endif %}
                 </div>
             </div>
 
-            <!-- Total Volume Lifted Box -->
             <div class="food-stat-box" style="border-left: 3px solid #059669;">
                 <div class="food-stat-top">
-                    <span class="food-stat-title">⚡ Total Volume Moved</span>
-                    <span class="badge-chip badge-emerald" style="font-size:11px;">
-                        Volume Load
-                    </span>
+                    <span class="food-stat-title">⚡ Total Volume</span>
+                    <span class="badge-chip badge-emerald text-xs">Load</span>
                 </div>
                 <div class="food-stat-numbers">
                     <span class="food-stat-val">{{ workout_summary.total_volume }}</span>
-                    <span class="food-stat-sub">kg volume</span>
+                    <span class="food-stat-sub">kg</span>
                 </div>
                 <div class="progress-bar-wrap" style="height:8px; margin:4px 0 6px;">
                     <div class="progress-bar-fill progress-bar-emerald" style="width: {{ [workout_summary.total_volume / 30, 100]|min }}%;"></div>
                 </div>
-                <div class="food-stat-desc">
-                    <span>Cumulative load calculated across all sets, reps & weight.</span>
-                </div>
+                <div class="food-stat-desc">Cumulative load across all sets, reps &amp; weight.</div>
             </div>
 
-            <!-- Duration & Energy Box -->
             <div class="food-stat-box" style="border-left: 3px solid #0284c7;">
                 <div class="food-stat-top">
-                    <span class="food-stat-title">⏱️ Active Time & PRs</span>
-                    <span class="badge-chip badge-cyan" style="font-size:11px;">Overload</span>
+                    <span class="food-stat-title">⏱️ Duration &amp; Goal</span>
+                    <span class="badge-chip badge-cyan text-xs">Overload</span>
                 </div>
                 <div class="food-stat-numbers" style="gap:14px;">
                     <div>
-                        <div style="font-size:11px; color:var(--text-muted); text-transform:uppercase;">Time</div>
+                        <div class="text-xs" style="color:var(--text-muted); text-transform:uppercase;">Time</div>
                         <span style="font-size:20px; font-weight:700; color:#0284c7;">{{ workout_summary.total_duration }}m</span>
                     </div>
                     <div>
-                        <div style="font-size:11px; color:var(--text-muted); text-transform:uppercase;">Next Bench</div>
+                        <div class="text-xs" style="color:var(--text-muted); text-transform:uppercase;">Next Bench</div>
                         <span style="font-size:20px; font-weight:700; color:#059669;">
                             {% if latest_bench %}{{ latest_bench.target_next_weight }}{{ latest_bench.unit }}{% else %}55kg{% endif %}
                         </span>
                     </div>
                 </div>
-                <div class="food-stat-desc" style="margin-top:10px;">
-                    Target overload automatically updates when you log your sets!
-                </div>
+                <div class="food-stat-desc mt-md">Target auto-updates when you log sets!</div>
             </div>
         </div>
 
-        <!-- Workouts Logged by Muscle Group / Category (Grid matching Food by Meal in diet.html) -->
-        <h4 style="font-size:16px; font-weight:700; color:var(--text-primary); margin-bottom:0.75rem;">
-            Workouts Logged by Category
-        </h4>
+        <!-- Logged by Category -->
+        <h4 class="section-title" style="font-size:14.5px; margin-bottom:0.65rem;">Workouts by Category</h4>
         <div class="workout-logs-grid">
             {% for cat_key, cat_data in workout_summary.categories.items() %}
             <div class="workout-log-box">
@@ -156,12 +138,12 @@
                         <div class="workout-log-title">
                             <span>{{ cat_data.icon }}</span> {{ cat_data.label }}
                         </div>
-                        <div style="display:flex; gap:6px; align-items:center;">
+                        <div class="flex-actions">
                             {% if cat_data.total_sets > 0 %}
                                 <span class="badge-volume">{{ cat_data.total_sets }} sets</span>
                                 <span class="badge-macro-prot">{{ cat_data.total_volume }} kg</span>
                             {% else %}
-                                <span style="font-size:11px; color:var(--text-muted);">0 logged</span>
+                                <span class="text-xs" style="color:var(--text-muted);">0 logged</span>
                             {% endif %}
                         </div>
                     </div>
@@ -173,44 +155,33 @@
                             <div class="workout-log-info">
                                 <div class="workout-log-name">
                                     <span>{{ item.exercise_name }}</span>
-                                    {% if item.is_custom %}
-                                        <span class="badge-custom-pill">Custom</span>
-                                    {% endif %}
+                                    {% if item.is_custom %}<span class="badge-custom-pill">Custom</span>{% endif %}
                                 </div>
                                 <div class="workout-log-meta">
-                                    <span><strong>{{ item.sets }}</strong> sets × <strong>{{ item.reps }}</strong> reps</span>
+                                    <span><strong>{{ item.sets }}</strong> × <strong>{{ item.reps }}</strong></span>
                                     {% if item.weight > 0 %}
                                         <span>• <strong>{{ item.weight }} {{ item.unit }}</strong></span>
-                                        <span class="badge-volume">{{ item.get_total_volume() }} {{ item.unit }} vol</span>
+                                        <span class="badge-volume">{{ item.get_total_volume() }} {{ item.unit }}</span>
                                     {% endif %}
-                                    {% if item.duration_mins > 0 %}
-                                        <span>• ⏱️ {{ item.duration_mins }} mins</span>
-                                    {% endif %}
-                                    {% if item.notes %}
-                                        <span style="font-style:italic; color:var(--text-secondary);">"{{ item.notes }}"</span>
-                                    {% endif %}
+                                    {% if item.duration_mins > 0 %}<span>• ⏱️ {{ item.duration_mins }}m</span>{% endif %}
+                                    {% if item.notes %}<span style="font-style:italic; color:var(--text-secondary);">"{{ item.notes }}"</span>{% endif %}
                                 </div>
                             </div>
                             <div class="workout-log-metrics">
                                 {% if item.target_next_weight and item.target_next_weight > 0 %}
-                                    <span class="badge-goal-pill" title="Next Progressive Overload Goal">
-                                        🎯 Next: {{ item.target_next_weight }}{{ item.unit }}
-                                    </span>
+                                    <span class="badge-goal-pill" title="Next Progressive Overload Goal">🎯 {{ item.target_next_weight }}{{ item.unit }}</span>
                                 {% endif %}
-                                <form method="POST" action="{{ url_for('workouts.delete_workout_log', log_id=item.id) }}" style="margin:0;" onsubmit="return confirm('Remove {{ item.exercise_name }} from your workout log?');">
-                                    <button type="submit" class="workout-delete-btn" title="Remove exercise">✕</button>
+                                <form method="POST" action="{{ url_for('workouts.delete_workout_log', log_id=item.id) }}" style="margin:0;" onsubmit="return confirm('Remove {{ item.exercise_name }}?');">
+                                    <button type="submit" class="workout-delete-btn" title="Remove">✕</button>
                                 </form>
                             </div>
                         </li>
                         {% endfor %}
                     </ul>
                     {% else %}
-                    <div class="workout-empty-hint">
-                        No {{ cat_data.label.lower() }} logged yet today.
-                    </div>
+                    <div class="workout-empty-hint">No {{ cat_data.label.lower() }} logged yet.</div>
                     {% endif %}
                 </div>
-
                 <button type="button" class="btn-add-workout-item" onclick="openWorkoutLogger('{{ cat_key }}')">
                     ＋ Add to {{ cat_data.label }}
                 </button>
@@ -219,68 +190,67 @@
         </div>
     </div>
 
-    <!-- Role-Specific Warm-Up & Mobility Protocol -->
-    <div class="stat-card" style="margin-bottom:2rem; border-left:3px solid #a55eea;">
-        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
-            <h3 style="font-size:17px; font-weight:700; color:var(--text-primary); display:flex; align-items:center; gap:8px;">
+    <!-- Warm-Up Protocol (collapsible) -->
+    <div class="stat-card" style="margin-bottom:1.5rem; border-left:3px solid #a55eea;">
+        <div class="flex-between mb-sm">
+            <h3 style="font-size:15px; font-weight:700; color:var(--text-primary); display:flex; align-items:center; gap:8px; margin:0;">
                 <span>🧘</span> {{ warmup.title }}
             </h3>
-            <span class="badge-chip badge-ai">Pre-Workout Mobility</span>
-        </div>
-        <p style="color:var(--text-secondary); font-size:13.5px; margin-bottom:12px;">{{ warmup.note }}</p>
-
-        <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(230px, 1fr)); gap:10px;">
-            {% for item in warmup.exercises %}
-            <div style="background:var(--bg-surface-elevated); border:1px solid var(--border-subtle); border-radius:var(--radius-sm); padding:10px 14px; font-size:13px; color:var(--text-primary); display:flex; align-items:center; gap:8px;">
-                <span style="color:#a55eea; font-weight:bold;">→</span>
-                <span>{{ item }}</span>
+            <div class="flex-row">
+                <span class="badge-chip badge-ai">Pre-Workout</span>
+                <button class="collapsible-toggle" onclick="toggleSection('warmupBody', this)">▾ Hide</button>
             </div>
-            {% endfor %}
+        </div>
+        <div id="warmupBody" class="collapsible-body">
+            <p class="text-secondary-sm mb-sm">{{ warmup.note }}</p>
+            <div class="three-col-grid">
+                {% for item in warmup.exercises %}
+                <div class="warmup-item">
+                    <span class="warmup-arrow">→</span>
+                    <span>{{ item }}</span>
+                </div>
+                {% endfor %}
+            </div>
         </div>
     </div>
 
-    <!-- Scheduled Training Sessions Grid -->
-    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1.2rem; flex-wrap:wrap; gap:10px;">
-        <h3 style="font-size:20px; font-weight:700; color:var(--text-primary); margin:0;">
-            Scheduled Training Sessions & Split Plan
-        </h3>
+    <!-- Scheduled Training Sessions -->
+    <div class="section-divider">
+        <h3 class="section-divider-title">Scheduled Training Sessions</h3>
         <span class="badge-chip badge-ai">One-Click Quick Log</span>
     </div>
 
-    <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(320px, 1fr)); gap:1.4rem; margin-bottom:2.5rem;">
+    <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(300px, 1fr)); gap:1.2rem; margin-bottom:2rem;">
         {% for day in days %}
         <div class="stat-card">
-            <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:12px;">
+            <div class="flex-between mb-sm">
                 <div>
-                    <h4 style="font-size:18px; font-weight:700; color:var(--text-primary); margin:0;">{{ day.title }}</h4>
-                    <span style="font-size:12px; color:var(--text-muted); font-weight:600;">Focus: {{ day.focus }}</span>
+                    <h4 style="font-size:17px; font-weight:700; color:var(--text-primary); margin:0;">{{ day.title }}</h4>
+                    <span class="text-muted-sm">Focus: {{ day.focus }}</span>
                 </div>
-                <span class="badge-chip badge-cyan" style="font-size:11px;">{{ day.exercises|length }} Exercises</span>
+                <span class="badge-chip badge-cyan text-xs">{{ day.exercises|length }} Exercises</span>
             </div>
 
-            <div style="display:flex; flex-direction:column; gap:12px; margin-top:14px;">
+            <div class="flex-col" style="margin-top:10px;">
                 {% for ex in day.exercises %}
-                <div style="background:var(--bg-surface-elevated); border:1px solid var(--border-subtle); border-radius:var(--radius-sm); padding:12px 14px;">
-                    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:4px;">
-                        <strong style="color:var(--text-primary); font-size:14.5px;">{{ ex.name }}</strong>
-                        <span class="badge-chip badge-coral" style="font-size:10.5px;">{{ sets }} × {{ reps }}</span>
+                <div class="session-ex-item">
+                    <div class="session-ex-top">
+                        <strong class="session-ex-name">{{ ex.name }}</strong>
+                        <span class="badge-chip badge-coral text-xs">{{ sets }} × {{ reps }}</span>
                     </div>
-                    <div style="font-size:11.5px; color:var(--brand-primary); font-weight:600; margin-bottom:4px;">🎯 {{ ex.muscle }}</div>
-                    <div style="font-size:12.5px; color:var(--text-secondary); font-style:italic;">"{{ ex.tip }}"</div>
+                    <div class="session-ex-muscle">🎯 {{ ex.muscle }}</div>
+                    <div class="session-ex-tip">"{{ ex.tip }}"</div>
 
-                    <!-- Quick Log Action & Sets Checkboxes -->
-                    <div style="display:flex; justify-content:space-between; align-items:center; margin-top:10px; flex-wrap:wrap; gap:8px;">
-                        <div style="display:flex; gap:6px; align-items:center;">
-                            <span style="font-size:11px; color:var(--text-muted); font-weight:600;">SETS:</span>
+                    <div class="session-ex-footer">
+                        <div class="session-sets-row">
+                            <span class="session-set-label">SETS:</span>
                             {% for s in range(1, sets + 1) %}
-                            <label style="display:inline-flex; align-items:center; gap:3px; background:#ffffff; border:1px solid var(--border-subtle); border-radius:4px; padding:2px 6px; font-size:10.5px; color:var(--text-primary); cursor:pointer; font-weight:600;">
+                            <label class="session-set-check">
                                 <input type="checkbox" style="accent-color:var(--brand-primary); cursor:pointer;">
                                 <span>{{ s }}</span>
                             </label>
                             {% endfor %}
                         </div>
-
-                        <!-- One-click quick log button -->
                         <form method="POST" action="{{ url_for('workouts.quick_add_plan_exercise') }}" style="margin:0;">
                             <input type="hidden" name="exercise_name" value="{{ ex.name }}">
                             <input type="hidden" name="category" value="{{ 'chest' if 'chest' in ex.muscle.lower() or 'bench' in ex.name.lower() else ('back' if 'back' in ex.muscle.lower() or 'lats' in ex.muscle.lower() or 'row' in ex.name.lower() or 'pull' in ex.name.lower() else ('legs' if 'legs' in ex.muscle.lower() or 'quads' in ex.muscle.lower() or 'squat' in ex.name.lower() or 'hamstring' in ex.muscle.lower() else ('shoulders' if 'shoulder' in ex.muscle.lower() or 'deltoid' in ex.muscle.lower() or 'press' in ex.name.lower() else ('arms' if 'bicep' in ex.muscle.lower() or 'tricep' in ex.muscle.lower() or 'curl' in ex.name.lower() else ('core' if 'core' in ex.muscle.lower() or 'abs' in ex.muscle.lower() or 'plank' in ex.name.lower() else 'custom'))))) }}">
@@ -289,8 +259,8 @@
                             <input type="hidden" name="weight" value="40">
                             <input type="hidden" name="unit" value="kg">
                             <input type="hidden" name="date" value="{{ selected_date_str }}">
-                            <button type="submit" class="btn-secondary-custom" style="padding:4px 10px; font-size:11.5px; font-weight:600; color:var(--brand-primary);">
-                                ✓ Did This Today
+                            <button type="submit" class="btn-secondary-custom" style="padding:4px 10px; font-size:11.5px; color:var(--brand-primary);">
+                                ✓ Did This
                             </button>
                         </form>
                     </div>
@@ -301,67 +271,57 @@
         {% endfor %}
     </div>
 
-    <div style="margin-top:2.5rem; text-align:center; color:var(--text-muted); font-size:13.5px;">
-        Want to switch to a different training split? <a href="{{ url_for('profile.view') }}" style="color:var(--brand-primary); font-weight:600;">Update your level or goal in Profile</a>.
+    <div style="text-align:center;" class="text-muted-sm">
+        Want a different split? <a href="{{ url_for('profile.view') }}" style="color:var(--brand-primary); font-weight:600;">Update your level or goal in Profile</a>.
     </div>
 </div>
 
-<!-- ==========================================================================
-     MODAL: ADD WORKOUT / LOG WHAT YOU DID (PRESET LIBRARY OR CUSTOM ENTRY)
-     ========================================================================== -->
+<!-- ====== MODAL: LOG WORKOUT ====== -->
 <div class="modal-overlay" id="workoutLogModal" style="display:none;">
     <div class="modal-card" style="max-width: 650px; max-height: 90vh; overflow-y: auto;">
-        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1rem;">
+        <div class="flex-between" style="margin-bottom:1rem;">
             <div>
-                <h3 style="font-size:20px; font-weight:700; color:var(--text-primary); margin:0;">🏋️ Log What You Did</h3>
-                <p style="font-size:12.5px; color:var(--text-secondary); margin-top:2px;">
-                    Track what you lifted or performed today with instant progressive overload calculation.
-                </p>
+                <h3 style="font-size:18px; font-weight:700; color:var(--text-primary); margin:0;">🏋️ Log What You Did</h3>
+                <p class="text-secondary-sm mt-sm">Track lifts with instant progressive overload calculation.</p>
             </div>
             <button type="button" onclick="closeWorkoutLogger()" style="background:none; border:none; color:var(--text-muted); font-size:24px; cursor:pointer;">&times;</button>
         </div>
 
-        <!-- Mode Tabs: Preset Database vs Custom Entry -->
         <div class="logger-tabs">
             <button type="button" class="logger-tab-btn active" id="tabWorkoutPresetBtn" onclick="switchWorkoutLoggerTab('preset')">
-                🔍 Common Exercises Database
+                🔍 Exercise Database
             </button>
             <button type="button" class="logger-tab-btn" id="tabWorkoutCustomBtn" onclick="switchWorkoutLoggerTab('custom')">
-                ✏️ Custom Workout Entry
+                ✏️ Custom Entry
             </button>
         </div>
 
-        <!-- TAB 1: PRESET EXERCISE SEARCH & SELECT -->
+        <!-- TAB 1: PRESET -->
         <div id="loggerWorkoutPresetPanel">
-            <p style="font-size:12.5px; color:var(--text-secondary); margin:0 0 12px 0;">
-                Select any exercise from our preset database to auto-fill form cues, muscle targets, and progressive overload targets.
-            </p>
+            <p class="text-secondary-sm mb-sm">Select an exercise to auto-fill cues &amp; overload targets.</p>
             <form method="POST" action="{{ url_for('workouts.add_workout_log') }}" id="presetWorkoutForm">
                 <input type="hidden" name="date" value="{{ selected_date_str }}">
                 <input type="hidden" name="exercise_name" id="selectedExerciseName">
                 <input type="hidden" name="is_custom" value="false">
 
-                <!-- Target Muscle Category Slot Selection -->
-                <div class="form-group" style="margin-bottom:12px;">
-                    <label style="font-size:13px; font-weight:600; color:var(--text-primary);">Workout / Muscle Slot</label>
+                <div class="form-group" style="margin-bottom:10px;">
+                    <label style="font-size:13px; font-weight:600; color:var(--text-primary);">Muscle Slot</label>
                     <select name="category" id="presetCategorySlot" class="form-control" style="font-weight:600;">
-                        <option value="chest">🏋️ Chest & Triceps</option>
-                        <option value="back">🚣 Back & Biceps</option>
-                        <option value="legs">🦵 Legs & Glutes</option>
-                        <option value="shoulders">🥥 Shoulders & Traps</option>
-                        <option value="arms">💪 Arms & Forearms</option>
-                        <option value="core">🧘 Core & Abs</option>
-                        <option value="cardio">🏃 Cardio & Conditioning</option>
-                        <option value="custom" selected>⚡ Custom & Functional</option>
+                        <option value="chest">🏋️ Chest &amp; Triceps</option>
+                        <option value="back">🚣 Back &amp; Biceps</option>
+                        <option value="legs">🦵 Legs &amp; Glutes</option>
+                        <option value="shoulders">🥥 Shoulders &amp; Traps</option>
+                        <option value="arms">💪 Arms &amp; Forearms</option>
+                        <option value="core">🧘 Core &amp; Abs</option>
+                        <option value="cardio">🏃 Cardio</option>
+                        <option value="custom" selected>⚡ Custom</option>
                     </select>
                 </div>
 
-                <!-- Live Search Box -->
                 <div class="form-group" style="margin-bottom:10px;">
-                    <input type="text" id="presetWorkoutSearchInput" class="form-control" placeholder="Search exercise (e.g. bench, squat, deadlift, pull-up, curls, lunges)..." oninput="filterPresetExercises()" autocomplete="off">
+                    <input type="text" id="presetWorkoutSearchInput" class="form-control" placeholder="Search exercise (bench, squat, deadlift…)" oninput="filterPresetExercises()" autocomplete="off">
                 </div>
 
-                <!-- Category Filter Pills -->
                 <div class="category-chips-row" style="margin-bottom:10px;">
                     {% for c_id, c_name in workout_categories %}
                         <button type="button" class="cat-chip {% if loop.first %}active{% endif %}" onclick="selectWorkoutCategory('{{ c_id }}', this)">
@@ -370,10 +330,9 @@
                     {% endfor %}
                 </div>
 
-                <!-- Preset Exercise Cards Grid -->
                 <div class="preset-exercise-list" id="presetExerciseList">
                     {% for ex in common_exercises %}
-                    <div class="preset-exercise-card" 
+                    <div class="preset-exercise-card"
                          data-id="{{ ex.id }}"
                          data-name="{{ ex.name }}"
                          data-cat="{{ ex.category }}"
@@ -386,45 +345,40 @@
                          data-tags="{{ ex.tags|join(' ') }}"
                          onclick="selectPresetExercise('{{ ex.id }}')">
                         <div>
-                            <div class="preset-exercise-title">
-                                <span>{{ ex.icon }}</span> {{ ex.name }}
-                            </div>
+                            <div class="preset-exercise-title"><span>{{ ex.icon }}</span> {{ ex.name }}</div>
                             <div class="preset-exercise-sub">🎯 {{ ex.muscle }}</div>
                         </div>
-                        <div>
-                            <span class="badge-volume" style="font-size:10.5px;">{{ ex.default_sets }}×{{ ex.default_reps }}</span>
-                        </div>
+                        <div><span class="badge-volume" style="font-size:10.5px;">{{ ex.default_sets }}×{{ ex.default_reps }}</span></div>
                     </div>
                     {% endfor %}
                 </div>
 
-                <!-- Selection Configuration & Interactive Overload Box -->
-                <div id="exerciseSelectionConfigBox" style="background:var(--bg-surface-elevated); border:1px solid var(--border-subtle); border-radius:var(--radius-md); padding:14px; margin-bottom:1rem; display:none;">
-                    <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:10px; flex-wrap:wrap; gap:8px;">
+                <!-- Config Box -->
+                <div id="exerciseSelectionConfigBox" style="background:var(--bg-surface-elevated); border:1px solid var(--border-subtle); border-radius:var(--radius-md); padding:12px; margin-bottom:1rem; display:none;">
+                    <div class="flex-between mb-sm">
                         <div>
-                            <div style="font-size:11px; text-transform:uppercase; color:var(--brand-primary); font-weight:700;">Selected Exercise</div>
-                            <strong style="font-size:16px; color:var(--text-primary);" id="previewExerciseName">—</strong>
-                            <div style="font-size:12px; color:var(--text-muted);" id="previewExerciseMuscle">Muscle Target</div>
+                            <div class="text-xs" style="color:var(--brand-primary); font-weight:700; text-transform:uppercase;">Selected Exercise</div>
+                            <strong style="font-size:15px; color:var(--text-primary);" id="previewExerciseName">—</strong>
+                            <div class="text-muted-sm" id="previewExerciseMuscle">Muscle Target</div>
                         </div>
-                        <span class="badge-chip badge-coral" id="compoundBadge" style="font-size:11px;">Compound Lift</span>
+                        <span class="badge-chip badge-coral text-xs" id="compoundBadge">Compound Lift</span>
                     </div>
 
-                    <!-- Input Grid for Sets, Reps, Weight, Unit -->
-                    <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(110px, 1fr)); gap:10px; margin-bottom:12px;">
+                    <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(100px, 1fr)); gap:9px; margin-bottom:10px;">
                         <div class="form-group" style="margin-bottom:0;">
-                            <label style="font-size:12px; font-weight:600; color:var(--text-secondary);">Sets Completed</label>
+                            <label class="text-xs" style="font-weight:600; color:var(--text-secondary);">Sets</label>
                             <input type="number" name="sets" id="presetSetsInput" class="form-control" value="3" min="1" max="20" oninput="recalcPresetOverload()">
                         </div>
                         <div class="form-group" style="margin-bottom:0;">
-                            <label style="font-size:12px; font-weight:600; color:var(--text-secondary);">Reps / Set</label>
+                            <label class="text-xs" style="font-weight:600; color:var(--text-secondary);">Reps / Set</label>
                             <input type="number" name="reps" id="presetRepsInput" class="form-control" value="10" min="1" max="100" oninput="recalcPresetOverload()">
                         </div>
                         <div class="form-group" style="margin-bottom:0;">
-                            <label style="font-size:12px; font-weight:600; color:var(--text-secondary);">Weight</label>
+                            <label class="text-xs" style="font-weight:600; color:var(--text-secondary);">Weight</label>
                             <input type="number" step="0.5" name="weight" id="presetWeightInput" class="form-control" value="50" min="0" oninput="recalcPresetOverload()">
                         </div>
                         <div class="form-group" style="margin-bottom:0;">
-                            <label style="font-size:12px; font-weight:600; color:var(--text-secondary);">Unit</label>
+                            <label class="text-xs" style="font-weight:600; color:var(--text-secondary);">Unit</label>
                             <select name="unit" id="presetUnitSelect" class="form-control" onchange="recalcPresetOverload()">
                                 <option value="kg" selected>kg</option>
                                 <option value="lbs">lbs</option>
@@ -433,33 +387,28 @@
                     </div>
 
                     <div class="form-group" style="margin-bottom:10px;">
-                        <label style="font-size:12px; font-weight:600; color:var(--text-secondary);">Notes (optional, e.g. RPE, personal best)</label>
-                        <input type="text" name="notes" class="form-control" placeholder="e.g. Felt great, clean form on last set">
+                        <label class="text-xs" style="font-weight:600; color:var(--text-secondary);">Notes (optional)</label>
+                        <input type="text" name="notes" class="form-control" placeholder="e.g. RPE 8, clean form">
                     </div>
 
-                    <!-- Dynamic Overload Banner -->
-                    <div style="background:rgba(5,150,105,0.08); border:1px solid rgba(5,150,105,0.25); border-radius:var(--radius-sm); padding:8px 12px; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:6px;">
-                        <span style="font-size:12.5px; color:var(--text-primary);">
-                            🎯 Next Session Goal:
-                        </span>
-                        <strong style="color:#059669; font-size:13.5px;" id="presetNextGoalText">55 kg</strong>
+                    <div class="overload-banner">
+                        <span class="overload-label">🎯 Next Session Goal:</span>
+                        <strong class="overload-value" id="presetNextGoalText">55 kg</strong>
                     </div>
                 </div>
 
-                <div style="display:flex; gap:10px;">
+                <div class="flex-actions">
                     <button type="button" onclick="closeWorkoutLogger()" class="btn-secondary-custom" style="flex:1;">Cancel</button>
                     <button type="submit" id="btnSubmitPresetWorkout" class="btn-primary-custom" style="flex:2;" disabled>
-                        ＋ Log Selected Exercise
+                        ＋ Log Exercise
                     </button>
                 </div>
             </form>
         </div>
 
-        <!-- TAB 2: CUSTOM WORKOUT ENTRY -->
+        <!-- TAB 2: CUSTOM -->
         <div id="loggerWorkoutCustomPanel" style="display:none;">
-            <p style="font-size:12.5px; color:var(--text-secondary); margin:0 0 12px 0;">
-                Log your own custom exercise, sport, or variation (e.g. Weighted Dips, Heavy Bag Boxing, Sled Push) with custom sets, reps, and weights.
-            </p>
+            <p class="text-secondary-sm mb-sm">Log your own exercise, sport, or variation with custom sets, reps &amp; weight.</p>
             <form method="POST" action="{{ url_for('workouts.add_workout_log') }}">
                 <input type="hidden" name="date" value="{{ selected_date_str }}">
                 <input type="hidden" name="is_custom" value="true">
@@ -467,23 +416,23 @@
                 <div class="form-group">
                     <label>Muscle / Category Slot</label>
                     <select name="category" id="customCategorySlot" class="form-control">
-                        <option value="chest">🏋️ Chest & Triceps</option>
-                        <option value="back">🚣 Back & Biceps</option>
-                        <option value="legs">🦵 Legs & Glutes</option>
-                        <option value="shoulders">🥥 Shoulders & Traps</option>
-                        <option value="arms">💪 Arms & Forearms</option>
-                        <option value="core">🧘 Core & Abs</option>
-                        <option value="cardio">🏃 Cardio & Conditioning</option>
-                        <option value="custom" selected>⚡ Custom & Functional</option>
+                        <option value="chest">🏋️ Chest &amp; Triceps</option>
+                        <option value="back">🚣 Back &amp; Biceps</option>
+                        <option value="legs">🦵 Legs &amp; Glutes</option>
+                        <option value="shoulders">🥥 Shoulders &amp; Traps</option>
+                        <option value="arms">💪 Arms &amp; Forearms</option>
+                        <option value="core">🧘 Core &amp; Abs</option>
+                        <option value="cardio">🏃 Cardio</option>
+                        <option value="custom" selected>⚡ Custom</option>
                     </select>
                 </div>
 
                 <div class="form-group">
-                    <label>Custom Workout / Exercise Name *</label>
-                    <input type="text" name="custom_exercise" id="customWorkoutNameInput" class="form-control" placeholder="e.g. Weighted Dips (+15kg), Romanian Deadlift, Farmer's Walk, Boxing..." required oninput="updateCustomOverloadGoal()">
+                    <label>Exercise Name *</label>
+                    <input type="text" name="custom_exercise" id="customWorkoutNameInput" class="form-control" placeholder="e.g. Weighted Dips, Romanian Deadlift, Boxing…" required oninput="updateCustomOverloadGoal()">
                 </div>
 
-                <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px;">
+                <div class="two-col-grid" style="gap:10px;">
                     <div class="form-group">
                         <label>Sets Completed</label>
                         <input type="number" name="sets" id="customSetsInput" class="form-control" value="3" min="1" max="50">
@@ -494,9 +443,9 @@
                     </div>
                 </div>
 
-                <div style="display:grid; grid-template-columns:2fr 1fr; gap:12px;">
+                <div style="display:grid; grid-template-columns:2fr 1fr; gap:10px;">
                     <div class="form-group">
-                        <label>Weight Lifted (leave 0 if bodyweight / cardio)</label>
+                        <label>Weight (0 = bodyweight / cardio)</label>
                         <input type="number" step="0.5" name="weight" id="customWeightInput" class="form-control" value="50" min="0" oninput="updateCustomOverloadGoal()">
                     </div>
                     <div class="form-group">
@@ -508,35 +457,25 @@
                     </div>
                 </div>
 
-                <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px;">
+                <div class="two-col-grid" style="gap:10px;">
                     <div class="form-group">
-                        <label>Duration in Minutes (optional)</label>
+                        <label>Duration (mins, optional)</label>
                         <input type="number" name="duration_mins" class="form-control" placeholder="e.g. 15" min="0">
                     </div>
                     <div class="form-group">
                         <label>Notes / Intensity</label>
-                        <input type="text" name="notes" class="form-control" placeholder="e.g. RPE 8, felt smooth">
+                        <input type="text" name="notes" class="form-control" placeholder="e.g. RPE 8">
                     </div>
                 </div>
 
-                <!-- Dynamic Progressive Overload Target Banner for Custom -->
-                <div id="customGoalBanner" style="margin-bottom:1.25rem; background:rgba(5,150,105,0.08); border:1px solid rgba(5,150,105,0.25); border-radius:var(--radius-sm); padding:10px 14px; display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:8px;">
-                    <div style="display:flex; align-items:center; gap:8px;">
-                        <span style="font-size:18px;">🎯</span>
-                        <span style="font-size:13px; color:var(--text-primary);">
-                            Next Progressive Overload Goal:
-                        </span>
-                    </div>
-                    <div>
-                        <span id="customTargetBadge" class="badge-chip badge-emerald" style="font-size:13px; padding:3px 10px; font-weight:700;">
-                            55 kg (Goal)
-                        </span>
-                    </div>
+                <div class="overload-banner" id="customGoalBanner" style="margin-bottom:1.1rem;">
+                    <span class="overload-label">🎯 Next Progressive Overload Goal:</span>
+                    <span id="customTargetBadge" class="badge-chip badge-emerald" style="font-size:13px; font-weight:700;">55 kg (Goal)</span>
                 </div>
 
-                <div style="display:flex; gap:10px;">
+                <div class="flex-actions">
                     <button type="button" onclick="closeWorkoutLogger()" class="btn-secondary-custom" style="flex:1;">Cancel</button>
-                    <button type="submit" class="btn-primary-custom" style="flex:2;">✓ Save & Log Custom Workout</button>
+                    <button type="submit" class="btn-primary-custom" style="flex:2;">✓ Save &amp; Log</button>
                 </div>
             </form>
         </div>
@@ -544,24 +483,38 @@
 </div>
 
 <script>
-    // --- WORKOUT LOGGER MODAL CONTROLS ---
+    // --- COLLAPSIBLE ---
+    function toggleSection(id, btn) {
+        const body = document.getElementById(id);
+        if (!body) return;
+        if (body.classList.contains('collapsed')) {
+            body.classList.remove('collapsed');
+            body.style.maxHeight = body.scrollHeight + 'px';
+            btn.textContent = '▾ Hide';
+        } else {
+            body.style.maxHeight = body.scrollHeight + 'px'; // force repaint
+            requestAnimationFrame(() => {
+                body.classList.add('collapsed');
+            });
+            btn.textContent = '▸ Show';
+        }
+    }
+    // Init collapsible max-heights
+    document.querySelectorAll('.collapsible-body:not(.collapsed)').forEach(el => {
+        el.style.maxHeight = el.scrollHeight + 'px';
+    });
+
+    // --- WORKOUT LOGGER MODAL ---
     function openWorkoutLogger(slot, tab = 'preset') {
         const modal = document.getElementById('workoutLogModal');
         modal.style.display = 'flex';
-
-        if (slot === 'custom') {
-            tab = 'custom';
-            slot = null;
-        }
-
+        if (slot === 'custom') { tab = 'custom'; slot = null; }
         switchWorkoutLoggerTab(tab);
-
         if (slot) {
             const presetSelect = document.getElementById('presetCategorySlot');
             const customSelect = document.getElementById('customCategorySlot');
             if (presetSelect) presetSelect.value = slot;
             if (customSelect) customSelect.value = slot;
-
             const chip = document.querySelector(`.cat-chip[onclick*="'${slot}'"]`);
             if (chip) selectWorkoutCategory(slot, chip);
         }
@@ -573,18 +526,14 @@
 
     window.addEventListener('click', function(e) {
         const modal = document.getElementById('workoutLogModal');
-        if (e.target === modal) {
-            closeWorkoutLogger();
-        }
+        if (e.target === modal) closeWorkoutLogger();
     });
 
-    // --- TAB SWITCHER ---
     function switchWorkoutLoggerTab(mode) {
         const presetPanel = document.getElementById('loggerWorkoutPresetPanel');
         const customPanel = document.getElementById('loggerWorkoutCustomPanel');
         const tabPresetBtn = document.getElementById('tabWorkoutPresetBtn');
         const tabCustomBtn = document.getElementById('tabWorkoutCustomBtn');
-
         if (mode === 'preset') {
             presetPanel.style.display = 'block';
             customPanel.style.display = 'none';
@@ -599,7 +548,7 @@
         }
     }
 
-    // --- PRESET EXERCISE SEARCH & FILTER ---
+    // --- PRESET EXERCISE SEARCH ---
     let currentCategoryFilter = 'all';
 
     function selectWorkoutCategory(catId, btnElement) {
@@ -611,41 +560,25 @@
 
     function filterPresetExercises() {
         const q = (document.getElementById('presetWorkoutSearchInput').value || '').toLowerCase().trim();
-        const cards = document.querySelectorAll('.preset-exercise-card');
-
-        cards.forEach(card => {
-            const name = (card.getAttribute('data-name') || '').toLowerCase();
+        document.querySelectorAll('.preset-exercise-card').forEach(card => {
+            const name   = (card.getAttribute('data-name')   || '').toLowerCase();
             const muscle = (card.getAttribute('data-muscle') || '').toLowerCase();
-            const tags = (card.getAttribute('data-tags') || '').toLowerCase();
-            const cat = card.getAttribute('data-cat') || '';
-
-            const matchCat = (currentCategoryFilter === 'all' || cat === currentCategoryFilter);
+            const tags   = (card.getAttribute('data-tags')   || '').toLowerCase();
+            const cat    = card.getAttribute('data-cat') || '';
+            const matchCat   = (currentCategoryFilter === 'all' || cat === currentCategoryFilter);
             const matchQuery = (!q || name.includes(q) || muscle.includes(q) || tags.includes(q));
-
-            if (matchCat && matchQuery) {
-                card.style.display = 'flex';
-            } else {
-                card.style.display = 'none';
-            }
+            card.style.display = (matchCat && matchQuery) ? 'flex' : 'none';
         });
     }
 
-    // --- SELECT PRESET EXERCISE ---
     let selectedExerciseData = null;
 
     function selectPresetExercise(exerciseId) {
-        const cards = document.querySelectorAll('.preset-exercise-card');
         let matchedCard = null;
-
-        cards.forEach(c => {
-            if (c.getAttribute('data-id') === exerciseId) {
-                c.classList.add('selected');
-                matchedCard = c;
-            } else {
-                c.classList.remove('selected');
-            }
+        document.querySelectorAll('.preset-exercise-card').forEach(c => {
+            if (c.getAttribute('data-id') === exerciseId) { c.classList.add('selected'); matchedCard = c; }
+            else c.classList.remove('selected');
         });
-
         if (!matchedCard) return;
 
         selectedExerciseData = {
@@ -660,7 +593,6 @@
             is_compound: matchedCard.getAttribute('data-compound') === 'True'
         };
 
-        // Populate hidden and visible form fields
         document.getElementById('selectedExerciseName').value = selectedExerciseData.name;
         document.getElementById('previewExerciseName').textContent = selectedExerciseData.name;
         document.getElementById('previewExerciseMuscle').textContent = `🎯 ${selectedExerciseData.muscle}`;
@@ -670,59 +602,35 @@
         document.getElementById('presetUnitSelect').value = selectedExerciseData.unit;
 
         const presetSlot = document.getElementById('presetCategorySlot');
-        if (presetSlot && selectedExerciseData.cat) {
-            presetSlot.value = selectedExerciseData.cat;
-        }
+        if (presetSlot && selectedExerciseData.cat) presetSlot.value = selectedExerciseData.cat;
 
         const compoundBadge = document.getElementById('compoundBadge');
-        if (compoundBadge) {
-            compoundBadge.textContent = selectedExerciseData.is_compound ? 'Compound Lift (+5kg goal)' : 'Isolation (+2.5kg goal)';
-        }
+        if (compoundBadge) compoundBadge.textContent = selectedExerciseData.is_compound ? 'Compound (+5kg)' : 'Isolation (+2.5kg)';
 
         document.getElementById('exerciseSelectionConfigBox').style.display = 'block';
         document.getElementById('btnSubmitPresetWorkout').removeAttribute('disabled');
-
         recalcPresetOverload();
     }
 
     function recalcPresetOverload() {
-        const weightInput = document.getElementById('presetWeightInput');
-        const unitSelect = document.getElementById('presetUnitSelect');
-        const nextGoalText = document.getElementById('presetNextGoalText');
-
-        const weight = parseFloat(weightInput.value) || 0;
-        const unit = unitSelect.value || 'kg';
-        const isLbs = unit === 'lbs';
-
+        const weight = parseFloat(document.getElementById('presetWeightInput').value) || 0;
+        const unit   = document.getElementById('presetUnitSelect').value || 'kg';
+        const isLbs  = unit === 'lbs';
         const isCompound = selectedExerciseData ? selectedExerciseData.is_compound : true;
-        const increment = isLbs ? (isCompound ? 10.0 : 5.0) : (isCompound ? 5.0 : 2.5);
-        const next = Math.round((weight + increment) * 10) / 10;
-
-        nextGoalText.textContent = `${next} ${unit} (Progressive Overload)`;
+        const increment  = isLbs ? (isCompound ? 10.0 : 5.0) : (isCompound ? 5.0 : 2.5);
+        document.getElementById('presetNextGoalText').textContent = `${Math.round((weight + increment) * 10) / 10} ${unit} (Progressive Overload)`;
     }
 
-    // --- CUSTOM WORKOUT OVERLOAD CALCULATOR ---
     function updateCustomOverloadGoal() {
-        const nameInput = document.getElementById('customWorkoutNameInput');
-        const weightInput = document.getElementById('customWeightInput');
-        const unitSelect = document.getElementById('customUnitSelect');
+        const exName = (document.getElementById('customWorkoutNameInput').value || '').trim() || 'Custom Workout';
+        const weight = parseFloat(document.getElementById('customWeightInput').value) || 0;
+        const unit   = document.getElementById('customUnitSelect').value || 'kg';
+        const isLbs  = unit === 'lbs';
+        const nameLower  = exName.toLowerCase();
+        const isCompound = ['bench','squat','deadlift','press','row','dips','pull-up','lunge'].some(c => nameLower.includes(c));
+        const increment  = isLbs ? (isCompound ? 10.0 : 5.0) : (isCompound ? 5.0 : 2.5);
         const badge = document.getElementById('customTargetBadge');
-
-        const exName = (nameInput.value || '').trim() || 'Custom Workout';
-        const weight = parseFloat(weightInput.value) || 0;
-        const unit = unitSelect.value || 'kg';
-        const isLbs = unit === 'lbs';
-
-        const nameLower = exName.toLowerCase();
-        const isCompound = ['bench', 'squat', 'deadlift', 'press', 'row', 'dips', 'pull-up', 'lunge'].some(c => nameLower.includes(c));
-        const increment = isLbs ? (isCompound ? 10.0 : 5.0) : (isCompound ? 5.0 : 2.5);
-        const next = Math.round((weight + increment) * 10) / 10;
-
-        if (weight > 0) {
-            badge.textContent = `${exName}: ${next} ${unit} (Goal)`;
-        } else {
-            badge.textContent = `Bodyweight / Endurance PR`;
-        }
+        badge.textContent = weight > 0 ? `${exName}: ${Math.round((weight + increment) * 10) / 10} ${unit} (Goal)` : `Bodyweight / Endurance PR`;
     }
 </script>
 {% endblock %}
