@@ -718,6 +718,95 @@ a:hover { color: var(--brand-primary-hover); }
 .log-plan-meal-btn { background: rgba(16,185,129,0.1); border: 1px solid rgba(16,185,129,0.3); color: #059669; border-radius: var(--radius-sm); padding: 5px 12px; font-size: 12px; font-weight: 600; cursor: pointer; transition: all 0.2s ease; display: inline-flex; align-items: center; gap: 4px; }
 .log-plan-meal-btn:hover { background: #059669; color: #fff; box-shadow: 0 2px 8px rgba(5,150,105,0.25); }
 
+
+/* ==========================================================================
+   DECLUTTER & ACCORDION / SUB-TAB UTILITIES
+   ========================================================================== */
+
+.compact-segment-tabs {
+    display: inline-flex;
+    background: var(--bg-surface-elevated);
+    padding: 4px;
+    border-radius: var(--radius-md);
+    border: 1px solid var(--border-subtle);
+    gap: 4px;
+    margin-bottom: 1.25rem;
+    flex-wrap: wrap;
+}
+
+.segment-btn {
+    background: transparent;
+    border: none;
+    padding: 7px 16px;
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--text-secondary);
+    border-radius: var(--radius-sm);
+    cursor: pointer;
+    transition: all 0.2s ease;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.segment-btn:hover {
+    color: var(--brand-primary);
+}
+
+.segment-btn.active {
+    background: var(--brand-primary);
+    color: #ffffff;
+    box-shadow: 0 2px 8px rgba(124, 58, 237, 0.25);
+}
+
+.clean-collapsible {
+    background: var(--bg-surface);
+    border: 1px solid var(--border-subtle);
+    border-radius: var(--radius-md);
+    margin-bottom: 1rem;
+    overflow: hidden;
+    transition: border-color 0.2s ease;
+}
+
+.clean-collapsible:hover {
+    border-color: rgba(124, 58, 237, 0.25);
+}
+
+.clean-collapsible-summary {
+    padding: 12px 16px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    cursor: pointer;
+    user-select: none;
+    font-weight: 600;
+    font-size: 14.5px;
+    color: var(--text-primary);
+    list-style: none;
+}
+
+.clean-collapsible-summary::-webkit-details-marker {
+    display: none;
+}
+
+.clean-collapsible-content {
+    padding: 0 16px 16px 16px;
+    border-top: 1px solid var(--border-subtle);
+}
+
+/* Quick macro pill strip for headers */
+.compact-macro-bar {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+    flex-wrap: wrap;
+    background: var(--bg-surface-elevated);
+    padding: 8px 14px;
+    border-radius: var(--radius-sm);
+    border: 1px solid var(--border-subtle);
+    font-size: 12.5px;
+}
+
 /* ==========================================================================
    REGIONAL / CUISINE TABS
    ========================================================================== */

@@ -1,0 +1,111 @@
+{% extends "base.html" %}
+{% block title %}Coach Portal — Fitrack{% endblock %}
+{% block content %}
+<div class="page-wrapper">
+    <div class="page-header">
+        <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:12px;">
+            <div>
+                <h2 class="page-title">🌿 Coach Portal &amp; Client Doubts</h2>
+                <p class="page-subtitle">Welcome Coach <strong>{{ current_user.username }}</strong> — answer doubts, provide guidance, and mentor your clients.</p>
+            </div>
+            <div>
+                <span class="badge-chip badge-coach" style="font-size:12px; padding:5px 12px;">
+                    🛡️ Verified Coach Account
+                </span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Coach Info Card -->
+    <div class="ai-hero-banner" style="margin-bottom:1.8rem; background:linear-gradient(135deg, #059669, #047857);">
+        <div class="ai-hero-content">
+            <div class="ai-hero-title">
+                <span>👨‍🏫</span> Coach {{ current_user.username }}
+                <span class="badge-chip" style="background:rgba(255,255,255,0.25); color:#fff;">{{ current_user.coach_specialty or 'Certified Coach' }}</span>
+            </div>
+            <p class="ai-hero-desc">
+                {{ current_user.coach_bio or 'Active Fitness & Nutrition Coach on Fitrack.' }}
+            </p>
+        </div>
+        <div style="text-align:right;">
+            <div style="font-size:28px; font-weight:800; color:#fff;">{{ all_messages|length }}</div>
+            <div style="font-size:12px; color:rgba(255,255,255,0.85);">Total Client Messages</div>
+        </div>
+    </div>
+
+    <!-- Client Inbox & Doubts Grid -->
+    <h3 style="font-size:18px; font-weight:700; color:var(--text-primary); margin-bottom:1rem; display:flex; align-items:center; gap:8px;">
+        <span>📬</span> Client Inquiries &amp; Questions
+    </h3>
+
+    {% if clients_dict %}
+    <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(320px, 1fr)); gap:1.25rem;">
+        {% for cid, cdata in clients_dict.items() %}
+        <div class="stat-card" style="border-left: 4px solid var(--brand-primary); display:flex; flex-direction:column; justify-content:space-between;">
+            <div>
+                <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:10px;">
+                    <div>
+                        <div style="display:flex; align-items:center; gap:8px;">
+                            <span style="font-size:18px;">🏃</span>
+                            <strong style="color:var(--text-primary); font-size:16px;">{{ cdata.client.username }}</strong>
+                        </div>
+                        <span class="badge-chip badge-cyan" style="font-size:10.5px; margin-top:3px;">
+                            Goal: {{ cdata.client.goal|capitalize }} • {{ cdata.client.get_role_display() }}
+                        </span>
+                    </div>
+                    <span class="badge-chip badge-purple" style="font-size:11px;">
+                        {{ cdata.messages|length }} messages
+                    </span>
+                </div>
+
+                <div style="background:var(--bg-surface-elevated); border:1px solid var(--border-subtle); border-radius:var(--radius-sm); padding:10px 12px; margin-bottom:12px; font-size:12px; color:var(--text-secondary);">
+                    {% set bmi, bmi_cat = cdata.client.calculate_bmi() %}
+                    <strong>Client Stats:</strong> 
+                    {% if cdata.client.weight_kg %}{{ cdata.client.weight_kg }}kg{% else %}Weight unset{% endif %} · 
+                    BMI: {{ bmi or 'N/A' }} · Target: {{ cdata.client.target_weight_kg or 'N/A' }}kg
+                </div>
+
+                <!-- Message stream -->
+                <div style="max-height:220px; overflow-y:auto; display:flex; flex-direction:column; gap:8px; margin-bottom:14px; padding-right:4px;">
+                    {% for m in cdata.messages|reverse %}
+                    <div style="padding:8px 10px; border-radius:var(--radius-sm); font-size:12.5px; {% if m.sender_role == 'coach' %}background:rgba(5,150,105,0.08); border-left:3px solid var(--accent-emerald); align-self:flex-end; max-width:92%;{% else %}background:var(--bg-surface); border:1px solid var(--border-subtle); align-self:flex-start; max-width:92%;{% endif %}">
+                        <div style="display:flex; justify-content:space-between; align-items:center; font-size:11px; margin-bottom:3px; gap:8px;">
+                            <strong style="color:{% if m.sender_role == 'coach' %}var(--accent-emerald){% else %}var(--brand-primary){% endif %};">
+                                {% if m.sender_role == 'coach' %}You (Coach){% else %}{{ cdata.client.username }}{% endif %}
+                            </strong>
+                            <span style="color:var(--text-muted);">{{ m.time_display() }}</span>
+                        </div>
+                        <div style="font-weight:600; font-size:12px; color:var(--text-primary); margin-bottom:2px;">{{ m.subject }}</div>
+                        <div style="color:var(--text-secondary); line-height:1.4; white-space:pre-line;">{{ m.message }}</div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+
+            <!-- Reply Box Form -->
+            <form method="POST" action="{{ url_for('ai.coach_reply') }}" style="border-top:1px solid var(--border-subtle); padding-top:10px; margin:0;">
+                <input type="hidden" name="client_id" value="{{ cid }}">
+                <input type="hidden" name="subject" value="Re: {{ cdata.messages[0].subject if cdata.messages else 'Coach Advice' }}">
+                <div style="display:flex; gap:8px;">
+                    <textarea name="reply_text" class="form-control" rows="2" placeholder="Write guidance or answer {{ cdata.client.username }}'s doubt..." style="font-size:12.5px; padding:6px 10px;" required></textarea>
+                </div>
+                <div style="display:flex; justify-content:flex-end; margin-top:6px;">
+                    <button type="submit" class="btn-primary-custom" style="padding:6px 14px; font-size:12px; background:#059669;">
+                        Send Answer →
+                    </button>
+                </div>
+            </form>
+        </div>
+        {% endfor %}
+    </div>
+    {% else %}
+    <div class="stat-card" style="text-align:center; padding:3rem 1.5rem;">
+        <span style="font-size:40px; display:block; margin-bottom:10px;">📭</span>
+        <h4 style="font-size:18px; font-weight:700; color:var(--text-primary); margin-bottom:6px;">No doubts received yet</h4>
+        <p style="color:var(--text-secondary); font-size:13.5px; max-width:480px; margin:0 auto;">
+            When clients ask questions about workouts, South Indian nutrition, form or weight plateau, their queries will appear here for you to answer directly.
+        </p>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

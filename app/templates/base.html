@@ -23,6 +23,11 @@
                 <a href="{{ url_for('auth.dashboard') }}" class="nav-link {% if request.endpoint == 'auth.dashboard' %}active{% endif %}">
                     Dashboard
                 </a>
+                {% if current_user.is_admin %}
+                <a href="{{ url_for('admin.portal') }}" class="nav-link {% if request.blueprint == 'admin' %}active{% endif %}" style="color:#a78bfa; font-weight:700;">
+                    🔐 Admin
+                </a>
+                {% elif not current_user.is_coach %}
                 <a href="{{ url_for('diet.view_plan') }}" class="nav-link {% if request.blueprint == 'diet' %}active{% endif %}">
                     🍛 Food
                 </a>
@@ -38,6 +43,11 @@
                 <a href="{{ url_for('ai.recommendations') }}" class="nav-link nav-link-coach {% if request.endpoint == 'ai.recommendations' %}active{% endif %}">
                     🌿 Coach
                 </a>
+                {% else %}
+                <a href="{{ url_for('ai.coach_portal') }}" class="nav-link nav-link-coach {% if request.endpoint == 'ai.coach_portal' %}active{% endif %}">
+                    🛡️ Coach Portal
+                </a>
+                {% endif %}
             </nav>
             {% endif %}
         </div>
@@ -60,10 +70,16 @@
                 <div class="avatar-dropdown" id="avatarDropdown">
                     <div class="avatar-dropdown-name">{{ current_user.username }} ({{ current_user.get_role_display() }})</div>
                     <a href="{{ url_for('profile.view') }}">⚙️ Profile &amp; Biometrics</a>
+                    {% if current_user.is_admin %}
+                    <a href="{{ url_for('admin.portal') }}" style="color:#a78bfa; font-weight:700;">🔐 Admin Control Panel</a>
+                    {% elif current_user.is_coach %}
+                    <a href="{{ url_for('ai.coach_portal') }}">🛡️ Coach Portal &amp; Inbox</a>
+                    {% else %}
                     <a href="{{ url_for('diet.view_plan') }}">🍛 Nutrition &amp; Meal Plan</a>
                     <a href="{{ url_for('workouts.plan') }}">🏋️ Workout Split</a>
                     <a href="{{ url_for('ai.recommendations') }}">🌿 Personal Coach Hub</a>
                     <a href="{{ url_for('leaderboard.leaderboard') }}">🏆 Community</a>
+                    {% endif %}
                     <a href="{{ url_for('auth.logout') }}" style="color:#ef4444;">🚪 Logout</a>
                 </div>
             </div>
@@ -77,11 +93,17 @@
         <div class="mobile-nav-panel" id="mobileNavPanel">
             <button class="mobile-nav-close" id="mobileNavClose" type="button">&times;</button>
             <a href="{{ url_for('auth.dashboard') }}" class="nav-link {% if request.endpoint == 'auth.dashboard' %}active{% endif %}">Dashboard</a>
+            {% if current_user.is_admin %}
+            <a href="{{ url_for('admin.portal') }}" class="nav-link {% if request.blueprint == 'admin' %}active{% endif %}" style="color:#a78bfa; font-weight:700;">🔐 Admin Control Panel</a>
+            {% elif not current_user.is_coach %}
             <a href="{{ url_for('diet.view_plan') }}" class="nav-link {% if request.blueprint == 'diet' %}active{% endif %}">🍛 Food &amp; Nutrition</a>
             <a href="{{ url_for('workouts.plan') }}" class="nav-link {% if request.blueprint == 'workouts' %}active{% endif %}">🏋️ Workouts</a>
             <a href="{{ url_for('weight.history') }}" class="nav-link {% if request.blueprint == 'weight' %}active{% endif %}">📈 Weight</a>
             <a href="{{ url_for('leaderboard.leaderboard') }}" class="nav-link {% if request.blueprint == 'leaderboard' %}active{% endif %}">🏆 Community</a>
-            <a href="{{ url_for('ai.recommendations') }}" class="nav-link nav-link-coach {% if request.endpoint == 'ai.recommendations' %}active{% endif %}">🌿 Coach</a>
+            <a href="{{ url_for('ai.recommendations') }}" class="nav-link nav-link-coach {% if request.endpoint == 'ai.recommendations' %}active{% endif %}">🌿 Personal Coach</a>
+            {% else %}
+            <a href="{{ url_for('ai.coach_portal') }}" class="nav-link nav-link-coach {% if request.endpoint == 'ai.coach_portal' %}active{% endif %}">🛡️ Coach Portal</a>
+            {% endif %}
             <hr style="border-color: var(--border-subtle); margin: 0.5rem 0;">
             <a href="{{ url_for('profile.view') }}" class="nav-link">⚙️ Profile</a>
             <a href="{{ url_for('auth.logout') }}" class="nav-link" style="color:#ef4444;">🚪 Logout</a>
@@ -105,7 +127,7 @@
 
     {% block content %}{% endblock %}
 
-    {% if current_user.is_authenticated %}
+    {% if current_user.is_authenticated and not current_user.is_coach %}
     <!-- ===================== FLOATING COACH WIDGET ===================== -->
     <button class="ai-coach-fab" id="aiCoachFab" type="button" title="Chat with Coach Raghav">
         <span>💬</span> Ask Coach
@@ -121,13 +143,13 @@
         </div>
         <div class="ai-chat-body" id="aiChatBody">
             <div class="chat-bubble chat-bubble-bot">
-                Vanakkam <strong>{{ current_user.username }}</strong>! I'm Coach Raghav, your personal fitness and nutrition mentor. How can I assist you with your home meals, workouts, or daily habits today?
+                Hey <strong>{{ current_user.username }}</strong>! I'm Coach Raghav, your personal fitness and nutrition mentor. How can I help you today — meals, workouts, or habits?
             </div>
             <div class="chat-quick-chips">
-                <button class="chip-btn" onclick="sendQuickPrompt('What are high-protein South Indian vegetarian meals?')">🧀 High-Protein Veg</button>
-                <button class="chip-btn" onclick="sendQuickPrompt('Can I drink filter coffee while losing weight?')">☕ Filter Coffee</button>
-                <button class="chip-btn" onclick="sendQuickPrompt('Best South Indian pre-workout snack for today?')">⚡ Pre-Workout</button>
-                <button class="chip-btn" onclick="sendQuickPrompt('How should I balance rice, sambar, and poriyal to hit my macros?')">🍛 Rice &amp; Macros</button>
+                <button class="chip-btn" onclick="sendQuickPrompt('What are high-protein vegetarian meals?')">🧀 High-Protein Veg</button>
+                <button class="chip-btn" onclick="sendQuickPrompt('Can I drink filter coffee while losing weight?')">☕ Coffee & Fitness</button>
+                <button class="chip-btn" onclick="sendQuickPrompt('Best pre-workout snack for today?')">⚡ Pre-Workout</button>
+                <button class="chip-btn" onclick="sendQuickPrompt('How do I balance my macros with rice and dal?')">🍛 Macro Balance</button>
             </div>
         </div>
         <form class="ai-chat-footer" id="aiChatForm" onsubmit="handleChatSubmit(event)">
