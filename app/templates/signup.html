@@ -19,6 +19,21 @@
                 <input type="password" name="password" class="form-control" required placeholder="••••••••">
             </div>
             <div class="form-group">
+                <label>I am joining as a:</label>
+                <div style="display:flex; gap:10px; margin-top:4px;">
+                    <label style="flex:1; display:flex; align-items:center; gap:8px; background:var(--bg-surface-elevated); border:1px solid var(--border-subtle); padding:10px 14px; border-radius:var(--radius-sm); cursor:pointer;">
+                        <input type="radio" name="account_type" value="client" checked onchange="toggleAccountType(this.value)" style="accent-color:var(--brand-primary);">
+                        <span style="font-weight:600; font-size:13.5px;">🏃 Member / Client</span>
+                    </label>
+                    <label style="flex:1; display:flex; align-items:center; gap:8px; background:var(--bg-surface-elevated); border:1px solid var(--border-subtle); padding:10px 14px; border-radius:var(--radius-sm); cursor:pointer;">
+                        <input type="radio" name="account_type" value="coach" onchange="toggleAccountType(this.value)" style="accent-color:var(--brand-primary);">
+                        <span style="font-weight:600; font-size:13.5px;">🌿 Fitness Coach</span>
+                    </label>
+                </div>
+            </div>
+
+            <!-- Client specific field -->
+            <div class="form-group" id="clientRoleField">
                 <label>Your Primary Role / Lifestyle</label>
                 <select name="role" class="form-control">
                     {% if roles %}
@@ -40,8 +55,35 @@
                     Calibrates your AI coach, daily meal plans, and posture warm-ups.
                 </small>
             </div>
+
+            <!-- Coach specific fields -->
+            <div id="coachExtraFields" style="display:none;">
+                <div class="form-group">
+                    <label>Coaching Specialty / Expertise</label>
+                    <input type="text" name="coach_specialty" class="form-control" placeholder="e.g. Strength & Conditioning, Fat Loss, South Indian Nutrition">
+                </div>
+                <div class="form-group">
+                    <label>Short Coach Bio &amp; Credentials</label>
+                    <input type="text" name="coach_bio" class="form-control" placeholder="e.g. Certified CSCS & Sports Nutritionist with 8+ years coaching experience">
+                </div>
+            </div>
+
             <button type="submit" class="btn-primary-custom" style="margin-top:1rem;">Create Account</button>
         </form>
+
+        <script>
+            function toggleAccountType(type) {
+                const clientRole = document.getElementById('clientRoleField');
+                const coachExtra = document.getElementById('coachExtraFields');
+                if (type === 'coach') {
+                    clientRole.style.display = 'none';
+                    coachExtra.style.display = 'block';
+                } else {
+                    clientRole.style.display = 'block';
+                    coachExtra.style.display = 'none';
+                }
+            }
+        </script>
         <p class="auth-footer">Already have an account? <a href="{{ url_for('auth.login') }}">Login</a></p>
     </div>
 </div>

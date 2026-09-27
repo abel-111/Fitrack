@@ -28,6 +28,13 @@ class User(UserMixin, db.Model):
     profile_picture = db.Column(db.String(200), default='default.png')
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
 
+    is_coach = db.Column(db.Boolean, default=False)
+    coach_approved = db.Column(db.Boolean, default=False)  # Admin must approve coaches
+    coach_bio = db.Column(db.String(300), default='Certified Fitness & Nutrition Specialist')
+    coach_specialty = db.Column(db.String(100), default='General Fitness, Strength & Nutrition')
+
+    is_admin = db.Column(db.Boolean, default=False)
+
     attendances = db.relationship('Attendance', backref='user', lazy=True)
     weight_logs = db.relationship('WeightLog', backref='user', lazy=True)
     lift_logs = db.relationship('LiftLog', backref='user', lazy=True, order_by='desc(LiftLog.logged_at)')
@@ -35,6 +42,8 @@ class User(UserMixin, db.Model):
     diet_plans = db.relationship('UserDietPlan', backref='user', lazy=True, order_by='desc(UserDietPlan.created_at)')
     food_logs = db.relationship('FoodLog', backref='user', lazy=True, order_by='desc(FoodLog.logged_at)')
     workout_logs = db.relationship('WorkoutLog', backref='user', lazy=True, order_by='desc(WorkoutLog.logged_at)')
+    client_messages = db.relationship('CoachMessage', foreign_keys='CoachMessage.client_id', backref='client_user', lazy=True)
+    coach_messages = db.relationship('CoachMessage', foreign_keys='CoachMessage.coach_id', backref='coach_user', lazy=True)
 
     ROLE_LABELS = {
         'desk_worker': '💼 Desk Worker',
@@ -479,4 +488,19 @@ class WorkoutLog(db.Model):
         else:
             increment = 5.0 if is_compound else 2.5
         return round(weight + increment, 1)
+
+
+class CoachMessage(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    client_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    coach_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    sender_role = db.Column(db.String(20), default='client')  # 'client' or 'coach'
+    subject = db.Column(db.String(150), default='General Fitness Doubt')
+    message = db.Column(db.Text, nullable=False)
+    is_read = db.Column(db.Boolean, default=False)
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+
+    def time_display(self):
+        return self.created_at.strftime('%b %d, %I:%M %p')
+
 

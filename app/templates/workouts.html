@@ -25,254 +25,276 @@
         </div>
     </div>
 
-    <!-- DAILY WORKOUT TRACKER -->
-    <div class="workout-tracker-card" id="workoutTrackerSection">
-        <div class="tracker-header">
-            <div class="tracker-header-left">
-                <div class="tracker-title-row">
-                    <span class="emoji-xl">🏋️‍♂️</span>
-                    <h3 class="tracker-title">Daily Workout Tracker</h3>
-                    <span class="badge-chip badge-coral text-xs">Custom Workouts &amp; Overload</span>
-                </div>
-                <p class="tracker-desc">Log what you did today — custom exercises, sets, reps, volume &amp; progressive overload targets.</p>
-            </div>
-            <button type="button" class="btn-primary-custom" onclick="openWorkoutLogger()" style="padding:7px 16px; font-size:13px;">
-                ＋ Add Entry
+    <!-- View Selector Tabs: Daily Tracker vs Weekly Scheduled Split -->
+    <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:12px; margin-bottom:1.25rem;">
+        <div class="compact-segment-tabs" style="margin-bottom:0;">
+            <button type="button" class="segment-btn active" id="segWorkoutTrackerBtn" onclick="switchWorkoutSection('tracker')">
+                🏋️‍♂️ Daily Workout Log &amp; Volume
+            </button>
+            <button type="button" class="segment-btn" id="segWorkoutRoutineBtn" onclick="switchWorkoutSection('routine')">
+                📅 Scheduled Routine &amp; Warmup
             </button>
         </div>
-
-        <!-- Date Navigator -->
-        <div class="food-date-nav">
-            <div class="food-date-controls">
-                <a href="{{ url_for('workouts.plan', date=prev_date_str) }}" class="food-date-btn" title="Previous Day">
-                    ← {{ prev_date_str }}
-                </a>
-                {% if not is_today %}
-                <a href="{{ url_for('workouts.plan') }}" class="food-date-btn" style="background:var(--brand-primary); color:#fff; border-color:var(--brand-primary);">
-                    📅 Today
-                </a>
-                {% endif %}
-            </div>
-            <div class="food-date-badge">
-                <span>📅 {{ workout_summary.date_display }}</span>
-                {% if is_today %}
-                    <span class="badge-chip badge-emerald text-xs">Today</span>
-                {% else %}
-                    <span class="badge-chip text-xs" style="background:rgba(109,40,217,0.1); color:var(--brand-primary);">History</span>
-                {% endif %}
-            </div>
-            <div class="food-date-controls">
-                <input type="date" id="jumpWorkoutDateInput" value="{{ selected_date_str }}" class="form-control" style="padding:4px 8px; font-size:12px; height:auto; width:auto;" onchange="window.location.href='{{ url_for('workouts.plan') }}?date=' + this.value">
-                <a href="{{ url_for('workouts.plan', date=next_date_str) }}" class="food-date-btn" title="Next Day">
-                    {{ next_date_str }} →
-                </a>
-            </div>
+        <div style="font-size:12.5px; color:var(--text-secondary); display:flex; align-items:center; gap:8px;">
+            <span>Level: <strong>{{ level|capitalize }}</strong></span>
+            <span>•</span>
+            <span>Split: <strong>{{ current_user.workout_split or 'Default' }}</strong></span>
         </div>
+    </div>
 
-        <!-- Stats Row -->
-        <div class="food-stats-grid">
-            <div class="food-stat-box" style="border-left: 3px solid #7c3aed;">
-                <div class="food-stat-top">
-                    <span class="food-stat-title">🏋️ Exercises &amp; Sets</span>
-                    <span class="badge-chip badge-purple text-xs">{{ workout_summary.total_sets }} Sets</span>
-                </div>
-                <div class="food-stat-numbers">
-                    <span class="food-stat-val">{{ workout_summary.total_exercises }}</span>
-                    <span class="food-stat-sub">exercise{{ 's' if workout_summary.total_exercises != 1 }}</span>
-                </div>
-                <div class="progress-bar-wrap" style="height:8px; margin:4px 0 6px;">
-                    <div class="progress-bar-fill progress-bar-purple" style="width: {{ [workout_summary.total_sets * 8, 100]|min }}%;"></div>
-                </div>
-                <div class="food-stat-desc">
-                    {% if workout_summary.total_exercises > 0 %}
-                        🔥 <strong>{{ workout_summary.total_sets }} working sets</strong> pushed today!
-                    {% else %}
-                        Log exercises to track volume &amp; overload.
-                    {% endif %}
-                </div>
-            </div>
-
-            <div class="food-stat-box" style="border-left: 3px solid #059669;">
-                <div class="food-stat-top">
-                    <span class="food-stat-title">⚡ Total Volume</span>
-                    <span class="badge-chip badge-emerald text-xs">Load</span>
-                </div>
-                <div class="food-stat-numbers">
-                    <span class="food-stat-val">{{ workout_summary.total_volume }}</span>
-                    <span class="food-stat-sub">kg</span>
-                </div>
-                <div class="progress-bar-wrap" style="height:8px; margin:4px 0 6px;">
-                    <div class="progress-bar-fill progress-bar-emerald" style="width: {{ [workout_summary.total_volume / 30, 100]|min }}%;"></div>
-                </div>
-                <div class="food-stat-desc">Cumulative load across all sets, reps &amp; weight.</div>
-            </div>
-
-            <div class="food-stat-box" style="border-left: 3px solid #0284c7;">
-                <div class="food-stat-top">
-                    <span class="food-stat-title">⏱️ Duration &amp; Goal</span>
-                    <span class="badge-chip badge-cyan text-xs">Overload</span>
-                </div>
-                <div class="food-stat-numbers" style="gap:14px;">
-                    <div>
-                        <div class="text-xs" style="color:var(--text-muted); text-transform:uppercase;">Time</div>
-                        <span style="font-size:20px; font-weight:700; color:#0284c7;">{{ workout_summary.total_duration }}m</span>
+    <!-- SECTION 1: DAILY WORKOUT TRACKER -->
+    <div id="sectionWorkoutTracker" class="workout-tab-content">
+        <div class="workout-tracker-card" id="workoutTrackerSection">
+            <div class="tracker-header">
+                <div class="tracker-header-left">
+                    <div class="tracker-title-row">
+                        <span class="emoji-xl">🏋️‍♂️</span>
+                        <h3 class="tracker-title">Daily Workout Tracker</h3>
+                        <span class="badge-chip badge-coral text-xs">Custom Workouts &amp; Overload</span>
                     </div>
-                    <div>
-                        <div class="text-xs" style="color:var(--text-muted); text-transform:uppercase;">Next Bench</div>
-                        <span style="font-size:20px; font-weight:700; color:#059669;">
-                            {% if latest_bench %}{{ latest_bench.target_next_weight }}{{ latest_bench.unit }}{% else %}55kg{% endif %}
-                        </span>
-                    </div>
+                    <p class="tracker-desc">Log what you did today — custom exercises, sets, reps, volume &amp; progressive overload targets.</p>
                 </div>
-                <div class="food-stat-desc mt-md">Target auto-updates when you log sets!</div>
-            </div>
-        </div>
-
-        <!-- Logged by Category -->
-        <h4 class="section-title" style="font-size:14.5px; margin-bottom:0.65rem;">Workouts by Category</h4>
-        <div class="workout-logs-grid">
-            {% for cat_key, cat_data in workout_summary.categories.items() %}
-            <div class="workout-log-box">
-                <div>
-                    <div class="workout-log-header">
-                        <div class="workout-log-title">
-                            <span>{{ cat_data.icon }}</span> {{ cat_data.label }}
-                        </div>
-                        <div class="flex-actions">
-                            {% if cat_data.total_sets > 0 %}
-                                <span class="badge-volume">{{ cat_data.total_sets }} sets</span>
-                                <span class="badge-macro-prot">{{ cat_data.total_volume }} kg</span>
-                            {% else %}
-                                <span class="text-xs" style="color:var(--text-muted);">0 logged</span>
-                            {% endif %}
-                        </div>
-                    </div>
-
-                    {% if cat_data.exercises %}
-                    <ul class="workout-items-list">
-                        {% for item in cat_data.exercises %}
-                        <li class="workout-log-item">
-                            <div class="workout-log-info">
-                                <div class="workout-log-name">
-                                    <span>{{ item.exercise_name }}</span>
-                                    {% if item.is_custom %}<span class="badge-custom-pill">Custom</span>{% endif %}
-                                </div>
-                                <div class="workout-log-meta">
-                                    <span><strong>{{ item.sets }}</strong> × <strong>{{ item.reps }}</strong></span>
-                                    {% if item.weight > 0 %}
-                                        <span>• <strong>{{ item.weight }} {{ item.unit }}</strong></span>
-                                        <span class="badge-volume">{{ item.get_total_volume() }} {{ item.unit }}</span>
-                                    {% endif %}
-                                    {% if item.duration_mins > 0 %}<span>• ⏱️ {{ item.duration_mins }}m</span>{% endif %}
-                                    {% if item.notes %}<span style="font-style:italic; color:var(--text-secondary);">"{{ item.notes }}"</span>{% endif %}
-                                </div>
-                            </div>
-                            <div class="workout-log-metrics">
-                                {% if item.target_next_weight and item.target_next_weight > 0 %}
-                                    <span class="badge-goal-pill" title="Next Progressive Overload Goal">🎯 {{ item.target_next_weight }}{{ item.unit }}</span>
-                                {% endif %}
-                                <form method="POST" action="{{ url_for('workouts.delete_workout_log', log_id=item.id) }}" style="margin:0;" onsubmit="return confirm('Remove {{ item.exercise_name }}?');">
-                                    <button type="submit" class="workout-delete-btn" title="Remove">✕</button>
-                                </form>
-                            </div>
-                        </li>
-                        {% endfor %}
-                    </ul>
-                    {% else %}
-                    <div class="workout-empty-hint">No {{ cat_data.label.lower() }} logged yet.</div>
-                    {% endif %}
-                </div>
-                <button type="button" class="btn-add-workout-item" onclick="openWorkoutLogger('{{ cat_key }}')">
-                    ＋ Add to {{ cat_data.label }}
+                <button type="button" class="btn-primary-custom" onclick="openWorkoutLogger()" style="padding:7px 16px; font-size:13px;">
+                    ＋ Add Entry
                 </button>
+            </div>
+
+            <!-- Date Navigator -->
+            <div class="food-date-nav">
+                <div class="food-date-controls">
+                    <a href="{{ url_for('workouts.plan', date=prev_date_str) }}" class="food-date-btn" title="Previous Day">
+                        ← {{ prev_date_str }}
+                    </a>
+                    {% if not is_today %}
+                    <a href="{{ url_for('workouts.plan') }}" class="food-date-btn" style="background:var(--brand-primary); color:#fff; border-color:var(--brand-primary);">
+                        📅 Today
+                    </a>
+                    {% endif %}
+                </div>
+                <div class="food-date-badge">
+                    <span>📅 {{ workout_summary.date_display }}</span>
+                    {% if is_today %}
+                        <span class="badge-chip badge-emerald text-xs">Today</span>
+                    {% else %}
+                        <span class="badge-chip text-xs" style="background:rgba(109,40,217,0.1); color:var(--brand-primary);">History</span>
+                    {% endif %}
+                </div>
+                <div class="food-date-controls">
+                    <input type="date" id="jumpWorkoutDateInput" value="{{ selected_date_str }}" class="form-control" style="padding:4px 8px; font-size:12px; height:auto; width:auto;" onchange="window.location.href='{{ url_for('workouts.plan') }}?date=' + this.value">
+                    <a href="{{ url_for('workouts.plan', date=next_date_str) }}" class="food-date-btn" title="Next Day">
+                        {{ next_date_str }} →
+                    </a>
+                </div>
+            </div>
+
+            <!-- Stats Row -->
+            <div class="food-stats-grid">
+                <div class="food-stat-box" style="border-left: 3px solid #7c3aed;">
+                    <div class="food-stat-top">
+                        <span class="food-stat-title">🏋️ Exercises &amp; Sets</span>
+                        <span class="badge-chip badge-purple text-xs">{{ workout_summary.total_sets }} Sets</span>
+                    </div>
+                    <div class="food-stat-numbers">
+                        <span class="food-stat-val">{{ workout_summary.total_exercises }}</span>
+                        <span class="food-stat-sub">exercise{{ 's' if workout_summary.total_exercises != 1 }}</span>
+                    </div>
+                    <div class="progress-bar-wrap" style="height:8px; margin:4px 0 6px;">
+                        <div class="progress-bar-fill progress-bar-purple" style="width: {{ [workout_summary.total_sets * 8, 100]|min }}%;"></div>
+                    </div>
+                    <div class="food-stat-desc">
+                        {% if workout_summary.total_exercises > 0 %}
+                            🔥 <strong>{{ workout_summary.total_sets }} working sets</strong> pushed today!
+                        {% else %}
+                            Log exercises to track volume &amp; overload.
+                        {% endif %}
+                    </div>
+                </div>
+
+                <div class="food-stat-box" style="border-left: 3px solid #059669;">
+                    <div class="food-stat-top">
+                        <span class="food-stat-title">⚡ Total Volume</span>
+                        <span class="badge-chip badge-emerald text-xs">Load</span>
+                    </div>
+                    <div class="food-stat-numbers">
+                        <span class="food-stat-val">{{ workout_summary.total_volume }}</span>
+                        <span class="food-stat-sub">kg</span>
+                    </div>
+                    <div class="progress-bar-wrap" style="height:8px; margin:4px 0 6px;">
+                        <div class="progress-bar-fill progress-bar-emerald" style="width: {{ [workout_summary.total_volume / 30, 100]|min }}%;"></div>
+                    </div>
+                    <div class="food-stat-desc">Cumulative load across all sets, reps &amp; weight.</div>
+                </div>
+
+                <div class="food-stat-box" style="border-left: 3px solid #0284c7;">
+                    <div class="food-stat-top">
+                        <span class="food-stat-title">⏱️ Duration &amp; Goal</span>
+                        <span class="badge-chip badge-cyan text-xs">Overload</span>
+                    </div>
+                    <div class="food-stat-numbers" style="gap:14px;">
+                        <div>
+                            <div class="text-xs" style="color:var(--text-muted); text-transform:uppercase;">Time</div>
+                            <span style="font-size:20px; font-weight:700; color:#0284c7;">{{ workout_summary.total_duration }}m</span>
+                        </div>
+                        <div>
+                            <div class="text-xs" style="color:var(--text-muted); text-transform:uppercase;">Next Bench</div>
+                            <span style="font-size:20px; font-weight:700; color:#059669;">
+                                {% if latest_bench %}{{ latest_bench.target_next_weight }}{{ latest_bench.unit }}{% else %}55kg{% endif %}
+                            </span>
+                        </div>
+                    </div>
+                    <div class="food-stat-desc mt-md">Target auto-updates when you log sets!</div>
+                </div>
+            </div>
+
+            <!-- Logged by Category -->
+            <h4 class="section-title" style="font-size:14.5px; margin-bottom:0.65rem;">Workouts by Category</h4>
+            <div class="workout-logs-grid">
+                {% for cat_key, cat_data in workout_summary.categories.items() %}
+                <div class="workout-log-box">
+                    <div>
+                        <div class="workout-log-header">
+                            <div class="workout-log-title">
+                                <span>{{ cat_data.icon }}</span> {{ cat_data.label }}
+                            </div>
+                            <div class="flex-actions">
+                                {% if cat_data.total_sets > 0 %}
+                                    <span class="badge-volume">{{ cat_data.total_sets }} sets</span>
+                                    <span class="badge-macro-prot">{{ cat_data.total_volume }} kg</span>
+                                {% else %}
+                                    <span class="text-xs" style="color:var(--text-muted);">0 logged</span>
+                                {% endif %}
+                            </div>
+                        </div>
+
+                        {% if cat_data.exercises %}
+                        <ul class="workout-items-list">
+                            {% for item in cat_data.exercises %}
+                            <li class="workout-log-item">
+                                <div class="workout-log-info">
+                                    <div class="workout-log-name">
+                                        <span>{{ item.exercise_name }}</span>
+                                        {% if item.is_custom %}<span class="badge-custom-pill">Custom</span>{% endif %}
+                                    </div>
+                                    <div class="workout-log-meta">
+                                        <span><strong>{{ item.sets }}</strong> × <strong>{{ item.reps }}</strong></span>
+                                        {% if item.weight > 0 %}
+                                            <span>• <strong>{{ item.weight }} {{ item.unit }}</strong></span>
+                                            <span class="badge-volume">{{ item.get_total_volume() }} {{ item.unit }}</span>
+                                        {% endif %}
+                                        {% if item.duration_mins > 0 %}<span>• ⏱️ {{ item.duration_mins }}m</span>{% endif %}
+                                        {% if item.notes %}<span style="font-style:italic; color:var(--text-secondary);">"{{ item.notes }}"</span>{% endif %}
+                                    </div>
+                                </div>
+                                <div class="workout-log-metrics">
+                                    {% if item.target_next_weight and item.target_next_weight > 0 %}
+                                        <span class="badge-goal-pill" title="Next Progressive Overload Goal">🎯 {{ item.target_next_weight }}{{ item.unit }}</span>
+                                    {% endif %}
+                                    <form method="POST" action="{{ url_for('workouts.delete_workout_log', log_id=item.id) }}" style="margin:0;" onsubmit="return confirm('Remove {{ item.exercise_name }}?');">
+                                        <button type="submit" class="workout-delete-btn" title="Remove">✕</button>
+                                    </form>
+                                </div>
+                            </li>
+                            {% endfor %}
+                        </ul>
+                        {% else %}
+                        <div class="workout-empty-hint">No {{ cat_data.label.lower() }} logged yet.</div>
+                        {% endif %}
+                    </div>
+                    <button type="button" class="btn-add-workout-item" onclick="openWorkoutLogger('{{ cat_key }}')">
+                        ＋ Add to {{ cat_data.label }}
+                    </button>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+
+    <!-- SECTION 2: SCHEDULED ROUTINE & WARMUPS -->
+    <div id="sectionWorkoutRoutine" class="workout-tab-content" style="display:none;">
+        <!-- Warm-Up Protocol (collapsible) -->
+        <div class="stat-card" style="margin-bottom:1.5rem; border-left:3px solid #a55eea;">
+            <div class="flex-between mb-sm">
+                <h3 style="font-size:15px; font-weight:700; color:var(--text-primary); display:flex; align-items:center; gap:8px; margin:0;">
+                    <span>🧘</span> {{ warmup.title }}
+                </h3>
+                <div class="flex-row">
+                    <span class="badge-chip badge-ai">Pre-Workout</span>
+                    <button class="collapsible-toggle" onclick="toggleSection('warmupBody', this)">▾ Hide</button>
+                </div>
+            </div>
+            <div id="warmupBody" class="collapsible-body">
+                <p class="text-secondary-sm mb-sm">{{ warmup.note }}</p>
+                <div class="three-col-grid">
+                    {% for item in warmup.exercises %}
+                    <div class="warmup-item">
+                        <span class="warmup-arrow">→</span>
+                        <span>{{ item }}</span>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+
+        <!-- Scheduled Training Sessions -->
+        <div class="section-divider">
+            <h3 class="section-divider-title">Scheduled Training Sessions</h3>
+            <span class="badge-chip badge-ai">One-Click Quick Log</span>
+        </div>
+
+        <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(300px, 1fr)); gap:1.2rem; margin-bottom:2rem;">
+            {% for day in days %}
+            <div class="stat-card">
+                <div class="flex-between mb-sm">
+                    <div>
+                        <h4 style="font-size:17px; font-weight:700; color:var(--text-primary); margin:0;">{{ day.title }}</h4>
+                        <span class="text-muted-sm">Focus: {{ day.focus }}</span>
+                    </div>
+                    <span class="badge-chip badge-cyan text-xs">{{ day.exercises|length }} Exercises</span>
+                </div>
+
+                <div class="flex-col" style="margin-top:10px;">
+                    {% for ex in day.exercises %}
+                    <div class="session-ex-item">
+                        <div class="session-ex-top">
+                            <strong class="session-ex-name">{{ ex.name }}</strong>
+                            <span class="badge-chip badge-coral text-xs">{{ sets }} × {{ reps }}</span>
+                        </div>
+                        <div class="session-ex-muscle">🎯 {{ ex.muscle }}</div>
+                        <div class="session-ex-tip">"{{ ex.tip }}"</div>
+
+                        <div class="session-ex-footer">
+                            <div class="session-sets-row">
+                                <span class="session-set-label">SETS:</span>
+                                {% for s in range(1, sets + 1) %}
+                                <label class="session-set-check">
+                                    <input type="checkbox" style="accent-color:var(--brand-primary); cursor:pointer;">
+                                    <span>{{ s }}</span>
+                                </label>
+                                {% endfor %}
+                            </div>
+                            <form method="POST" action="{{ url_for('workouts.quick_add_plan_exercise') }}" style="margin:0;">
+                                <input type="hidden" name="exercise_name" value="{{ ex.name }}">
+                                <input type="hidden" name="category" value="{{ 'chest' if 'chest' in ex.muscle.lower() or 'bench' in ex.name.lower() else ('back' if 'back' in ex.muscle.lower() or 'lats' in ex.muscle.lower() or 'row' in ex.name.lower() or 'pull' in ex.name.lower() else ('legs' if 'legs' in ex.muscle.lower() or 'quads' in ex.muscle.lower() or 'squat' in ex.name.lower() or 'hamstring' in ex.muscle.lower() else ('shoulders' if 'shoulder' in ex.muscle.lower() or 'deltoid' in ex.muscle.lower() or 'press' in ex.name.lower() else ('arms' if 'bicep' in ex.muscle.lower() or 'tricep' in ex.muscle.lower() or 'curl' in ex.name.lower() else ('core' if 'core' in ex.muscle.lower() or 'abs' in ex.muscle.lower() or 'plank' in ex.name.lower() else 'custom'))))) }}">
+                                <input type="hidden" name="sets" value="{{ sets }}">
+                                <input type="hidden" name="reps" value="10">
+                                <input type="hidden" name="weight" value="40">
+                                <input type="hidden" name="unit" value="kg">
+                                <input type="hidden" name="date" value="{{ selected_date_str }}">
+                                <button type="submit" class="btn-secondary-custom" style="padding:4px 10px; font-size:11.5px; color:var(--brand-primary);">
+                                    ✓ Did This
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
             </div>
             {% endfor %}
         </div>
-    </div>
 
-    <!-- Warm-Up Protocol (collapsible) -->
-    <div class="stat-card" style="margin-bottom:1.5rem; border-left:3px solid #a55eea;">
-        <div class="flex-between mb-sm">
-            <h3 style="font-size:15px; font-weight:700; color:var(--text-primary); display:flex; align-items:center; gap:8px; margin:0;">
-                <span>🧘</span> {{ warmup.title }}
-            </h3>
-            <div class="flex-row">
-                <span class="badge-chip badge-ai">Pre-Workout</span>
-                <button class="collapsible-toggle" onclick="toggleSection('warmupBody', this)">▾ Hide</button>
-            </div>
+        <div style="text-align:center;" class="text-muted-sm">
+            Want a different split? <a href="{{ url_for('profile.view') }}" style="color:var(--brand-primary); font-weight:600;">Update your level or goal in Profile</a>.
         </div>
-        <div id="warmupBody" class="collapsible-body">
-            <p class="text-secondary-sm mb-sm">{{ warmup.note }}</p>
-            <div class="three-col-grid">
-                {% for item in warmup.exercises %}
-                <div class="warmup-item">
-                    <span class="warmup-arrow">→</span>
-                    <span>{{ item }}</span>
-                </div>
-                {% endfor %}
-            </div>
-        </div>
-    </div>
-
-    <!-- Scheduled Training Sessions -->
-    <div class="section-divider">
-        <h3 class="section-divider-title">Scheduled Training Sessions</h3>
-        <span class="badge-chip badge-ai">One-Click Quick Log</span>
-    </div>
-
-    <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(300px, 1fr)); gap:1.2rem; margin-bottom:2rem;">
-        {% for day in days %}
-        <div class="stat-card">
-            <div class="flex-between mb-sm">
-                <div>
-                    <h4 style="font-size:17px; font-weight:700; color:var(--text-primary); margin:0;">{{ day.title }}</h4>
-                    <span class="text-muted-sm">Focus: {{ day.focus }}</span>
-                </div>
-                <span class="badge-chip badge-cyan text-xs">{{ day.exercises|length }} Exercises</span>
-            </div>
-
-            <div class="flex-col" style="margin-top:10px;">
-                {% for ex in day.exercises %}
-                <div class="session-ex-item">
-                    <div class="session-ex-top">
-                        <strong class="session-ex-name">{{ ex.name }}</strong>
-                        <span class="badge-chip badge-coral text-xs">{{ sets }} × {{ reps }}</span>
-                    </div>
-                    <div class="session-ex-muscle">🎯 {{ ex.muscle }}</div>
-                    <div class="session-ex-tip">"{{ ex.tip }}"</div>
-
-                    <div class="session-ex-footer">
-                        <div class="session-sets-row">
-                            <span class="session-set-label">SETS:</span>
-                            {% for s in range(1, sets + 1) %}
-                            <label class="session-set-check">
-                                <input type="checkbox" style="accent-color:var(--brand-primary); cursor:pointer;">
-                                <span>{{ s }}</span>
-                            </label>
-                            {% endfor %}
-                        </div>
-                        <form method="POST" action="{{ url_for('workouts.quick_add_plan_exercise') }}" style="margin:0;">
-                            <input type="hidden" name="exercise_name" value="{{ ex.name }}">
-                            <input type="hidden" name="category" value="{{ 'chest' if 'chest' in ex.muscle.lower() or 'bench' in ex.name.lower() else ('back' if 'back' in ex.muscle.lower() or 'lats' in ex.muscle.lower() or 'row' in ex.name.lower() or 'pull' in ex.name.lower() else ('legs' if 'legs' in ex.muscle.lower() or 'quads' in ex.muscle.lower() or 'squat' in ex.name.lower() or 'hamstring' in ex.muscle.lower() else ('shoulders' if 'shoulder' in ex.muscle.lower() or 'deltoid' in ex.muscle.lower() or 'press' in ex.name.lower() else ('arms' if 'bicep' in ex.muscle.lower() or 'tricep' in ex.muscle.lower() or 'curl' in ex.name.lower() else ('core' if 'core' in ex.muscle.lower() or 'abs' in ex.muscle.lower() or 'plank' in ex.name.lower() else 'custom'))))) }}">
-                            <input type="hidden" name="sets" value="{{ sets }}">
-                            <input type="hidden" name="reps" value="10">
-                            <input type="hidden" name="weight" value="40">
-                            <input type="hidden" name="unit" value="kg">
-                            <input type="hidden" name="date" value="{{ selected_date_str }}">
-                            <button type="submit" class="btn-secondary-custom" style="padding:4px 10px; font-size:11.5px; color:var(--brand-primary);">
-                                ✓ Did This
-                            </button>
-                        </form>
-                    </div>
-                </div>
-                {% endfor %}
-            </div>
-        </div>
-        {% endfor %}
-    </div>
-
-    <div style="text-align:center;" class="text-muted-sm">
-        Want a different split? <a href="{{ url_for('profile.view') }}" style="color:var(--brand-primary); font-weight:600;">Update your level or goal in Profile</a>.
     </div>
 </div>
 
@@ -631,6 +653,20 @@
         const increment  = isLbs ? (isCompound ? 10.0 : 5.0) : (isCompound ? 5.0 : 2.5);
         const badge = document.getElementById('customTargetBadge');
         badge.textContent = weight > 0 ? `${exName}: ${Math.round((weight + increment) * 10) / 10} ${unit} (Goal)` : `Bodyweight / Endurance PR`;
+    }
+
+    function switchWorkoutSection(tabKey) {
+        const trackerSec = document.getElementById('sectionWorkoutTracker');
+        const routineSec = document.getElementById('sectionWorkoutRoutine');
+
+        const btnTracker = document.getElementById('segWorkoutTrackerBtn');
+        const btnRoutine = document.getElementById('segWorkoutRoutineBtn');
+
+        if (trackerSec) trackerSec.style.display = (tabKey === 'tracker') ? 'block' : 'none';
+        if (routineSec) routineSec.style.display = (tabKey === 'routine') ? 'block' : 'none';
+
+        btnTracker?.classList.toggle('active', tabKey === 'tracker');
+        btnRoutine?.classList.toggle('active', tabKey === 'routine');
     }
 </script>
 {% endblock %}

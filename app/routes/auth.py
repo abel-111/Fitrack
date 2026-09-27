@@ -14,6 +14,9 @@ def signup():
         email = request.form.get('email')
         password = request.form.get('password')
         role = request.form.get('role', 'general')
+        account_type = request.form.get('account_type', 'client')
+        coach_specialty = request.form.get('coach_specialty', 'General Fitness & Nutrition')
+        coach_bio = request.form.get('coach_bio', 'Certified Fitness Specialist')
 
         if User.query.filter_by(email=email).first():
             flash('Email already registered.', 'danger')
@@ -23,12 +26,20 @@ def signup():
             flash('Username already taken.', 'danger')
             return redirect(url_for('auth.signup'))
 
-        user = User(username=username, email=email, role=role if role in User.ROLE_LABELS else 'general')
+        is_coach_val = (account_type == 'coach')
+        user = User(
+            username=username,
+            email=email,
+            role=role if role in User.ROLE_LABELS else 'general',
+            is_coach=is_coach_val,
+            coach_specialty=coach_specialty if is_coach_val else None,
+            coach_bio=coach_bio if is_coach_val else None
+        )
         user.set_password(password)
         db.session.add(user)
         db.session.commit()
 
-        flash('Account created! Please log in.', 'success')
+        flash('Account created successfully! Please log in.', 'success')
         return redirect(url_for('auth.login'))
 
     from app.services.ai_coach import ROLE_DETAILS
@@ -39,6 +50,8 @@ def signup():
 @auth_bp.route('/login', methods=['GET', 'POST'])
 def login():
     if current_user.is_authenticated:
+        if getattr(current_user, 'is_coach', False):
+            return redirect(url_for('ai.coach_portal'))
         return redirect(url_for('auth.dashboard'))
 
     if request.method == 'POST':
@@ -49,6 +62,9 @@ def login():
 
         if user and user.check_password(password):
             login_user(user)
+            if user.is_coach:
+                flash(f"Welcome back, Coach {user.username}!", "success")
+                return redirect(url_for('ai.coach_portal'))
             return redirect(url_for('auth.dashboard'))
         else:
             flash('Invalid email or password.', 'danger')

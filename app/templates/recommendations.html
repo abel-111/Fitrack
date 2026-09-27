@@ -98,8 +98,8 @@
     </div>
 
     <!-- Science-Backed Supplement Protocol -->
-    <div class="stat-card">
-        <h3 style="font-size:18px; font-weight:700; color:#fff; display:flex; align-items:center; gap:8px; margin-bottom:12px;">
+    <div class="stat-card" style="margin-bottom:1.8rem;">
+        <h3 style="font-size:18px; font-weight:700; color:var(--text-primary); display:flex; align-items:center; gap:8px; margin-bottom:12px;">
             <span>💊</span> Recommended Evidence-Based Supplement Protocol
         </h3>
         <p style="color:var(--text-secondary); font-size:13px; margin-bottom:14px;">
@@ -110,13 +110,106 @@
             {% for supp in insights.supplements %}
             <div style="background:var(--bg-surface-elevated); border:1px solid var(--border-subtle); border-radius:var(--radius-sm); padding:14px;">
                 <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:6px;">
-                    <strong style="color:#fff; font-size:14px;">{{ supp.name }}</strong>
+                    <strong style="color:var(--text-primary); font-size:14px;">{{ supp.name }}</strong>
                     <span class="badge-chip badge-coral" style="font-size:10.5px;">{{ supp.dosage }}</span>
                 </div>
                 <p style="color:var(--text-secondary); font-size:12.5px; margin:0;">{{ supp.benefit }}</p>
             </div>
             {% endfor %}
         </div>
+    </div>
+
+    <!-- ASK A DEDICATED COACH (CLIENT-COACH DOUBTS & Q&A) -->
+    <div class="stat-card" style="border-top:4px solid var(--brand-primary); background:var(--bg-surface);">
+        <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:1.25rem; flex-wrap:wrap; gap:10px;">
+            <div>
+                <h3 style="font-size:19px; font-weight:700; color:var(--text-primary); display:flex; align-items:center; gap:8px; margin:0;">
+                    <span>👨‍🏫</span> Ask Your Dedicated Coach
+                    <span class="badge-chip badge-emerald" style="font-size:11px;">Direct Mentor Access</span>
+                </h3>
+                <p style="font-size:13px; color:var(--text-secondary); margin-top:4px;">
+                    Have questions about workout form, calorie plateau, injuries, or meal substitutes? Ask any verified coach and get personal guidance.
+                </p>
+            </div>
+        </div>
+
+        <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(280px, 1fr)); gap:1.25rem; margin-bottom:1.5rem;">
+            <!-- Form Card -->
+            <div style="background:var(--bg-surface-elevated); border:1px solid var(--border-subtle); border-radius:var(--radius-md); padding:1.2rem;">
+                <h4 style="font-size:15px; font-weight:700; color:var(--text-primary); margin-bottom:0.75rem;">
+                    ✉️ Submit a Doubt / Question
+                </h4>
+                <form method="POST" action="{{ url_for('ai.ask_human_coach') }}">
+                    <div class="form-group" style="margin-bottom:0.75rem;">
+                        <label style="font-size:12.5px; font-weight:600;">Choose Coach</label>
+                        <select name="coach_id" class="form-control" style="font-size:13px;">
+                            {% for c in coaches %}
+                                <option value="{{ c.id }}">Coach {{ c.username }} ({{ c.coach_specialty or 'Fitness Specialist' }})</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+
+                    <div class="form-group" style="margin-bottom:0.75rem;">
+                        <label style="font-size:12.5px; font-weight:600;">Topic / Subject</label>
+                        <input type="text" name="subject" class="form-control" placeholder="e.g. Can't hit protein target / Squat knee pain" style="font-size:13px;" required>
+                    </div>
+
+                    <div class="form-group" style="margin-bottom:0.75rem;">
+                        <label style="font-size:12.5px; font-weight:600;">Your Question / Doubt Details</label>
+                        <textarea name="message" class="form-control" rows="3" placeholder="Explain your situation, diet, or workout struggle..." style="font-size:13px;" required></textarea>
+                    </div>
+
+                    <button type="submit" class="btn-primary-custom" style="width:100%; justify-content:center;">
+                        Send Doubt to Coach
+                    </button>
+                </form>
+            </div>
+
+            <!-- Certified Coaches Directory -->
+            <div>
+                <h4 style="font-size:15px; font-weight:700; color:var(--text-primary); margin-bottom:0.75rem;">
+                    🌟 Available Certified Coaches
+                </h4>
+                <div style="display:flex; flex-direction:column; gap:10px;">
+                    {% for c in coaches %}
+                    <div style="background:var(--bg-surface-elevated); border:1px solid var(--border-subtle); border-radius:var(--radius-sm); padding:12px 14px;">
+                        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:4px;">
+                            <strong style="color:var(--text-primary); font-size:14px;">Coach {{ c.username }}</strong>
+                            <span class="badge-chip badge-coach" style="font-size:10.5px;">{{ c.coach_specialty or 'Certified Coach' }}</span>
+                        </div>
+                        <p style="font-size:12px; color:var(--text-secondary); margin:0; line-height:1.4;">
+                            {{ c.coach_bio or 'Dedicated fitness specialist available to guide your nutrition and overload targets.' }}
+                        </p>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+
+        <!-- Previous Questions & Coach Responses -->
+        {% if my_doubts %}
+        <h4 style="font-size:15px; font-weight:700; color:var(--text-primary); margin-bottom:0.75rem; border-top:1px solid var(--border-subtle); padding-top:1rem;">
+            📬 Your Questions &amp; Coach Replies ({{ my_doubts|length }})
+        </h4>
+        <div style="display:flex; flex-direction:column; gap:10px;">
+            {% for d in my_doubts %}
+            <div style="background:var(--bg-surface-elevated); border:1px solid var(--border-subtle); border-radius:var(--radius-md); padding:12px 15px;">
+                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:6px; flex-wrap:wrap; gap:6px;">
+                    <div style="display:flex; align-items:center; gap:8px;">
+                        <span class="badge-chip {% if d.sender_role == 'coach' %}badge-emerald{% else %}badge-purple{% endif %}" style="font-size:10.5px;">
+                            {% if d.sender_role == 'coach' %}Coach Reply{% else %}Sent by You{% endif %}
+                        </span>
+                        <strong style="font-size:13.5px; color:var(--text-primary);">{{ d.subject }}</strong>
+                    </div>
+                    <span style="font-size:11.5px; color:var(--text-muted);">{{ d.time_display() }}</span>
+                </div>
+                <p style="font-size:13px; color:var(--text-secondary); margin:0; line-height:1.45; white-space:pre-line;">
+                    {{ d.message }}
+                </p>
+            </div>
+            {% endfor %}
+        </div>
+        {% endif %}
     </div>
 </div>
 {% endblock %}

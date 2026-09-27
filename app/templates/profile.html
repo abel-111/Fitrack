@@ -69,107 +69,129 @@
         </h3>
 
         <form method="POST" action="{{ url_for('profile.update_settings') }}">
-            <div class="form-grid">
-                <div class="form-group">
-                    <label>Current Role / Lifestyle</label>
-                    <select name="role" class="form-control">
-                        {% for r_key, r_data in roles.items() %}
-                            <option value="{{ r_key }}" {% if current_user.role == r_key %}selected{% endif %}>
-                                {{ r_data.icon }} {{ r_data.title }}
-                            </option>
-                        {% endfor %}
-                    </select>
-                    <small class="text-muted-sm" style="display:block; margin-top:4px;">Personalises hydration, warm-ups &amp; meal timing.</small>
-                </div>
+            <!-- Sub-Group 1: Lifestyle & Regional Preferences -->
+            <div style="background:var(--bg-surface-elevated); border:1px solid var(--border-subtle); border-radius:var(--radius-md); padding:1rem 1.2rem; margin-bottom:1.25rem;">
+                <h4 style="font-size:14.5px; font-weight:700; color:var(--text-primary); margin-bottom:0.75rem; display:flex; align-items:center; gap:6px;">
+                    <span>🌱</span> Lifestyle &amp; Regional Preferences
+                </h4>
+                <div class="form-grid">
+                    <div class="form-group" style="margin-bottom:0.5rem;">
+                        <label>Current Role / Lifestyle</label>
+                        <select name="role" class="form-control">
+                            {% for r_key, r_data in roles.items() %}
+                                <option value="{{ r_key }}" {% if current_user.role == r_key %}selected{% endif %}>
+                                    {{ r_data.icon }} {{ r_data.title }}
+                                </option>
+                            {% endfor %}
+                        </select>
+                        <small class="text-muted-sm" style="display:block; margin-top:3px;">Personalises hydration &amp; schedules.</small>
+                    </div>
 
-                <div class="form-group">
-                    <label>Dietary Preference</label>
-                    <select name="dietary_preference" class="form-control">
-                        {% for pref_key, pref_label in dietary_preferences %}
-                            <option value="{{ pref_key }}" {% if current_user.dietary_preference == pref_key %}selected{% endif %}>
-                                {{ pref_label }}
-                            </option>
-                        {% endfor %}
-                    </select>
-                    <small class="text-muted-sm" style="display:block; margin-top:4px;">Guides recipe selection in your Meal Plan.</small>
-                </div>
+                    <div class="form-group" style="margin-bottom:0.5rem;">
+                        <label>Dietary Preference</label>
+                        <select name="dietary_preference" class="form-control">
+                            {% for pref_key, pref_label in dietary_preferences %}
+                                <option value="{{ pref_key }}" {% if current_user.dietary_preference == pref_key %}selected{% endif %}>
+                                    {{ pref_label }}
+                                </option>
+                            {% endfor %}
+                        </select>
+                        <small class="text-muted-sm" style="display:block; margin-top:3px;">Guides meal plan recipes.</small>
+                    </div>
 
-                <div class="form-group">
-                    <label>Home State</label>
-                    <select name="state" class="form-control">
-                        {% for s in south_indian_states %}
-                            <option value="{{ s }}" {% if current_user.state == s %}selected{% endif %}>{{ s }}</option>
-                        {% endfor %}
-                    </select>
-                    <small class="text-muted-sm" style="display:block; margin-top:4px;">Meal plan features authentic dishes from your state.</small>
-                </div>
+                    <div class="form-group" style="margin-bottom:0.5rem;">
+                        <label>Home State</label>
+                        <select name="state" class="form-control">
+                            {% for s in south_indian_states %}
+                                <option value="{{ s }}" {% if current_user.state == s %}selected{% endif %}>{{ s }}</option>
+                            {% endfor %}
+                        </select>
+                        <small class="text-muted-sm" style="display:block; margin-top:3px;">Authentic regional menus.</small>
+                    </div>
 
-                <div class="form-group">
-                    <label>Cuisine Style</label>
-                    <select name="cuisine_preference" class="form-control">
-                        {% for cp_key, cp_label in cuisine_preferences %}
-                            <option value="{{ cp_key }}" {% if current_user.cuisine_preference == cp_key %}selected{% endif %}>
-                                {{ cp_label }}
-                            </option>
-                        {% endfor %}
-                    </select>
-                    <small class="text-muted-sm" style="display:block; margin-top:4px;">Home state classics, other states, or continental.</small>
+                    <div class="form-group" style="margin-bottom:0.5rem;">
+                        <label>Cuisine Style</label>
+                        <select name="cuisine_preference" class="form-control">
+                            {% for cp_key, cp_label in cuisine_preferences %}
+                                <option value="{{ cp_key }}" {% if current_user.cuisine_preference == cp_key %}selected{% endif %}>
+                                    {{ cp_label }}
+                                </option>
+                            {% endfor %}
+                        </select>
+                        <small class="text-muted-sm" style="display:block; margin-top:3px;">State classics or continental.</small>
+                    </div>
                 </div>
+            </div>
 
-                <div class="form-group">
-                    <label>Primary Goal</label>
-                    <select name="goal" class="form-control">
-                        {% for g in goals %}
-                            <option value="{{ g }}" {% if current_user.goal == g %}selected{% endif %}>{{ g|capitalize }}</option>
-                        {% endfor %}
-                    </select>
+            <!-- Sub-Group 2: Fitness Goal & Training Level -->
+            <div style="background:var(--bg-surface-elevated); border:1px solid var(--border-subtle); border-radius:var(--radius-md); padding:1rem 1.2rem; margin-bottom:1.25rem;">
+                <h4 style="font-size:14.5px; font-weight:700; color:var(--text-primary); margin-bottom:0.75rem; display:flex; align-items:center; gap:6px;">
+                    <span>🎯</span> Fitness Goal &amp; Training Level
+                </h4>
+                <div class="form-grid">
+                    <div class="form-group" style="margin-bottom:0.5rem;">
+                        <label>Primary Goal</label>
+                        <select name="goal" class="form-control">
+                            {% for g in goals %}
+                                <option value="{{ g }}" {% if current_user.goal == g %}selected{% endif %}>{{ g|capitalize }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+
+                    <div class="form-group" style="margin-bottom:0.5rem;">
+                        <label>Fitness Level</label>
+                        <select name="fitness_level" class="form-control">
+                            {% for level in fitness_levels %}
+                                <option value="{{ level }}" {% if current_user.fitness_level == level %}selected{% endif %}>{{ level|capitalize }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+
+                    <div class="form-group" style="margin-bottom:0.5rem;">
+                        <label>Activity Level</label>
+                        <select name="activity_level" class="form-control">
+                            {% for act_key, act_label in activity_levels %}
+                                <option value="{{ act_key }}" {% if current_user.activity_level == act_key %}selected{% endif %}>{{ act_label }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
                 </div>
+            </div>
 
-                <div class="form-group">
-                    <label>Fitness Level</label>
-                    <select name="fitness_level" class="form-control">
-                        {% for level in fitness_levels %}
-                            <option value="{{ level }}" {% if current_user.fitness_level == level %}selected{% endif %}>{{ level|capitalize }}</option>
-                        {% endfor %}
-                    </select>
-                </div>
+            <!-- Sub-Group 3: Physical Metrics & Biometrics -->
+            <div style="background:var(--bg-surface-elevated); border:1px solid var(--border-subtle); border-radius:var(--radius-md); padding:1rem 1.2rem; margin-bottom:1.25rem;">
+                <h4 style="font-size:14.5px; font-weight:700; color:var(--text-primary); margin-bottom:0.75rem; display:flex; align-items:center; gap:6px;">
+                    <span>📐</span> Body Metrics (Calorie &amp; Overload Calculations)
+                </h4>
+                <div class="form-grid">
+                    <div class="form-group" style="margin-bottom:0.5rem;">
+                        <label>Gender (for BMR accuracy)</label>
+                        <select name="gender" class="form-control">
+                            <option value="male"   {% if current_user.gender == 'male'   %}selected{% endif %}>Male</option>
+                            <option value="female" {% if current_user.gender == 'female' %}selected{% endif %}>Female</option>
+                            <option value="other"  {% if current_user.gender == 'other'  %}selected{% endif %}>Other</option>
+                        </select>
+                    </div>
 
-                <div class="form-group">
-                    <label>Activity Level</label>
-                    <select name="activity_level" class="form-control">
-                        {% for act_key, act_label in activity_levels %}
-                            <option value="{{ act_key }}" {% if current_user.activity_level == act_key %}selected{% endif %}>{{ act_label }}</option>
-                        {% endfor %}
-                    </select>
-                </div>
+                    <div class="form-group" style="margin-bottom:0.5rem;">
+                        <label>Height (cm)</label>
+                        <input type="number" step="0.5" name="height_cm" class="form-control" placeholder="e.g. 175" value="{{ current_user.height_cm or '' }}">
+                    </div>
 
-                <div class="form-group">
-                    <label>Gender (for BMR accuracy)</label>
-                    <select name="gender" class="form-control">
-                        <option value="male"   {% if current_user.gender == 'male'   %}selected{% endif %}>Male</option>
-                        <option value="female" {% if current_user.gender == 'female' %}selected{% endif %}>Female</option>
-                        <option value="other"  {% if current_user.gender == 'other'  %}selected{% endif %}>Other</option>
-                    </select>
-                </div>
+                    <div class="form-group" style="margin-bottom:0.5rem;">
+                        <label>Current Weight (kg)</label>
+                        <input type="number" step="0.1" name="weight_kg" class="form-control" placeholder="e.g. 70" value="{{ current_user.weight_kg or '' }}">
+                    </div>
 
-                <div class="form-group">
-                    <label>Height (cm)</label>
-                    <input type="number" step="0.5" name="height_cm" class="form-control" placeholder="e.g. 175" value="{{ current_user.height_cm or '' }}">
-                </div>
+                    <div class="form-group" style="margin-bottom:0.5rem;">
+                        <label>Target Weight (kg)</label>
+                        <input type="number" step="0.1" name="target_weight_kg" class="form-control" placeholder="e.g. 68" value="{{ current_user.target_weight_kg or '' }}">
+                    </div>
 
-                <div class="form-group">
-                    <label>Current Weight (kg)</label>
-                    <input type="number" step="0.1" name="weight_kg" class="form-control" placeholder="e.g. 70" value="{{ current_user.weight_kg or '' }}">
-                </div>
-
-                <div class="form-group">
-                    <label>Target Weight (kg)</label>
-                    <input type="number" step="0.1" name="target_weight_kg" class="form-control" placeholder="e.g. 68" value="{{ current_user.target_weight_kg or '' }}">
-                </div>
-
-                <div class="form-group">
-                    <label>Age</label>
-                    <input type="number" name="age" class="form-control" placeholder="e.g. 24" value="{{ current_user.age or '' }}">
+                    <div class="form-group" style="margin-bottom:0.5rem;">
+                        <label>Age</label>
+                        <input type="number" name="age" class="form-control" placeholder="e.g. 24" value="{{ current_user.age or '' }}">
+                    </div>
                 </div>
             </div>
 
