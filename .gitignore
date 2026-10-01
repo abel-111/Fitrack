@@ -3,3 +3,4 @@ __pycache__/
 gym.db
 .env
 app/static/uploads/
+COACH_AND_ADMIN_CREDENTIALS.txt

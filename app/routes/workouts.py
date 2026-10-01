@@ -252,6 +252,31 @@ def plan():
     lifts = LiftLog.query.filter_by(user_id=current_user.id).order_by(LiftLog.logged_at.desc()).limit(20).all()
     latest_bench = LiftLog.query.filter_by(user_id=current_user.id).filter(LiftLog.exercise_name.ilike('%bench%')).order_by(LiftLog.logged_at.desc()).first()
 
+    # Build a dict of { exercise_name_lower: last_WorkoutLog } for all scheduled exercises
+    # so the template can show last weight and recommend next target
+    all_exercise_names = []
+    for day in days:
+        for ex in day['exercises']:
+            all_exercise_names.append(ex['name'])
+
+    last_logged_weights = {}
+    if all_exercise_names:
+        for ex_name in all_exercise_names:
+            last_log = (
+                WorkoutLog.query
+                .filter_by(user_id=current_user.id)
+                .filter(WorkoutLog.exercise_name.ilike(f'%{ex_name[:15]}%'))
+                .order_by(WorkoutLog.date.desc(), WorkoutLog.logged_at.desc())
+                .first()
+            )
+            if last_log:
+                last_logged_weights[ex_name] = {
+                    'weight': last_log.weight,
+                    'unit': last_log.unit,
+                    'date': last_log.date.strftime('%d %b'),
+                    'next_target': last_log.target_next_weight or WorkoutLog.calculate_next_target(last_log.weight, last_log.unit, ex_name)
+                }
+
     return render_template(
         'workouts.html',
         level=level,
@@ -269,6 +294,7 @@ def plan():
         workout_summary=workout_summary,
         workout_categories=WORKOUT_CATEGORIES,
         common_exercises=COMMON_EXERCISES,
+        last_logged_weights=last_logged_weights,
         selected_date_str=selected_date.strftime('%Y-%m-%d'),
         prev_date_str=prev_date.strftime('%Y-%m-%d'),
         next_date_str=next_date.strftime('%Y-%m-%d'),

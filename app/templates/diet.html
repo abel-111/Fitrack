@@ -705,6 +705,12 @@
                     {% endfor %}
                 </div>
 
+                <!-- Multi-select cart indicator -->
+                <div id="multiSelectBanner" style="display:none; background:linear-gradient(135deg,rgba(124,58,237,0.12),rgba(5,150,105,0.08)); border:1px solid rgba(124,58,237,0.3); border-radius:var(--radius-md); padding:8px 12px; margin-bottom:8px; font-size:12.5px; color:var(--text-primary); display:none; align-items:center; justify-content:space-between; gap:8px;">
+                    <span>🛒 <strong id="cartCountText">0 items</strong> selected — <span id="cartCalPreview" style="color:#059669;">0 kcal</span></span>
+                    <button type="button" onclick="clearFoodCart()" style="background:none;border:none;color:var(--text-muted);font-size:11px;cursor:pointer;text-decoration:underline;">Clear all</button>
+                </div>
+
                 <!-- Selection Configuration & Multiplier -->
                 <div id="selectionConfigBox" style="background:var(--bg-surface-elevated); border:1px solid var(--border-subtle); border-radius:var(--radius-md); padding:12px 14px; margin-bottom:1rem; display:none;">
                     <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px; flex-wrap:wrap; gap:8px;">
@@ -717,7 +723,7 @@
                             <span style="font-size:12px; color:var(--text-secondary); font-weight:600;">Quantity:</span>
                             <div class="stepper-row">
                                 <button type="button" class="stepper-btn" onclick="changeQty(-0.5)">−</button>
-                                <input type="number" name="quantity" id="presetQtyInput" class="stepper-input" value="1.0" min="0.1" step="0.5" oninput="recalcPresetTotals()">
+                                <input type="number" name="quantity" id="presetQtyInput" class="stepper-input" value="1" min="0.5" step="any" oninput="recalcPresetTotals()">
                                 <button type="button" class="stepper-btn" onclick="changeQty(0.5)">+</button>
                             </div>
                         </div>
@@ -744,8 +750,11 @@
                     </div>
                 </div>
 
-                <div style="display:flex; gap:10px;">
+                <div style="display:flex; gap:10px; flex-wrap:wrap;">
                     <button type="button" onclick="closeFoodLogger()" class="btn-secondary-custom" style="flex:1;">Cancel</button>
+                    <button type="button" id="btnAddToCart" onclick="addCurrentToCart()" class="btn-secondary-custom" style="flex:1; background:rgba(124,58,237,0.1); color:var(--brand-primary); border-color:rgba(124,58,237,0.3);" disabled>
+                        + Add More
+                    </button>
                     <button type="submit" id="btnSubmitPreset" class="btn-primary-custom" style="flex:2;" disabled>
                         ＋ Log Selected Food
                     </button>
@@ -919,13 +928,15 @@
         document.getElementById('previewSelectedServing').textContent = currentSelectedFood.serving;
 
         document.getElementById('btnSubmitPreset').disabled = false;
+        document.getElementById('btnAddToCart').disabled = false;
 
         recalcPresetTotals();
     }
 
     function changeQty(delta) {
         const qtyInput = document.getElementById('presetQtyInput');
-        let val = parseFloat(qtyInput.value) || 1.0;
+        let val = parseFloat(qtyInput.value);
+        if (isNaN(val) || val <= 0) val = 1.0;
         val = Math.max(0.5, Math.round((val + delta) * 10) / 10);
         qtyInput.value = val;
         recalcPresetTotals();
@@ -945,14 +956,124 @@
         document.getElementById('calcCarbs').innerHTML = `${totalCarbs} <span style="font-size:11px;">g</span>`;
         document.getElementById('calcFat').innerHTML = `${totalFat} <span style="font-size:11px;">g</span>`;
 
-        // Update hidden form inputs
-        document.getElementById('selectedFoodName').value = currentSelectedFood.name;
-        document.getElementById('selectedFoodServing').value = currentSelectedFood.serving;
-        document.getElementById('selectedFoodCals').value = totalCals;
-        document.getElementById('selectedFoodProt').value = totalProt;
-        document.getElementById('selectedFoodCarbs').value = totalCarbs;
-        document.getElementById('selectedFoodFat').value = totalFat;
+        // Update hidden form inputs (for single-select path)
+        if (foodCart.length === 0) {
+            document.getElementById('selectedFoodName').value = currentSelectedFood.name;
+            document.getElementById('selectedFoodServing').value = currentSelectedFood.serving;
+            document.getElementById('selectedFoodCals').value = totalCals;
+            document.getElementById('selectedFoodProt').value = totalProt;
+            document.getElementById('selectedFoodCarbs').value = totalCarbs;
+            document.getElementById('selectedFoodFat').value = totalFat;
+        }
     }
+
+    /* ---- MULTI-FOOD CART ---- */
+    let foodCart = []; // array of { name, serving, cals, prot, carbs, fat, qty, mealType }
+
+    function addCurrentToCart() {
+        if (!currentSelectedFood) return;
+        const qty = Math.max(0.5, parseFloat(document.getElementById('presetQtyInput').value) || 1.0);
+        const mealType = document.getElementById('presetMealSlot').value;
+        const existing = foodCart.findIndex(i => i.name === currentSelectedFood.name && i.mealType === mealType);
+        if (existing >= 0) {
+            foodCart[existing].qty += qty;
+        } else {
+            foodCart.push({
+                name: currentSelectedFood.name,
+                serving: currentSelectedFood.serving,
+                cals: currentSelectedFood.cals,
+                prot: currentSelectedFood.prot,
+                carbs: currentSelectedFood.carbs,
+                fat: currentSelectedFood.fat,
+                qty: qty,
+                mealType: mealType
+            });
+        }
+        updateCartBanner();
+        // Reset selection for next pick
+        currentSelectedFood = null;
+        document.getElementById('selectionConfigBox').style.display = 'none';
+        document.getElementById('btnSubmitPreset').disabled = true;
+        document.getElementById('btnAddToCart').disabled = true;
+        document.querySelectorAll('.preset-food-card').forEach(c => c.classList.remove('selected'));
+        document.getElementById('presetQtyInput').value = 1;
+    }
+
+    function updateCartBanner() {
+        const banner = document.getElementById('multiSelectBanner');
+        if (foodCart.length === 0) {
+            banner.style.display = 'none';
+            return;
+        }
+        banner.style.display = 'flex';
+        const totalCartCals = Math.round(foodCart.reduce((s, i) => s + i.cals * i.qty, 0));
+        document.getElementById('cartCountText').textContent = foodCart.length + (foodCart.length === 1 ? ' item' : ' items');
+        document.getElementById('cartCalPreview').textContent = totalCartCals + ' kcal';
+        // Enable submit even if no current selection (can submit cart)
+        document.getElementById('btnSubmitPreset').disabled = false;
+    }
+
+    function clearFoodCart() {
+        foodCart = [];
+        updateCartBanner();
+        if (!currentSelectedFood) document.getElementById('btnSubmitPreset').disabled = true;
+    }
+
+    // Override the form submit to handle cart (multi-log via sequential fetches)
+    document.getElementById('presetFoodForm')?.addEventListener('submit', async function(e) {
+        if (foodCart.length === 0) return; // let normal single-item submit handle it
+        e.preventDefault();
+        const dateVal = document.querySelector('#presetFoodForm input[name="date"]').value;
+        let successCount = 0;
+        for (const item of foodCart) {
+            const totalCals = Math.round(item.cals * item.qty);
+            const totalProt = Math.round(item.prot * item.qty * 10) / 10;
+            const totalCarbs = Math.round(item.carbs * item.qty * 10) / 10;
+            const totalFat = Math.round(item.fat * item.qty * 10) / 10;
+            const fd = new FormData();
+            fd.append('food_name', item.name);
+            fd.append('serving_size', item.serving);
+            fd.append('meal_type', item.mealType);
+            fd.append('quantity', item.qty);
+            fd.append('calories', totalCals);
+            fd.append('protein', totalProt);
+            fd.append('carbs', totalCarbs);
+            fd.append('fat', totalFat);
+            fd.append('is_per_unit', 'false');
+            fd.append('date', dateVal);
+            try {
+                await fetch('{{ url_for("diet.add_food_log") }}', { method: 'POST', body: fd });
+                successCount++;
+            } catch(err) { console.error('Failed to log', item.name, err); }
+        }
+        // Also log current selection if any
+        if (currentSelectedFood) {
+            const qty = Math.max(0.5, parseFloat(document.getElementById('presetQtyInput').value) || 1);
+            const mealType = document.getElementById('presetMealSlot').value;
+            const totalCals = Math.round(currentSelectedFood.cals * qty);
+            const totalProt = Math.round(currentSelectedFood.prot * qty * 10) / 10;
+            const totalCarbs = Math.round(currentSelectedFood.carbs * qty * 10) / 10;
+            const totalFat = Math.round(currentSelectedFood.fat * qty * 10) / 10;
+            const fd = new FormData();
+            fd.append('food_name', currentSelectedFood.name);
+            fd.append('serving_size', currentSelectedFood.serving);
+            fd.append('meal_type', mealType);
+            fd.append('quantity', qty);
+            fd.append('calories', totalCals);
+            fd.append('protein', totalProt);
+            fd.append('carbs', totalCarbs);
+            fd.append('fat', totalFat);
+            fd.append('is_per_unit', 'false');
+            fd.append('date', dateVal);
+            try {
+                await fetch('{{ url_for("diet.add_food_log") }}', { method: 'POST', body: fd });
+                successCount++;
+            } catch(err) { console.error('Failed to log current', err); }
+        }
+        foodCart = [];
+        closeFoodLogger();
+        window.location.reload();
+    });
 
     async function toggleMeal(mealId) {
         try {

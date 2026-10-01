@@ -19,9 +19,6 @@
             <button class="btn-primary-custom" onclick="openWorkoutLogger()" type="button" style="background:#7c3aed;">
                 ＋ Log Workout
             </button>
-            <a href="{{ url_for('profile.view') }}" class="btn-secondary-custom" style="font-size:13px;">
-                ⚙️ Change Split
-            </a>
         </div>
     </div>
 
@@ -262,7 +259,21 @@
                         <div class="session-ex-muscle">🎯 {{ ex.muscle }}</div>
                         <div class="session-ex-tip">"{{ ex.tip }}"</div>
 
-                        <div class="session-ex-footer">
+                        {% if ex.name in last_logged_weights %}
+                        {% set llw = last_logged_weights[ex.name] %}
+                        <div style="display:flex; gap:8px; flex-wrap:wrap; margin-top:6px; font-size:11.5px; color:var(--text-muted);">
+                            <span style="background:rgba(5,150,105,0.08); border:1px solid rgba(5,150,105,0.2); border-radius:5px; padding:2px 8px;">
+                                📦 Last: <strong>{{ llw.weight }}{{ llw.unit }}</strong> ({{ llw.date }})
+                            </span>
+                            {% if llw.next_target and llw.next_target > 0 %}
+                            <span style="background:rgba(124,58,237,0.08); border:1px solid rgba(124,58,237,0.2); border-radius:5px; padding:2px 8px; color:var(--brand-primary);">
+                                🎯 Target: <strong>{{ llw.next_target }}{{ llw.unit }}</strong>
+                            </span>
+                            {% endif %}
+                        </div>
+                        {% endif %}
+
+                <div class="session-ex-footer">
                             <div class="session-sets-row">
                                 <span class="session-set-label">SETS:</span>
                                 {% for s in range(1, sets + 1) %}
@@ -277,12 +288,24 @@
                                 <input type="hidden" name="category" value="{{ 'chest' if 'chest' in ex.muscle.lower() or 'bench' in ex.name.lower() else ('back' if 'back' in ex.muscle.lower() or 'lats' in ex.muscle.lower() or 'row' in ex.name.lower() or 'pull' in ex.name.lower() else ('legs' if 'legs' in ex.muscle.lower() or 'quads' in ex.muscle.lower() or 'squat' in ex.name.lower() or 'hamstring' in ex.muscle.lower() else ('shoulders' if 'shoulder' in ex.muscle.lower() or 'deltoid' in ex.muscle.lower() or 'press' in ex.name.lower() else ('arms' if 'bicep' in ex.muscle.lower() or 'tricep' in ex.muscle.lower() or 'curl' in ex.name.lower() else ('core' if 'core' in ex.muscle.lower() or 'abs' in ex.muscle.lower() or 'plank' in ex.name.lower() else 'custom'))))) }}">
                                 <input type="hidden" name="sets" value="{{ sets }}">
                                 <input type="hidden" name="reps" value="10">
-                                <input type="hidden" name="weight" value="40">
-                                <input type="hidden" name="unit" value="kg">
                                 <input type="hidden" name="date" value="{{ selected_date_str }}">
-                                <button type="submit" class="btn-secondary-custom" style="padding:4px 10px; font-size:11.5px; color:var(--brand-primary);">
-                                    ✓ Did This
-                                </button>
+                                <div style="display:flex; gap:6px; align-items:center; flex-wrap:wrap; margin-top:6px;">
+                                    <div style="display:flex; align-items:center; gap:4px;">
+                                        <input type="number" name="weight" class="form-control"
+                                               placeholder="Weight"
+                                               value="{{ last_logged_weights[ex.name].next_target if ex.name in last_logged_weights and last_logged_weights[ex.name].next_target else 0 }}"
+                                               min="0" step="0.5"
+                                               style="width:100px; padding:4px 8px; font-size:12px; height:auto;"
+                                               title="Weight lifted (0 = bodyweight)">
+                                        <select name="unit" class="form-control" style="width:60px; padding:4px 6px; font-size:12px; height:auto;">
+                                            <option value="kg" {% if ex.name not in last_logged_weights or last_logged_weights[ex.name].unit == 'kg' %}selected{% endif %}>kg</option>
+                                            <option value="lbs" {% if ex.name in last_logged_weights and last_logged_weights[ex.name].unit == 'lbs' %}selected{% endif %}>lbs</option>
+                                        </select>
+                                    </div>
+                                    <button type="submit" class="btn-secondary-custom" style="padding:4px 10px; font-size:11.5px; color:var(--brand-primary);">
+                                        ✓ Did This
+                                    </button>
+                                </div>
                             </form>
                         </div>
                     </div>
@@ -292,8 +315,11 @@
             {% endfor %}
         </div>
 
-        <div style="text-align:center;" class="text-muted-sm">
-            Want a different split? <a href="{{ url_for('profile.view') }}" style="color:var(--brand-primary); font-weight:600;">Update your level or goal in Profile</a>.
+        <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px;" class="text-muted-sm">
+            <span>Want a different split? <a href="{{ url_for('profile.view') }}" style="color:var(--brand-primary); font-weight:600;">Update your level or goal in Profile</a>.</span>
+            <a href="{{ url_for('profile.view') }}" class="btn-secondary-custom" style="font-size:12.5px; padding:6px 14px; color:var(--brand-primary); border-color:rgba(124,58,237,0.4); background:rgba(124,58,237,0.07);">
+                ⚙️ Change Workout Split
+            </a>
         </div>
     </div>
 </div>
@@ -352,7 +378,7 @@
                     {% endfor %}
                 </div>
 
-                <div class="preset-exercise-list" id="presetExerciseList">
+                <div class="preset-exercise-list" id="presetExerciseList" style="max-height:220px; overflow-y:auto; border-radius:var(--radius-md);">
                     {% for ex in common_exercises %}
                     <div class="preset-exercise-card"
                          data-id="{{ ex.id }}"

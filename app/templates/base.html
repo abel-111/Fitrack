@@ -9,25 +9,37 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link href="{{ url_for('static', filename='css/style.css') }}" rel="stylesheet">
+    <script>
+        (function() {
+            const savedTheme = localStorage.getItem('fitrack_theme') || (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+            document.documentElement.setAttribute('data-theme', savedTheme);
+        })();
+    </script>
 </head>
 <body>
     <!-- ===================== NAVBAR ===================== -->
     <div class="navbar-custom">
         <div class="nav-brand-group">
-            <a class="navbar-brand" href="{{ url_for('auth.dashboard') if current_user.is_authenticated else url_for('auth.login') }}">
+            <a class="navbar-brand" href="{% if current_user.is_authenticated %}{% if current_user.is_admin %}{{ url_for('admin.portal') }}{% else %}{{ url_for('auth.dashboard') }}{% endif %}{% else %}{{ url_for('auth.login') }}{% endif %}">
                 🏋️ Fit<span class="logo-highlight">rack</span>
             </a>
 
             {% if current_user.is_authenticated %}
             <nav class="nav-links">
+                {% if current_user.is_admin %}
+                <a href="{{ url_for('admin.portal') }}" class="nav-link {% if request.blueprint == 'admin' %}active{% endif %}" style="color:#a78bfa; font-weight:700;">
+                    🔐 Admin Control Center
+                </a>
+                <a href="{{ url_for('admin.portal') }}#clients-section" class="nav-link">
+                    🏃 Clients Directory
+                </a>
+                <a href="{{ url_for('admin.portal') }}#coaches-section" class="nav-link">
+                    🌿 Coaches Directory
+                </a>
+                {% elif not current_user.is_coach %}
                 <a href="{{ url_for('auth.dashboard') }}" class="nav-link {% if request.endpoint == 'auth.dashboard' %}active{% endif %}">
                     Dashboard
                 </a>
-                {% if current_user.is_admin %}
-                <a href="{{ url_for('admin.portal') }}" class="nav-link {% if request.blueprint == 'admin' %}active{% endif %}" style="color:#a78bfa; font-weight:700;">
-                    🔐 Admin
-                </a>
-                {% elif not current_user.is_coach %}
                 <a href="{{ url_for('diet.view_plan') }}" class="nav-link {% if request.blueprint == 'diet' %}active{% endif %}">
                     🍛 Food
                 </a>
@@ -44,6 +56,9 @@
                     🌿 Coach
                 </a>
                 {% else %}
+                <a href="{{ url_for('auth.dashboard') }}" class="nav-link {% if request.endpoint == 'auth.dashboard' %}active{% endif %}">
+                    Dashboard
+                </a>
                 <a href="{{ url_for('ai.coach_portal') }}" class="nav-link nav-link-coach {% if request.endpoint == 'ai.coach_portal' %}active{% endif %}">
                     🛡️ Coach Portal
                 </a>
@@ -53,6 +68,11 @@
         </div>
 
         <div class="nav-right-group">
+            <!-- Theme Toggle with Telegram Animation -->
+            <button class="theme-toggle-btn" id="themeToggleBtn" type="button" title="Toggle Dark/Light Mode" aria-label="Toggle Theme">
+                <span id="themeToggleIcon">🌙</span>
+            </button>
+
             {% if current_user.is_authenticated %}
             <!-- Hamburger (mobile) -->
             <button class="hamburger-btn" id="hamburgerBtn" type="button" aria-label="Open menu">
@@ -72,9 +92,11 @@
                     <a href="{{ url_for('profile.view') }}">⚙️ Profile &amp; Biometrics</a>
                     {% if current_user.is_admin %}
                     <a href="{{ url_for('admin.portal') }}" style="color:#a78bfa; font-weight:700;">🔐 Admin Control Panel</a>
-                    {% elif current_user.is_coach %}
-                    <a href="{{ url_for('ai.coach_portal') }}">🛡️ Coach Portal &amp; Inbox</a>
-                    {% else %}
+                    {% endif %}
+                    {% if current_user.is_coach %}
+                    <a href="{{ url_for('ai.coach_portal') }}" style="color:#10b981; font-weight:700;">🛡️ Coach Portal &amp; Inbox</a>
+                    {% endif %}
+                    {% if not current_user.is_coach and not current_user.is_admin %}
                     <a href="{{ url_for('diet.view_plan') }}">🍛 Nutrition &amp; Meal Plan</a>
                     <a href="{{ url_for('workouts.plan') }}">🏋️ Workout Split</a>
                     <a href="{{ url_for('ai.recommendations') }}">🌿 Personal Coach Hub</a>
@@ -92,16 +114,19 @@
     <div class="mobile-nav" id="mobileNav">
         <div class="mobile-nav-panel" id="mobileNavPanel">
             <button class="mobile-nav-close" id="mobileNavClose" type="button">&times;</button>
-            <a href="{{ url_for('auth.dashboard') }}" class="nav-link {% if request.endpoint == 'auth.dashboard' %}active{% endif %}">Dashboard</a>
             {% if current_user.is_admin %}
             <a href="{{ url_for('admin.portal') }}" class="nav-link {% if request.blueprint == 'admin' %}active{% endif %}" style="color:#a78bfa; font-weight:700;">🔐 Admin Control Panel</a>
+            <a href="{{ url_for('admin.portal') }}#clients-section" class="nav-link">🏃 Clients Directory</a>
+            <a href="{{ url_for('admin.portal') }}#coaches-section" class="nav-link">🌿 Coaches Directory</a>
             {% elif not current_user.is_coach %}
+            <a href="{{ url_for('auth.dashboard') }}" class="nav-link {% if request.endpoint == 'auth.dashboard' %}active{% endif %}">Dashboard</a>
             <a href="{{ url_for('diet.view_plan') }}" class="nav-link {% if request.blueprint == 'diet' %}active{% endif %}">🍛 Food &amp; Nutrition</a>
             <a href="{{ url_for('workouts.plan') }}" class="nav-link {% if request.blueprint == 'workouts' %}active{% endif %}">🏋️ Workouts</a>
             <a href="{{ url_for('weight.history') }}" class="nav-link {% if request.blueprint == 'weight' %}active{% endif %}">📈 Weight</a>
             <a href="{{ url_for('leaderboard.leaderboard') }}" class="nav-link {% if request.blueprint == 'leaderboard' %}active{% endif %}">🏆 Community</a>
             <a href="{{ url_for('ai.recommendations') }}" class="nav-link nav-link-coach {% if request.endpoint == 'ai.recommendations' %}active{% endif %}">🌿 Personal Coach</a>
             {% else %}
+            <a href="{{ url_for('auth.dashboard') }}" class="nav-link {% if request.endpoint == 'auth.dashboard' %}active{% endif %}">Dashboard</a>
             <a href="{{ url_for('ai.coach_portal') }}" class="nav-link nav-link-coach {% if request.endpoint == 'ai.coach_portal' %}active{% endif %}">🛡️ Coach Portal</a>
             {% endif %}
             <hr style="border-color: var(--border-subtle); margin: 0.5rem 0;">
@@ -129,21 +154,21 @@
 
     {% if current_user.is_authenticated and not current_user.is_coach %}
     <!-- ===================== FLOATING COACH WIDGET ===================== -->
-    <button class="ai-coach-fab" id="aiCoachFab" type="button" title="Chat with Coach Raghav">
+    <button class="ai-coach-fab" id="aiCoachFab" type="button" title="Chat with Your Coach">
         <span>💬</span> Ask Coach
     </button>
 
     <div class="ai-chat-modal" id="aiChatModal">
         <div class="ai-chat-header">
             <div class="ai-chat-title">
-                <span>🌿</span> Coach Raghav
+                <span>🌿</span> Personal Coach
                 <span class="badge-chip badge-coach" style="font-size:10px; padding:2px 7px;">Personal Mentor</span>
             </div>
             <button class="ai-chat-close" id="aiChatClose" type="button">&times;</button>
         </div>
         <div class="ai-chat-body" id="aiChatBody">
             <div class="chat-bubble chat-bubble-bot">
-                Hey <strong>{{ current_user.username }}</strong>! I'm Coach Raghav, your personal fitness and nutrition mentor. How can I help you today — meals, workouts, or habits?
+                Hey <strong>{{ current_user.username }}</strong>! I'm your coach, your personal fitness and nutrition mentor. How can I help you today — meals, workouts, or habits?
             </div>
             <div class="chat-quick-chips">
                 <button class="chip-btn" onclick="sendQuickPrompt('What are high-protein vegetarian meals?')">🧀 High-Protein Veg</button>
@@ -157,6 +182,7 @@
             <button type="submit" class="ai-chat-send">Send</button>
         </form>
     </div>
+    {% endif %}
 
     <script>
         // Avatar dropdown
@@ -180,12 +206,15 @@
         const mobileNavClose = document.getElementById('mobileNavClose');
         if (hamburgerBtn && mobileNav) {
             hamburgerBtn.addEventListener('click', () => mobileNav.classList.add('open'));
-            mobileNavClose.addEventListener('click', () => mobileNav.classList.remove('open'));
+            if (mobileNavClose) mobileNavClose.addEventListener('click', () => mobileNav.classList.remove('open'));
             mobileNav.addEventListener('click', (e) => {
                 if (e.target === mobileNav) mobileNav.classList.remove('open');
             });
         }
+    </script>
 
+    {% if current_user.is_authenticated and not current_user.is_coach %}
+    <script>
         // Coach Chat Widget
         const aiCoachFab  = document.getElementById('aiCoachFab');
         const aiChatModal = document.getElementById('aiChatModal');
@@ -230,7 +259,7 @@
             appendMessage(text, true);
             aiChatInput.value = '';
 
-            const loadingBubble = appendMessage('Coach Raghav is typing…', false);
+            const loadingBubble = appendMessage('Your coach is typing…', false);
             loadingBubble.style.opacity = '0.6';
 
             try {
@@ -256,5 +285,81 @@
         }
     </script>
     {% endif %}
+
+    <!-- Telegram-Style Circular Clip-Path Theme Switcher Script -->
+    <script>
+        (function() {
+            const toggleBtn = document.getElementById('themeToggleBtn');
+            const icon = document.getElementById('themeToggleIcon');
+            if (!toggleBtn) return;
+
+            function updateIcon(theme) {
+                if (icon) icon.textContent = theme === 'dark' ? '☀️' : '🌙';
+            }
+
+            const currentTheme = document.documentElement.getAttribute('data-theme') || 'light';
+            updateIcon(currentTheme);
+
+            toggleBtn.addEventListener('click', function(e) {
+                const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
+                const nextTheme = isDark ? 'light' : 'dark';
+
+                const rect = toggleBtn.getBoundingClientRect();
+                const x = rect.left + rect.width / 2;
+                const y = rect.top + rect.height / 2;
+
+                const endRadius = Math.hypot(
+                    Math.max(x, window.innerWidth - x),
+                    Math.max(y, window.innerHeight - y)
+                );
+
+                if (document.startViewTransition) {
+                    const transition = document.startViewTransition(() => {
+                        document.documentElement.setAttribute('data-theme', nextTheme);
+                        localStorage.setItem('fitrack_theme', nextTheme);
+                        updateIcon(nextTheme);
+                    });
+
+                    transition.ready.then(() => {
+                        const clipPath = [
+                            `circle(0px at ${x}px ${y}px)`,
+                            `circle(${endRadius}px at ${x}px ${y}px)`
+                        ];
+                        document.documentElement.animate(
+                            {
+                                clipPath: isDark ? [...clipPath].reverse() : clipPath
+                            },
+                            {
+                                duration: 550,
+                                easing: 'cubic-bezier(0.2, 0.8, 0.2, 1)',
+                                pseudoElement: isDark ? '::view-transition-old(root)' : '::view-transition-new(root)'
+                            }
+                        );
+                    });
+                } else {
+                    // Telegram-style ripple fallback
+                    const ripple = document.createElement('div');
+                    ripple.className = 'telegram-theme-ripple';
+                    const size = Math.max(window.innerWidth, window.innerHeight) * 2.5;
+                    ripple.style.width = size + 'px';
+                    ripple.style.height = size + 'px';
+                    ripple.style.left = x + 'px';
+                    ripple.style.top = y + 'px';
+                    ripple.style.backgroundColor = nextTheme === 'dark' ? '#0f0d19' : '#f5f0ff';
+                    document.body.appendChild(ripple);
+
+                    requestAnimationFrame(() => {
+                        ripple.classList.add('active');
+                        setTimeout(() => {
+                            document.documentElement.setAttribute('data-theme', nextTheme);
+                            localStorage.setItem('fitrack_theme', nextTheme);
+                            updateIcon(nextTheme);
+                            setTimeout(() => ripple.remove(), 400);
+                        }, 250);
+                    });
+                }
+            });
+        })();
+    </script>
 </body>
 </html>

@@ -1159,7 +1159,7 @@ def query_gemini_api(api_key, system_instruction, user_prompt):
 
 def ask_ai_coach(user, query):
     """
-    Coach Raghav — friendly, supportive South Indian fitness & nutrition mentor.
+    AI Coach — friendly, supportive personal fitness & nutrition mentor.
     Answers in warm, natural, human tone without robotic AI jargon.
     """
     query_clean = query.strip()
@@ -1168,7 +1168,9 @@ def ask_ai_coach(user, query):
     role_info = ROLE_DETAILS[role_key]
 
     system_context = (
-        f"You are Coach Raghav, a warm, experienced personal fitness and nutrition coach for the Fitrack app. "
+        f"You are the user's personal fitness and nutrition coach on Fitrack. "
+        f"IDENTITY RULE: Always introduce yourself simply as 'I am your coach' or 'I'm your coach'. "
+        f"DO NOT ever say 'I am Coach Raghav' or refer to yourself as 'Raghav'. Just say 'I am your coach'. "
         f"You deeply understand South Indian culinary staples "
         f"(idlis, dosas, sambar, rasam, neer mor, sundal, filter coffee, poriyal, ragi mudde, pesarattu, biryani, chicken sukka, meen curry). "
         f"IMPORTANT: Always respond in normal, clear English. Never use regional language greetings like 'Vanakkam', 'Namaste', or any Tamil/Telugu/Kannada/Malayalam phrases. "
@@ -1337,7 +1339,7 @@ def ask_ai_coach(user, query):
     elif any(k in q_lower for k in ['streak', 'motivation', 'consistency', 'missed', 'lazy', 'tired', 'discipline']):
         streak = user.get_current_streak()
         return (
-            f"🔥 **Staying Consistent with Coach Raghav:**\n\n"
+            f"🔥 **Staying Consistent with Your Coach:**\n\n"
             f"• You are currently on a **{streak}-day streak**!\n"
             f"• Some days you won't feel 100% motivated, and that's completely normal. On those days, just showing up for 25 minutes keeps the habit alive.\n"
             f"• Remember: Fitness isn't an all-or-nothing test. Small, healthy choices with your meals and regular workouts add up to life-changing results.\n"
@@ -1347,7 +1349,7 @@ def ask_ai_coach(user, query):
     # Fallback greeting & helpful prompts
     else:
         return (
-            f"Hello {user.username}! I'm Coach Raghav, your personal fitness and nutrition mentor.\n\n"
+            f"Hello {user.username}! I'm your coach, your personal fitness and nutrition mentor.\n\n"
             f"I'm here to help you get great results while enjoying wholesome food (Kerala, Tamil Nadu, North Indian and beyond). What can I help you with?\n\n"
             f"• 🌴 **Kerala & Tamil Nadu Meal Styles:** Top traditional dishes & macro hacks\n"
             f"• ☕ **Filter Coffee & Energy:** How to enjoy it around your workouts\n"

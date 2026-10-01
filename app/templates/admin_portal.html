@@ -1,5 +1,5 @@
 {% extends "base.html" %}
-{% block title %}Admin Portal — Fitrack{% endblock %}
+{% block title %}Admin Control Center — Fitrack{% endblock %}
 {% block content %}
 <div class="page-wrapper">
 
@@ -7,13 +7,21 @@
     <div class="page-header">
         <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:12px;">
             <div>
-                <h2 class="page-title">🔐 Admin Control Panel</h2>
-                <p class="page-subtitle">Manage coach approvals, review pending applications, and oversee the Fitrack platform.</p>
+                <h2 class="page-title">🔐 Master Admin Control Center</h2>
+                <p class="page-subtitle">Full administrative control over all clients, certified coaches, applications, telemetry, and platform operations.</p>
             </div>
-            <span class="badge-chip" style="background:linear-gradient(135deg,#7c3aed,#4f46e5); color:#fff; font-size:13px; padding:6px 14px; border-radius:20px;">
-                🔐 Super Admin
-            </span>
+            <div style="display:flex; gap:8px;">
+                <span class="badge-chip" style="background:linear-gradient(135deg,#7c3aed,#4f46e5); color:#fff; font-size:13px; padding:6px 14px; border-radius:20px;">
+                    🛡️ Full Access Superadmin
+                </span>
+            </div>
         </div>
+    </div>
+
+    <!-- Quick Navigation Jump Bar -->
+    <div style="display:flex; gap:10px; margin-bottom:1.8rem; flex-wrap:wrap;">
+        <a href="#clients-section" class="btn-secondary-custom btn-sm">🏃 Clients Directory ({{ total_clients }})</a>
+        <a href="#coaches-section" class="btn-secondary-custom btn-sm">🌿 Coaches Management ({{ total_coaches }})</a>
     </div>
 
     <!-- Stats Overview -->
@@ -21,182 +29,242 @@
         <div class="stat-card" style="border-left:4px solid #7c3aed;">
             <div class="stat-label"><span>Total Users</span><span style="font-size:20px;">👥</span></div>
             <div class="stat-value">{{ total_users }}</div>
-            <div class="stat-subtext">Registered accounts on Fitrack</div>
+            <div class="stat-subtext">Total platform accounts</div>
         </div>
         <div class="stat-card" style="border-left:4px solid #10b981;">
-            <div class="stat-label"><span>Approved Coaches</span><span style="font-size:20px;">✅</span></div>
-            <div class="stat-value">{{ approved_count }}</div>
-            <div class="stat-subtext">Active verified coaches</div>
+            <div class="stat-label"><span>Active Coaches</span><span style="font-size:20px;">✅</span></div>
+            <div class="stat-value">{{ approved_count }} <span style="font-size:12px; color:var(--text-muted);">/ {{ total_coaches }}</span></div>
+            <div class="stat-subtext">Verified coaching staff</div>
             <div class="progress-bar-wrap">
-                <div class="progress-bar-fill progress-bar-emerald" style="width:{{ [approved_count * 20, 100]|min }}%;"></div>
+                <div class="progress-bar-fill progress-bar-emerald" style="width:{{ [approved_count * 25, 100]|min }}%;"></div>
             </div>
         </div>
         <div class="stat-card" style="border-left:4px solid #f59e0b;">
-            <div class="stat-label"><span>Pending Approval</span><span style="font-size:20px;">⏳</span></div>
+            <div class="stat-label"><span>Pending Applications</span><span style="font-size:20px;">⏳</span></div>
             <div class="stat-value">{{ pending_count }}</div>
-            <div class="stat-subtext">Coach applications awaiting review</div>
+            <div class="stat-subtext">Coaches awaiting clearance</div>
             {% if pending_count > 0 %}
             <div class="progress-bar-wrap">
                 <div class="progress-bar-fill" style="width:100%; background:#f59e0b;"></div>
             </div>
             {% endif %}
         </div>
-        <div class="stat-card" style="border-left:4px solid var(--brand-primary);">
-            <div class="stat-label"><span>Member Clients</span><span style="font-size:20px;">🏃</span></div>
+        <div class="stat-card" style="border-left:4px solid var(--accent-cyan);">
+            <div class="stat-label"><span>Active Clients</span><span style="font-size:20px;">🏃</span></div>
             <div class="stat-value">{{ total_clients }}</div>
-            <div class="stat-subtext">Active fitness members</div>
+            <div class="stat-subtext">Members with fitness profiles</div>
         </div>
     </div>
 
-    <!-- ==================== PENDING COACH APPROVALS ==================== -->
-    <div style="margin-bottom:2rem;">
-        <div style="display:flex; align-items:center; gap:10px; margin-bottom:1rem;">
-            <h3 style="font-size:19px; font-weight:700; color:var(--text-primary); margin:0;">⏳ Pending Coach Applications</h3>
-            {% if pending_count > 0 %}
-            <span class="badge-chip" style="background:#f59e0b; color:#fff; font-size:12px; padding:3px 10px; border-radius:12px; font-weight:700;">
-                {{ pending_count }} awaiting review
-            </span>
+    <!-- ==================== CLIENTS DIRECTORY & FULL ACCESS ==================== -->
+    <div id="clients-section" style="margin-bottom:2.5rem;">
+        <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:12px; margin-bottom:1rem;">
+            <div>
+                <h3 style="font-size:19px; font-weight:700; color:var(--text-primary); margin:0;">
+                    🏃 Clients Directory &amp; Biometric Records
+                </h3>
+                <p style="font-size:12.5px; color:var(--text-secondary); margin-top:2px;">
+                    Inspect, edit biometrics, update credentials, review nutrition, or manage any client account.
+                </p>
+            </div>
+            
+            <!-- Filter & Search Controls -->
+            <form method="GET" action="{{ url_for('admin.portal') }}#clients-section" style="display:flex; gap:8px; flex-wrap:wrap; margin:0;">
+                <input type="text" name="q" value="{{ search_q }}" placeholder="Search client name or email..." class="form-control" style="font-size:12.5px; padding:6px 12px; width:220px;">
+                <select name="role" class="form-control" style="font-size:12.5px; padding:6px 10px; width:150px;">
+                    <option value="all">All Lifestyles</option>
+                    <option value="desk_worker" {% if role_filter == 'desk_worker' %}selected{% endif %}>Desk Worker</option>
+                    <option value="student" {% if role_filter == 'student' %}selected{% endif %}>Student</option>
+                    <option value="athlete" {% if role_filter == 'athlete' %}selected{% endif %}>Athlete</option>
+                    <option value="bodybuilder" {% if role_filter == 'bodybuilder' %}selected{% endif %}>Bodybuilder</option>
+                    <option value="busy_parent" {% if role_filter == 'busy_parent' %}selected{% endif %}>Busy Parent</option>
+                    <option value="general" {% if role_filter == 'general' %}selected{% endif %}>General Fitness</option>
+                </select>
+                <button type="submit" class="btn-primary-custom btn-sm">Filter</button>
+                {% if search_q or role_filter != 'all' %}
+                <a href="{{ url_for('admin.portal') }}#clients-section" class="btn-secondary-custom btn-sm">Reset</a>
+                {% endif %}
+            </form>
+        </div>
+
+        {% if clients %}
+        <div class="stat-card" style="padding:0; overflow:hidden;">
+            <div style="overflow-x:auto;">
+                <table style="width:100%; border-collapse:collapse; text-align:left; font-size:13px;">
+                    <thead>
+                        <tr style="background:var(--bg-surface-elevated); border-bottom:1px solid var(--border-subtle); color:var(--text-secondary);">
+                            <th style="padding:12px 16px;">Client Name / Email</th>
+                            <th style="padding:12px 16px;">Lifestyle &amp; Goal</th>
+                            <th style="padding:12px 16px;">Weight &amp; BMI</th>
+                            <th style="padding:12px 16px;">Streak</th>
+                            <th style="padding:12px 16px;">Joined</th>
+                            <th style="padding:12px 16px; text-align:right;">Admin Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for client in clients %}
+                        {% set bmi, bmi_cat = client.calculate_bmi() %}
+                        <tr style="border-bottom:1px solid var(--border-subtle); transition:background 0.15s ease;" onmouseover="this.style.background='var(--bg-input)';" onmouseout="this.style.background='transparent';">
+                            <td style="padding:12px 16px;">
+                                <div style="display:flex; align-items:center; gap:10px;">
+                                    <div style="width:34px; height:34px; border-radius:50%; background:linear-gradient(135deg,var(--brand-primary),#4f46e5); display:flex; align-items:center; justify-content:center; color:#fff; font-weight:700; font-size:14px; flex-shrink:0;">
+                                        {{ client.username[0]|upper }}
+                                    </div>
+                                    <div>
+                                        <strong style="color:var(--text-primary); display:block;">{{ client.username }}</strong>
+                                        <span style="color:var(--text-muted); font-size:11.5px;">{{ client.email }}</span>
+                                    </div>
+                                </div>
+                            </td>
+                            <td style="padding:12px 16px;">
+                                <span class="badge-chip badge-purple" style="font-size:11px;">{{ client.get_role_display() }}</span>
+                                <span class="badge-chip badge-cyan" style="font-size:11px; margin-top:2px;">{{ client.goal|capitalize }}</span>
+                            </td>
+                            <td style="padding:12px 16px;">
+                                {% if client.weight_kg %}
+                                    <strong>{{ client.weight_kg }}kg</strong> 
+                                    <span style="font-size:11.5px; color:var(--text-muted);">(Target: {{ client.target_weight_kg or 'N/A' }}kg)</span>
+                                    <div style="font-size:11.5px; color:var(--brand-primary);">BMI: {{ bmi or 'N/A' }} • {{ bmi_cat }}</div>
+                                {% else %}
+                                    <span style="color:var(--text-muted); font-size:12px;">Unset</span>
+                                {% endif %}
+                            </td>
+                            <td style="padding:12px 16px;">
+                                <span style="color:#f59e0b; font-weight:700;">🔥 {{ client.get_current_streak() }}d</span>
+                            </td>
+                            <td style="padding:12px 16px; color:var(--text-muted); font-size:12px;">
+                                {{ client.created_at.strftime('%d %b %Y') if client.created_at else 'N/A' }}
+                            </td>
+                            <td style="padding:12px 16px; text-align:right;">
+                                <div style="display:inline-flex; gap:6px;">
+                                    <a href="{{ url_for('admin.user_details', user_id=client.id) }}" class="btn-primary-custom btn-sm" style="font-size:11.5px; padding:4px 10px;">
+                                        🔍 Inspect &amp; Edit
+                                    </a>
+                                </div>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        {% else %}
+        <div class="stat-card" style="text-align:center; padding:2rem 1.5rem;">
+            <p style="color:var(--text-muted); margin:0;">No clients found matching the search criteria.</p>
+        </div>
+        {% endif %}
+    </div>
+
+    <!-- ==================== COACHES MANAGEMENT SECTION ==================== -->
+    <div id="coaches-section" style="margin-bottom:2.5rem;">
+        
+        <!-- PENDING APPLICATIONS -->
+        <div style="margin-bottom:2rem;">
+            <div style="display:flex; align-items:center; gap:10px; margin-bottom:1rem;">
+                <h3 style="font-size:19px; font-weight:700; color:var(--text-primary); margin:0;">⏳ Pending Coach Applications</h3>
+                {% if pending_count > 0 %}
+                <span class="badge-chip" style="background:#f59e0b; color:#fff; font-size:12px; padding:3px 10px; border-radius:12px; font-weight:700;">
+                    {{ pending_count }} awaiting clearance
+                </span>
+                {% endif %}
+            </div>
+
+            {% if pending_coaches %}
+            <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(320px, 1fr)); gap:1.25rem;">
+                {% for coach in pending_coaches %}
+                <div class="stat-card" style="border:2px solid #f59e0b; border-radius:var(--radius-md); position:relative; overflow:hidden;">
+                    <div style="position:absolute; top:0; right:0; background:#f59e0b; color:#fff; font-size:10px; font-weight:800; padding:3px 12px; border-bottom-left-radius:8px;">
+                        PENDING
+                    </div>
+                    <div style="display:flex; align-items:center; gap:12px; margin-bottom:10px;">
+                        <div style="width:42px; height:42px; border-radius:50%; background:linear-gradient(135deg,#f59e0b,#d97706); display:flex; align-items:center; justify-content:center; font-size:18px; font-weight:800; color:#fff; flex-shrink:0;">
+                            {{ coach.username[0]|upper }}
+                        </div>
+                        <div>
+                            <div style="font-size:15px; font-weight:700; color:var(--text-primary);">Coach {{ coach.username }}</div>
+                            <div style="font-size:12px; color:var(--text-muted);">{{ coach.email }}</div>
+                        </div>
+                    </div>
+                    <div style="background:var(--bg-surface-elevated); border:1px solid var(--border-subtle); border-radius:var(--radius-sm); padding:8px 10px; margin-bottom:10px; font-size:12px;">
+                        <strong>🎯 {{ coach.coach_specialty or 'General Coach' }}</strong>
+                        <div style="color:var(--text-secondary); margin-top:2px;">{{ coach.coach_bio or 'No bio.' }}</div>
+                    </div>
+                    <div style="display:flex; gap:8px;">
+                        <form method="POST" action="{{ url_for('admin.approve_coach', coach_id=coach.id) }}" style="flex:1;">
+                            <button type="submit" class="btn-primary-custom btn-sm" style="width:100%; justify-content:center; background:#10b981;">
+                                ✅ Approve
+                            </button>
+                        </form>
+                        <form method="POST" action="{{ url_for('admin.reject_coach', coach_id=coach.id) }}" style="flex:1;">
+                            <button type="submit" class="btn-secondary-custom btn-sm" style="width:100%; justify-content:center; border-color:#ef4444; color:#ef4444;">
+                                ⛔ Reject
+                            </button>
+                        </form>
+                        <a href="{{ url_for('admin.user_details', user_id=coach.id) }}" class="btn-secondary-custom btn-sm" style="padding:6px 10px;">
+                            ⚙️
+                        </a>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+            {% else %}
+            <div class="stat-card" style="text-align:center; padding:1.5rem; border:1px dashed var(--border-subtle);">
+                <p style="color:var(--text-muted); font-size:13px; margin:0;">🎉 No pending applications awaiting review.</p>
+            </div>
             {% endif %}
         </div>
 
-        {% if pending_coaches %}
-        <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(340px, 1fr)); gap:1.25rem;">
-            {% for coach in pending_coaches %}
-            <div class="stat-card" style="border:2px solid #f59e0b; border-radius:var(--radius-md); position:relative; overflow:hidden;">
-                <!-- Pending badge ribbon -->
-                <div style="position:absolute; top:0; right:0; background:#f59e0b; color:#fff; font-size:10px; font-weight:800; padding:3px 12px; border-bottom-left-radius:8px; letter-spacing:0.5px;">
-                    PENDING
-                </div>
-
-                <!-- Coach Info -->
-                <div style="display:flex; align-items:center; gap:12px; margin-bottom:12px; margin-top:4px;">
-                    <div style="width:46px; height:46px; border-radius:50%; background:linear-gradient(135deg,#f59e0b,#d97706); display:flex; align-items:center; justify-content:center; font-size:20px; font-weight:800; color:#fff; flex-shrink:0;">
-                        {{ coach.username[0]|upper }}
-                    </div>
-                    <div>
-                        <div style="font-size:16px; font-weight:700; color:var(--text-primary);">{{ coach.username }}</div>
-                        <div style="font-size:12px; color:var(--text-muted);">{{ coach.email }}</div>
-                    </div>
-                </div>
-
-                <!-- Specialty & Bio -->
-                <div style="background:var(--bg-surface-elevated); border:1px solid var(--border-subtle); border-radius:var(--radius-sm); padding:10px 12px; margin-bottom:12px;">
-                    <div style="font-size:12px; font-weight:700; color:var(--text-primary); margin-bottom:4px;">
-                        🎯 {{ coach.coach_specialty or 'General Fitness Coach' }}
-                    </div>
-                    <div style="font-size:12px; color:var(--text-secondary); line-height:1.5;">
-                        {{ coach.coach_bio or 'No bio provided.' }}
-                    </div>
-                </div>
-
-                <!-- Meta -->
-                <div style="display:flex; gap:8px; flex-wrap:wrap; margin-bottom:14px;">
-                    <span class="badge-chip badge-cyan" style="font-size:10.5px;">📅 Joined {{ coach.created_at.strftime('%d %b %Y') if coach.created_at else 'N/A' }}</span>
-                </div>
-
-                <!-- Actions -->
-                <div style="display:flex; gap:8px;">
-                    <form method="POST" action="{{ url_for('admin.approve_coach', coach_id=coach.id) }}" style="flex:1;">
-                        <button type="submit" class="btn-primary-custom" style="width:100%; justify-content:center; padding:8px 14px; font-size:13px; background:#10b981;">
-                            ✅ Approve Coach
-                        </button>
-                    </form>
-                    <form method="POST" action="{{ url_for('admin.reject_coach', coach_id=coach.id) }}" style="flex:1;">
-                        <button type="submit" style="width:100%; padding:8px 14px; font-size:13px; font-weight:600; border:1.5px solid #ef4444; color:#ef4444; background:transparent; border-radius:var(--radius-sm); cursor:pointer; transition:all 0.2s;"
-                            onmouseover="this.style.background='#ef4444'; this.style.color='#fff';"
-                            onmouseout="this.style.background='transparent'; this.style.color='#ef4444';">
-                            ⛔ Reject
-                        </button>
-                    </form>
-                </div>
+        <!-- APPROVED COACHES LIST -->
+        <div>
+            <div style="display:flex; align-items:center; gap:10px; margin-bottom:1rem;">
+                <h3 style="font-size:19px; font-weight:700; color:var(--text-primary); margin:0;">✅ Approved &amp; Active Coaches</h3>
+                <span class="badge-chip badge-emerald" style="font-size:11px;">{{ approved_count }} active coaches</span>
             </div>
-            {% endfor %}
-        </div>
-        {% else %}
-        <div class="stat-card" style="text-align:center; padding:2.5rem 1.5rem; border:1px dashed var(--border-subtle);">
-            <span style="font-size:36px; display:block; margin-bottom:10px;">🎉</span>
-            <h4 style="font-size:17px; font-weight:700; color:var(--text-primary); margin-bottom:6px;">No Pending Applications</h4>
-            <p style="color:var(--text-secondary); font-size:13.5px; max-width:400px; margin:0 auto;">
-                All coach applications have been reviewed. New applications will appear here automatically.
-            </p>
-        </div>
-        {% endif %}
-    </div>
 
-    <!-- ==================== APPROVED COACHES ==================== -->
-    <div>
-        <div style="display:flex; align-items:center; gap:10px; margin-bottom:1rem;">
-            <h3 style="font-size:19px; font-weight:700; color:var(--text-primary); margin:0;">✅ Approved & Active Coaches</h3>
-            <span class="badge-chip badge-emerald" style="font-size:11px;">{{ approved_count }} active</span>
-        </div>
-
-        {% if approved_coaches %}
-        <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(340px, 1fr)); gap:1.25rem;">
-            {% for coach in approved_coaches %}
-            <div class="stat-card" style="border-left:4px solid #10b981; position:relative; overflow:hidden;">
-                <!-- Approved badge -->
-                <div style="position:absolute; top:0; right:0; background:#10b981; color:#fff; font-size:10px; font-weight:800; padding:3px 12px; border-bottom-left-radius:8px; letter-spacing:0.5px;">
-                    APPROVED
-                </div>
-
-                <!-- Coach Info -->
-                <div style="display:flex; align-items:center; gap:12px; margin-bottom:12px; margin-top:4px;">
-                    <div style="width:46px; height:46px; border-radius:50%; background:linear-gradient(135deg,#10b981,#059669); display:flex; align-items:center; justify-content:center; font-size:20px; font-weight:800; color:#fff; flex-shrink:0;">
-                        {{ coach.username[0]|upper }}
+            {% if approved_coaches %}
+            <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(320px, 1fr)); gap:1.25rem;">
+                {% for coach in approved_coaches %}
+                <div class="stat-card" style="border-left:4px solid #10b981; position:relative; overflow:hidden;">
+                    <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:10px;">
+                        <div style="display:flex; align-items:center; gap:10px;">
+                            <div style="width:42px; height:42px; border-radius:50%; background:linear-gradient(135deg,#10b981,#059669); display:flex; align-items:center; justify-content:center; font-size:18px; font-weight:800; color:#fff; flex-shrink:0;">
+                                {{ coach.username[0]|upper }}
+                            </div>
+                            <div>
+                                <strong style="font-size:15px; color:var(--text-primary);">Coach {{ coach.username }}</strong>
+                                <span class="badge-chip badge-emerald" style="font-size:10px; display:inline-block; margin-left:4px;">Verified</span>
+                                <div style="font-size:12px; color:var(--text-muted);">{{ coach.email }}</div>
+                            </div>
+                        </div>
                     </div>
-                    <div>
-                        <div style="font-size:16px; font-weight:700; color:var(--text-primary);">{{ coach.username }}</div>
-                        <div style="font-size:12px; color:var(--text-muted);">{{ coach.email }}</div>
+                    <div style="background:var(--bg-surface-elevated); border:1px solid var(--border-subtle); border-radius:var(--radius-sm); padding:8px 10px; margin-bottom:12px; font-size:12px;">
+                        <div style="font-weight:700; color:var(--accent-emerald);">🎯 {{ coach.coach_specialty or 'Certified Coach' }}</div>
+                        <div style="color:var(--text-secondary); margin-top:2px;">{{ coach.coach_bio or 'No bio.' }}</div>
+                    </div>
+                    <div style="display:flex; gap:6px;">
+                        <a href="{{ url_for('admin.user_details', user_id=coach.id) }}" class="btn-primary-custom btn-sm" style="flex:1; justify-content:center; font-size:11.5px;">
+                            🔍 Inspect Dossier
+                        </a>
+                        <form method="POST" action="{{ url_for('admin.reject_coach', coach_id=coach.id) }}" style="flex:1;">
+                            <button type="submit" class="btn-secondary-custom btn-sm" style="width:100%; justify-content:center; border-color:#f59e0b; color:#f59e0b; font-size:11.5px;">
+                                ⚠️ Revoke
+                            </button>
+                        </form>
+                        <form method="POST" action="{{ url_for('admin.remove_coach', coach_id=coach.id) }}" style="flex:1;" onsubmit="return confirm('Demote Coach {{ coach.username }} to client?')">
+                            <button type="submit" class="btn-secondary-custom btn-sm" style="width:100%; justify-content:center; border-color:#ef4444; color:#ef4444; font-size:11.5px;">
+                                🔄 Demote
+                            </button>
+                        </form>
                     </div>
                 </div>
-
-                <!-- Specialty & Bio -->
-                <div style="background:var(--bg-surface-elevated); border:1px solid var(--border-subtle); border-radius:var(--radius-sm); padding:10px 12px; margin-bottom:12px;">
-                    <div style="font-size:12px; font-weight:700; color:var(--accent-emerald); margin-bottom:4px;">
-                        🎯 {{ coach.coach_specialty or 'General Fitness Coach' }}
-                    </div>
-                    <div style="font-size:12px; color:var(--text-secondary); line-height:1.5;">
-                        {{ coach.coach_bio or 'No bio provided.' }}
-                    </div>
-                </div>
-
-                <!-- Meta -->
-                <div style="display:flex; gap:8px; flex-wrap:wrap; margin-bottom:14px;">
-                    <span class="badge-chip badge-emerald" style="font-size:10.5px;">✅ Verified Coach</span>
-                    <span class="badge-chip badge-cyan" style="font-size:10.5px;">📅 {{ coach.created_at.strftime('%d %b %Y') if coach.created_at else 'N/A' }}</span>
-                </div>
-
-                <!-- Actions -->
-                <div style="display:flex; gap:8px;">
-                    <form method="POST" action="{{ url_for('admin.reject_coach', coach_id=coach.id) }}" style="flex:1;">
-                        <button type="submit" style="width:100%; padding:7px 14px; font-size:12px; font-weight:600; border:1.5px solid #f59e0b; color:#f59e0b; background:transparent; border-radius:var(--radius-sm); cursor:pointer; transition:all 0.2s;"
-                            onmouseover="this.style.background='#f59e0b'; this.style.color='#fff';"
-                            onmouseout="this.style.background='transparent'; this.style.color='#f59e0b';"
-                            title="Revoke coach access">
-                            ⚠️ Revoke Approval
-                        </button>
-                    </form>
-                    <form method="POST" action="{{ url_for('admin.remove_coach', coach_id=coach.id) }}" style="flex:1;"
-                          onsubmit="return confirm('Demote {{ coach.username }} to a regular client? This cannot be undone easily.')">
-                        <button type="submit" style="width:100%; padding:7px 14px; font-size:12px; font-weight:600; border:1.5px solid #ef4444; color:#ef4444; background:transparent; border-radius:var(--radius-sm); cursor:pointer; transition:all 0.2s;"
-                            onmouseover="this.style.background='#ef4444'; this.style.color='#fff';"
-                            onmouseout="this.style.background='transparent'; this.style.color='#ef4444';">
-                            🔄 Demote to Client
-                        </button>
-                    </form>
-                </div>
+                {% endfor %}
             </div>
-            {% endfor %}
+            {% else %}
+            <div class="stat-card" style="text-align:center; padding:1.5rem; border:1px dashed var(--border-subtle);">
+                <p style="color:var(--text-muted); font-size:13px; margin:0;">No active coaches currently registered.</p>
+            </div>
+            {% endif %}
         </div>
-        {% else %}
-        <div class="stat-card" style="text-align:center; padding:2.5rem 1.5rem; border:1px dashed var(--border-subtle);">
-            <span style="font-size:36px; display:block; margin-bottom:10px;">👥</span>
-            <h4 style="font-size:17px; font-weight:700; color:var(--text-primary); margin-bottom:6px;">No Approved Coaches Yet</h4>
-            <p style="color:var(--text-secondary); font-size:13.5px; max-width:400px; margin:0 auto;">
-                Approve pending coach applications above to get your coaching team active.
-            </p>
-        </div>
-        {% endif %}
     </div>
 
 </div>

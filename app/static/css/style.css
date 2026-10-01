@@ -33,6 +33,80 @@
     --font-body: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
 }
 
+[data-theme="dark"] {
+    --bg-dark: #0f0d19;
+    --bg-surface: #181528;
+    --bg-surface-elevated: #221e36;
+    --bg-card: rgba(24, 21, 40, 0.95);
+    --bg-input: #201c33;
+    --border-subtle: rgba(167, 139, 250, 0.16);
+    --border-highlight: rgba(167, 139, 250, 0.4);
+    --text-primary: #f3f0ff;
+    --text-secondary: #b8b0db;
+    --text-muted: #8076a8;
+    --text-accent: #a78bfa;
+    --text-on-brand: #ffffff;
+    --brand-primary: #8b5cf6;
+    --brand-primary-hover: #7c3aed;
+    --brand-primary-glow: rgba(139, 92, 246, 0.3);
+    --shadow-card: 0 4px 20px rgba(0, 0, 0, 0.35), 0 1px 4px rgba(0, 0, 0, 0.25);
+}
+
+/* Telegram-Style Smooth Circular Theme Transition */
+::view-transition-old(root),
+::view-transition-new(root) {
+    animation: none;
+    mix-blend-mode: normal;
+}
+::view-transition-old(root) {
+    z-index: 1;
+}
+::view-transition-new(root) {
+    z-index: 9999;
+}
+[data-theme="dark"]::view-transition-old(root) {
+    z-index: 9999;
+}
+[data-theme="dark"]::view-transition-new(root) {
+    z-index: 1;
+}
+
+/* Fallback Telegram-style ripple overlay for browsers without native View Transitions */
+.telegram-theme-ripple {
+    position: fixed;
+    border-radius: 50%;
+    pointer-events: none;
+    z-index: 99999;
+    transform: translate(-50%, -50%) scale(0);
+    transition: transform 0.65s cubic-bezier(0.2, 0.8, 0.2, 1), opacity 0.65s ease;
+}
+.telegram-theme-ripple.active {
+    transform: translate(-50%, -50%) scale(1);
+    opacity: 0;
+}
+
+/* Theme Toggle Button in Navbar */
+.theme-toggle-btn {
+    background: var(--bg-surface-elevated);
+    border: 1px solid var(--border-subtle);
+    border-radius: 50%;
+    width: 38px;
+    height: 38px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--text-primary);
+    cursor: pointer;
+    font-size: 17px;
+    transition: all 0.25s ease;
+    user-select: none;
+}
+.theme-toggle-btn:hover {
+    border-color: var(--brand-primary);
+    transform: rotate(20deg) scale(1.08);
+    box-shadow: 0 0 12px var(--brand-primary-glow);
+}
+
 /* RESET */
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
@@ -47,6 +121,13 @@ body {
     font-size: 15px;
     line-height: 1.6;
     min-height: 100vh;
+    transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+[data-theme="dark"] body {
+    background-image:
+        radial-gradient(circle at 10% 10%, rgba(139, 92, 246, 0.15) 0%, transparent 50%),
+        radial-gradient(circle at 90% 90%, rgba(30, 20, 50, 0.4) 0%, transparent 50%);
 }
 
 h1, h2, h3, h4, .font-heading {
@@ -126,7 +207,91 @@ a:hover { color: var(--brand-primary-hover); }
 }
 .nav-link-coach:hover { background: rgba(5, 150, 105, 0.14); color: #047857; box-shadow: 0 0 10px rgba(5, 150, 105, 0.15); }
 
-.nav-right-group { display: flex; align-items: center; gap: 0.75rem; }
+.nav-right-group { display: flex; align-items: center; gap: 0.75rem; position: relative; }
+
+/* Avatar Menu & Dropdown */
+.avatar-menu {
+    position: relative;
+    display: inline-block;
+}
+
+.avatar-btn {
+    width: 38px;
+    height: 38px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, var(--brand-primary), #6d28d9);
+    color: #fff;
+    border: 2px solid var(--border-subtle);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 15px;
+    font-weight: 700;
+    cursor: pointer;
+    overflow: hidden;
+    padding: 0;
+    transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+}
+
+.avatar-btn:hover {
+    transform: scale(1.05);
+    border-color: var(--brand-primary);
+    box-shadow: 0 0 10px var(--brand-primary-glow);
+}
+
+.avatar-btn img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+}
+
+.avatar-dropdown {
+    display: none;
+    position: absolute;
+    right: 0;
+    top: calc(100% + 10px);
+    min-width: 220px;
+    background: var(--bg-surface);
+    border: 1px solid var(--border-subtle);
+    border-radius: var(--radius-md);
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+    padding: 8px 0;
+    z-index: 1000;
+    flex-direction: column;
+}
+
+.avatar-dropdown.open {
+    display: flex;
+    animation: fadeInSlideUp 0.18s ease forwards;
+}
+
+.avatar-dropdown-name {
+    padding: 8px 16px;
+    font-size: 12.5px;
+    font-weight: 700;
+    color: var(--text-muted);
+    border-bottom: 1px solid var(--border-subtle);
+    margin-bottom: 4px;
+    text-transform: capitalize;
+}
+
+.avatar-dropdown a {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 16px;
+    font-size: 13.5px;
+    font-weight: 500;
+    color: var(--text-primary);
+    transition: background 0.15s ease, color 0.15s ease;
+}
+
+.avatar-dropdown a:hover {
+    background: var(--bg-surface-elevated);
+    color: var(--brand-primary);
+}
+
 
 /* Hamburger */
 .hamburger-btn {
@@ -549,10 +714,10 @@ a:hover { color: var(--brand-primary-hover); }
 .ai-chat-close { background: rgba(255,255,255,0.15); border: none; color: #fff; font-size: 18px; cursor: pointer; border-radius: 50%; width: 28px; height: 28px; display: flex; align-items: center; justify-content: center; }
 .ai-chat-close:hover { background: rgba(255,255,255,0.28); }
 
-.ai-chat-body { flex: 1; overflow-y: auto; padding: 16px; background: #faf8ff; display: flex; flex-direction: column; gap: 12px; }
+.ai-chat-body { flex: 1; overflow-y: auto; padding: 16px; background: var(--bg-surface-elevated); display: flex; flex-direction: column; gap: 12px; }
 
 .chat-bubble { max-width: 88%; padding: 11px 15px; border-radius: 12px; font-size: 13.5px; line-height: 1.45; word-break: break-word; }
-.chat-bubble-bot { align-self: flex-start; background: #fff; color: var(--text-primary); border: 1px solid var(--border-subtle); border-bottom-left-radius: 2px; }
+.chat-bubble-bot { align-self: flex-start; background: var(--bg-surface); color: var(--text-primary); border: 1px solid var(--border-subtle); border-bottom-left-radius: 2px; }
 .chat-bubble-user { align-self: flex-end; background: linear-gradient(135deg, var(--brand-primary), #a78bfa); color: #fff; border-bottom-right-radius: 2px; }
 
 .chat-quick-chips { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 4px; }

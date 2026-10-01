@@ -50,7 +50,9 @@ def signup():
 @auth_bp.route('/login', methods=['GET', 'POST'])
 def login():
     if current_user.is_authenticated:
-        if getattr(current_user, 'is_coach', False):
+        if getattr(current_user, 'is_admin', False):
+            return redirect(url_for('admin.portal'))
+        elif getattr(current_user, 'is_coach', False):
             return redirect(url_for('ai.coach_portal'))
         return redirect(url_for('auth.dashboard'))
 
@@ -62,7 +64,10 @@ def login():
 
         if user and user.check_password(password):
             login_user(user)
-            if user.is_coach:
+            if user.is_admin:
+                flash(f"Welcome to Admin Control Panel, {user.username}!", "success")
+                return redirect(url_for('admin.portal'))
+            elif user.is_coach:
                 flash(f"Welcome back, Coach {user.username}!", "success")
                 return redirect(url_for('ai.coach_portal'))
             return redirect(url_for('auth.dashboard'))
