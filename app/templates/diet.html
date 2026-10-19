@@ -113,7 +113,7 @@
                     </div>
                     <div class="food-stat-desc">
                         {% if food_summary.over_calorie_budget %}
-                            <span style="color:#6d28d9; font-weight:700;">⚠️ {{ food_summary.total_calories - food_summary.calorie_target }} kcal over daily budget</span>
+                            <span style="color:var(--brand-primary); font-weight:700;">⚠️ {{ food_summary.total_calories - food_summary.calorie_target }} kcal over daily budget</span>
                         {% else %}
                             <span>🔥 <strong>{{ food_summary.remaining_calories }} kcal</strong> remaining today</span>
                         {% endif %}
@@ -241,7 +241,7 @@
             <div class="stat-card">
                 <div class="stat-label">
                     <span>Target Protein</span>
-                    <span style="color:#6d28d9; font-weight:700;">{{ (plan.target_protein * 400 / plan.target_calories)|round }}%</span>
+                    <span style="color:var(--brand-primary); font-weight:700;">{{ (plan.target_protein * 400 / plan.target_calories)|round }}%</span>
                 </div>
                 <div class="stat-value">{{ plan.target_protein }} <span style="font-size:14px; color:var(--text-muted);">g</span></div>
                 <div class="stat-subtext">Dal, paneer, eggs, chicken, fish &amp; sundal</div>
@@ -444,7 +444,7 @@
                                 {{ m.description }}
                             </p>
                         </div>
-                        <div style="background:rgba(5, 150, 105, 0.08); border-left:3px solid var(--accent-emerald); border-radius:4px; padding:5px 8px; font-size:11px; color:#065f46; line-height:1.35; margin-top:6px;">
+                        <div class="meal-role-benefit" style="padding:5px 8px; font-size:11px; line-height:1.35; margin-top:6px; margin-bottom:0;">
                             <strong>Key Benefit:</strong> {{ m.pro_tip }}
                         </div>
                     </div>

@@ -84,136 +84,160 @@ ROLE_WARMUPS = {
 PLANS = {
     'beginner': [
         {
-            'title': 'Day 1 - Full Body A',
-            'focus': 'Chest, Quads, Lats, Core',
+            'title': 'Day 1 - Push Foundation',
+            'focus': 'Chest, Shoulders (Front/Lateral Delts), Triceps',
             'exercises': [
-                {'name': 'Barbell or Goblet Squat', 'muscle': 'Quads & Glutes', 'tip': 'Drive knees out and keep chest proud.'},
-                {'name': 'Barbell or Dumbbell Bench Press', 'muscle': 'Chest & Triceps', 'tip': 'Tuck shoulder blades down and back.'},
-                {'name': 'Bent-over Barbell Row', 'muscle': 'Upper Back & Lats', 'tip': 'Pull towards lower ribs with a flat spine.'},
-                {'name': 'Plank', 'muscle': 'Core Stability', 'tip': 'Brace core as if expecting a punch; hold 45-60s.'}
-            ]
-        },
-        {
-            'title': 'Day 2 - Full Body B',
-            'focus': 'Hamstrings, Shoulders, Back, Abs',
-            'exercises': [
-                {'name': 'Romanian Deadlift', 'muscle': 'Hamstrings & Glutes', 'tip': 'Hinge backwards at hips until hamstring stretch.'},
-                {'name': 'Overhead Shoulder Press', 'muscle': 'Deltoids & Triceps', 'tip': 'Lock out elbows overhead without arching lower back.'},
-                {'name': 'Lat Pulldown', 'muscle': 'Lats & Biceps', 'tip': 'Pull down to upper chest, pausing 1 second.'},
-                {'name': 'Bicycle Crunches', 'muscle': 'Obliques & Rectus Abdominis', 'tip': 'Controlled tempo, opposite elbow to knee.'}
-            ]
-        },
-        {
-            'title': 'Day 3 - Full Body C',
-            'focus': 'Legs, Upper Chest, Mid Back, Core',
-            'exercises': [
-                {'name': 'Leg Press or Lunges', 'muscle': 'Quads & Glutes', 'tip': 'Full range of motion without locking knees at top.'},
+                {'name': 'Barbell or Dumbbell Bench Press', 'muscle': 'Chest & Triceps', 'tip': 'Tuck shoulder blades down and back, controlled descent.'},
                 {'name': 'Incline Dumbbell Press', 'muscle': 'Upper Chest', 'tip': 'Set bench to 30 degrees for clavicular head stimulation.'},
-                {'name': 'Seated Cable Row', 'muscle': 'Mid Back & Rhomboids', 'tip': 'Squeeze shoulder blades together for a full second.'},
-                {'name': 'Side Plank', 'muscle': 'Lateral Core', 'tip': 'Keep straight line from head to ankles; 30s per side.'}
+                {'name': 'Seated Overhead Dumbbell Press', 'muscle': 'Anterior Deltoids', 'tip': 'Press overhead smoothly without arching lower back.'},
+                {'name': 'Dumbbell Lateral Raise', 'muscle': 'Side Delts', 'tip': 'Slight forward lean, lead with elbows up to shoulder level.'},
+                {'name': 'Tricep Rope Pushdown', 'muscle': 'Triceps Lateral Head', 'tip': 'Keep elbows pinned to ribs; spread the rope at bottom.'}
+            ]
+        },
+        {
+            'title': 'Day 2 - Pull Foundation',
+            'focus': 'Back, Lats, Rear Delts, Biceps',
+            'exercises': [
+                {'name': 'Lat Pulldown', 'muscle': 'Lats & Back Width', 'tip': 'Pull smoothly down to upper chest, pausing 1 second.'},
+                {'name': 'Seated Cable Row', 'muscle': 'Mid Back & Rhomboids', 'tip': 'Squeeze shoulder blades together firmly at the torso.'},
+                {'name': 'Chest-Supported Dumbbell Row', 'muscle': 'Upper Back', 'tip': 'Eliminate momentum; pull elbows back toward hips.'},
+                {'name': 'Face Pulls / Rear Delt Fly', 'muscle': 'Rear Delts & Posture', 'tip': 'Pull towards forehead with external rotation.'},
+                {'name': 'Standing Dumbbell Bicep Curl', 'muscle': 'Biceps Brachii', 'tip': 'Strict posture, zero hip swing, supinate wrists.'}
+            ]
+        },
+        {
+            'title': 'Day 3 - Legs & Core Foundation',
+            'focus': 'Quads, Hamstrings, Glutes, Calves, Abs',
+            'exercises': [
+                {'name': 'Goblet Squat or Leg Press', 'muscle': 'Quads & Glutes', 'tip': 'Drive knees out, maintain upright chest, full depth.'},
+                {'name': 'Romanian Deadlift (Dumbbell or Barbell)', 'muscle': 'Hamstrings & Glutes', 'tip': 'Hinge backwards at hips until deep hamstring stretch.'},
+                {'name': 'Seated Leg Extension', 'muscle': 'Quads Isolation', 'tip': 'Control the eccentric phase and squeeze at peak.'},
+                {'name': 'Lying or Seated Leg Curl', 'muscle': 'Hamstrings Flexion', 'tip': 'Keep hips glued to pad, avoid lower back arch.'},
+                {'name': 'Standing Calf Raise', 'muscle': 'Calves', 'tip': 'Pause at the bottom stretch for 2 full seconds.'},
+                {'name': 'Plank or Bicycle Crunches', 'muscle': 'Core Stability', 'tip': 'Brace core as if expecting a punch; hold steady.'}
             ]
         },
     ],
     'intermediate': [
         {
-            'title': 'Day 1 - Upper Power',
-            'focus': 'Chest, Lats, Shoulders, Arms',
+            'title': 'Day 1 - Push Hypertrophy',
+            'focus': 'Chest, Anterior Delts, Lateral Delts, Triceps',
             'exercises': [
-                {'name': 'Barbell Bench Press', 'muscle': 'Chest & Triceps', 'tip': '3-second eccentric descent on heavy sets.'},
-                {'name': 'Barbell Row', 'muscle': 'Lats & Upper Back', 'tip': 'Torso at 45 degrees, explosive pull.'},
-                {'name': 'Standing Overhead Press', 'muscle': 'Anterior Delts', 'tip': 'Brace glutes and abs tight.'},
-                {'name': 'Wide-Grip Lat Pulldown', 'muscle': 'Lats Width', 'tip': 'Lean back slightly and flare lats.'},
-                {'name': 'Incline Dumbbell Bicep Curl', 'muscle': 'Biceps Long Head', 'tip': 'Full stretch at bottom, supinate wrists.'},
-                {'name': 'Tricep Rope Pushdown', 'muscle': 'Triceps Lateral Head', 'tip': 'Spread the rope at the bottom.'}
+                {'name': 'Flat Barbell Bench Press', 'muscle': 'Pectoralis Major', 'tip': '3-second eccentric descent on heavy working sets.'},
+                {'name': 'Incline Dumbbell Bench Press', 'muscle': 'Upper Pecs', 'tip': 'Deep stretch at bottom, converge dumbbells smoothly at top.'},
+                {'name': 'Standing Overhead Military Press', 'muscle': 'Front Deltoids', 'tip': 'Brace glutes and abs tight; full lockout overhead.'},
+                {'name': 'Cable Lateral Raise', 'muscle': 'Lateral Deltoids', 'tip': 'Constant tension on the side delts; slight elbow bend.'},
+                {'name': 'Cable Chest Fly', 'muscle': 'Inner Pec Squeeze', 'tip': 'Focus on peak contraction and controlled stretch.'},
+                {'name': 'Tricep Rope Pushdown', 'muscle': 'Triceps Lateral Head', 'tip': 'Spread the rope at the bottom and lock out.'}
             ]
         },
         {
-            'title': 'Day 2 - Lower Strength',
-            'focus': 'Quads, Hamstrings, Calves',
+            'title': 'Day 2 - Pull Hypertrophy',
+            'focus': 'Lats, Upper Back, Rear Delts, Biceps',
             'exercises': [
-                {'name': 'Barbell Back Squat', 'muscle': 'Quads & Glutes', 'tip': 'Hit parallel or below with upright torso.'},
+                {'name': 'Conventional Deadlift or Rack Pull', 'muscle': 'Total Posterior Chain', 'tip': 'Reset after each repetition with tight lats.'},
+                {'name': 'Wide-Grip Lat Pulldown or Pull-up', 'muscle': 'Lats Width', 'tip': 'Drive elbows down towards hips; don\'t swing.'},
+                {'name': 'Bent-over Barbell Row', 'muscle': 'Mid Back & Rhomboids', 'tip': 'Torso at 45 degrees, explosive pull to lower ribcage.'},
+                {'name': 'Cable Face Pull with External Rotation', 'muscle': 'Rear Delts & Rotator Cuff', 'tip': 'Pull towards temples, thumbs pointing back.'},
+                {'name': 'Incline Dumbbell Bicep Curl', 'muscle': 'Biceps Long Head', 'tip': 'Full stretch at bottom, supinate wrists at top.'},
+                {'name': 'Dumbbell Hammer Curl', 'muscle': 'Brachialis & Forearms', 'tip': 'Thickens upper arm and strengthens grip.'}
+            ]
+        },
+        {
+            'title': 'Day 3 - Legs & Core Power',
+            'focus': 'Quads, Hamstrings, Glutes, Calves, Abs',
+            'exercises': [
+                {'name': 'Barbell Back Squat', 'muscle': 'Quads & Glutes', 'tip': 'Hit parallel or below with upright torso and knee control.'},
                 {'name': 'Romanian Deadlift', 'muscle': 'Hamstrings & Glutes', 'tip': 'Shins remain vertical during hip hinge.'},
-                {'name': 'Leg Press', 'muscle': 'Quads Hypertrophy', 'tip': 'Feet middle-width, deep controlled descent.'},
-                {'name': 'Lying Leg Curl', 'muscle': 'Hamstrings Isolation', 'tip': 'Keep hips glued to pad.'},
-                {'name': 'Standing Calf Raise', 'muscle': 'Gastrocnemius', 'tip': 'Hold bottom stretch for 2 full seconds.'}
+                {'name': 'Leg Press or Hack Squat', 'muscle': 'Quads Hypertrophy', 'tip': 'Feet shoulder-width, deep controlled descent.'},
+                {'name': 'Lying Leg Curl', 'muscle': 'Hamstrings Isolation', 'tip': 'Keep hips glued to pad; avoid swinging weights.'},
+                {'name': 'Standing Calf Raise', 'muscle': 'Gastrocnemius', 'tip': 'Hold bottom stretch for 2 full seconds.'},
+                {'name': 'Hanging Knee/Leg Raises', 'muscle': 'Lower Abs', 'tip': 'Curl pelvis upward; avoid swinging momentum.'}
             ]
         },
         {
-            'title': 'Day 3 - Upper Hypertrophy',
-            'focus': 'Pecs, Upper Back, Shoulders',
+            'title': 'Day 4 - Legs & Shoulders Focus',
+            'focus': 'Quads, Hamstrings, Deltoids (All 3 Heads), Traps',
             'exercises': [
-                {'name': 'Incline Dumbbell Bench Press', 'muscle': 'Upper Pecs', 'tip': 'Deep stretch at bottom, converge dumbbells at top.'},
-                {'name': 'Bodyweight or Assisted Pull-up', 'muscle': 'Lats & Core', 'tip': 'Pull chest to bar with no swinging.'},
-                {'name': 'Seated Dumbbell Arnold Press', 'muscle': 'Total Shoulder', 'tip': 'Smooth rotation throughout movement.'},
-                {'name': 'Chest-Supported Row', 'muscle': 'Mid Traps & Rhomboids', 'tip': 'Eliminate lower back momentum.'},
-                {'name': 'Hammer Curls', 'muscle': 'Brachialis & Forearms', 'tip': 'Thickens the upper arm and grip strength.'},
-                {'name': 'Skull Crushers / EZ Bar Extension', 'muscle': 'Triceps Long Head', 'tip': 'Keep elbows tucked inward.'}
-            ]
-        },
-        {
-            'title': 'Day 4 - Lower Hypertrophy',
-            'focus': 'Deadlifts, Quads, Hamstrings, Calves',
-            'exercises': [
-                {'name': 'Conventional or Trap Bar Deadlift', 'muscle': 'Posterior Chain', 'tip': 'Push the floor away through midfoot.'},
-                {'name': 'Bulgarian Split Squat or Walking Lunges', 'muscle': 'Unilateral Quads/Glutes', 'tip': 'Lean forward slightly for glute bias.'},
+                {'name': 'Bulgarian Split Squat or Walking Lunges', 'muscle': 'Unilateral Quads & Glutes', 'tip': 'Lean forward slightly for glute & quad stretch.'},
                 {'name': 'Seated Leg Extension', 'muscle': 'Quads Peak Contraction', 'tip': 'Pause 1 second at top lockout.'},
-                {'name': 'Seated Leg Curl', 'muscle': 'Hamstrings', 'tip': 'High tension throughout range.'},
-                {'name': 'Seated Calf Raise', 'muscle': 'Soleus', 'tip': 'Slow and rhythmic 15-20 reps.'}
+                {'name': 'Seated Dumbbell Arnold Press', 'muscle': 'Total Shoulder Complex', 'tip': 'Smooth rotation from chest to overhead lockout.'},
+                {'name': 'Dumbbell Lateral Raise (Heavy/Drop-set)', 'muscle': 'Lateral Deltoids', 'tip': 'Controlled 3-second negative.'},
+                {'name': 'Bent-over Rear Delt Fly', 'muscle': 'Posterior Deltoids', 'tip': 'Squeeze back of shoulder blades at top.'},
+                {'name': 'Dumbbell Shrugs', 'muscle': 'Upper Trapezius', 'tip': 'Straight up and down with 2-second peak hold; no rolling.'}
             ]
         },
     ],
     'advanced': [
         {
-            'title': 'Day 1 - Push Hypertrophy',
-            'focus': 'Chest, Front Delts, Triceps',
+            'title': 'Day 1 - Push Hypertrophy & Strength',
+            'focus': 'Chest, Anterior & Lateral Delts, Triceps',
             'exercises': [
                 {'name': 'Flat Barbell Bench Press', 'muscle': 'Pectoralis Major', 'tip': 'Heavy working sets with 2 RIR.'},
-                {'name': 'Incline Dumbbell Press', 'muscle': 'Clavicular Pecs', 'tip': 'Elbows at 45-degree angle.'},
+                {'name': 'Incline Dumbbell Press', 'muscle': 'Clavicular Pecs', 'tip': 'Elbows at 45-degree angle, deep stretch.'},
                 {'name': 'Standing Overhead Military Press', 'muscle': 'Anterior Deltoids', 'tip': 'Strict lockouts without knee bounce.'},
-                {'name': 'Cable Lateral Raise', 'muscle': 'Lateral Deltoids', 'tip': 'Constant tension on the side delts.'},
-                {'name': 'Weighted Tricep Dips', 'muscle': 'Lower Pecs & Triceps', 'tip': 'Slow descent, drive through palms.'}
+                {'name': 'Cable Lateral Raise', 'muscle': 'Lateral Deltoids', 'tip': 'Constant tension on the side delts across full ROM.'},
+                {'name': 'Weighted Tricep Dips', 'muscle': 'Lower Pecs & Triceps', 'tip': 'Slow descent, drive hard through palms.'},
+                {'name': 'Overhead EZ-Bar Tricep Extension', 'muscle': 'Tricep Long Head', 'tip': 'Keep elbows pointing forward and tucked.'}
             ]
         },
         {
-            'title': 'Day 2 - Pull Hypertrophy',
-            'focus': 'Back Thickness, Lats, Biceps',
+            'title': 'Day 2 - Pull Hypertrophy & Back Density',
+            'focus': 'Back Thickness, Lats, Rear Delts, Biceps',
             'exercises': [
-                {'name': 'Conventional Deadlift', 'muscle': 'Total Posterior Chain', 'tip': 'Reset after each repetition.'},
-                {'name': 'Weighted Pull-ups', 'muscle': 'Lats & Biceps', 'tip': 'Full dead-hang at bottom.'},
-                {'name': 'Meadows Row or T-Bar Row', 'muscle': 'Lats & Rhomboids', 'tip': 'Drive elbow back towards hip.'},
-                {'name': 'Cable Face Pull with External Rotation', 'muscle': 'Rear Delts & Rotator Cuff', 'tip': 'Pull towards temples.'},
-                {'name': 'Barbell Bicep Curl', 'muscle': 'Biceps Brachii', 'tip': 'Strict posture, zero hip swing.'}
+                {'name': 'Conventional Deadlift', 'muscle': 'Total Posterior Chain', 'tip': 'Reset after each repetition; pull slack out of bar.'},
+                {'name': 'Weighted Pull-ups', 'muscle': 'Lats & Biceps', 'tip': 'Full dead-hang at bottom, chest to bar at top.'},
+                {'name': 'Meadows Row or T-Bar Row', 'muscle': 'Lats & Rhomboids', 'tip': 'Drive elbow back towards hip with strict form.'},
+                {'name': 'Cable Face Pull with External Rotation', 'muscle': 'Rear Delts & Rotator Cuff', 'tip': 'Pull towards temples, hold squeeze 1s.'},
+                {'name': 'Barbell Bicep Curl', 'muscle': 'Biceps Brachii', 'tip': 'Strict posture, zero hip swing.'},
+                {'name': 'Incline Dumbbell Hammer Curl', 'muscle': 'Brachialis & Forearms', 'tip': 'Slow, controlled eccentric tempo.'}
             ]
         },
         {
-            'title': 'Day 3 - Legs & Abs',
-            'focus': 'Quads, Hamstrings, Glutes, Calves',
+            'title': 'Day 3 - Legs & Abs Heavy',
+            'focus': 'Quads, Hamstrings, Glutes, Calves, Core',
             'exercises': [
-                {'name': 'Barbell Back Squat', 'muscle': 'Quads & Glutes', 'tip': 'Deep controlled depth.'},
-                {'name': 'Romanian Deadlift', 'muscle': 'Hamstrings', 'tip': 'Keep bar glued to thighs.'},
-                {'name': 'Hack Squat or Leg Press', 'muscle': 'Quad Tear-drop', 'tip': 'Foot placement low on platform.'},
+                {'name': 'Barbell Back Squat', 'muscle': 'Quads & Glutes', 'tip': 'Deep controlled depth, drive through midfoot.'},
+                {'name': 'Romanian Deadlift', 'muscle': 'Hamstrings', 'tip': 'Keep bar glued to thighs, deep posterior stretch.'},
+                {'name': 'Hack Squat or Heavy Leg Press', 'muscle': 'Quad Tear-drop', 'tip': 'Foot placement low-to-mid on platform.'},
                 {'name': 'Lying Leg Curl', 'muscle': 'Hamstring Flexion', 'tip': 'Toes pointed down to reduce calf contribution.'},
-                {'name': 'Hanging Leg Raises', 'muscle': 'Lower Abs & Hip Flexors', 'tip': 'Curl pelvis upward, don\'t just swing legs.'}
+                {'name': 'Seated Calf Raise', 'muscle': 'Soleus', 'tip': 'Slow, rhythmic 15-20 reps with bottom pause.'},
+                {'name': 'Hanging Leg Raises', 'muscle': 'Lower Abs & Hip Flexors', 'tip': 'Curl pelvis upward; don\'t just swing legs.'}
             ]
         },
         {
-            'title': 'Day 4 - Push Strength & Weak Points',
-            'focus': 'Incline Chest, Shoulders, Arms',
+            'title': 'Day 4 - Push Weak Points & Hypertrophy',
+            'focus': 'Incline Chest, Side Delts, Tricep Horseshoe',
             'exercises': [
-                {'name': 'Incline Barbell Bench Press', 'muscle': 'Upper Chest', 'tip': 'Touch collarbone area gently.'},
-                {'name': 'Dumbbell Arnold Press', 'muscle': 'Shoulders', 'tip': 'Controlled 3s lowering phase.'},
-                {'name': 'Cable Chest Fly', 'muscle': 'Inner Pec Squeeze', 'tip': 'Focus on peak contraction.'},
-                {'name': 'Overhead EZ-Bar Tricep Extension', 'muscle': 'Tricep Long Head', 'tip': 'Elbows pointed forward.'}
+                {'name': 'Incline Barbell Bench Press', 'muscle': 'Upper Chest', 'tip': 'Touch collarbone area gently, pause 1s at bottom.'},
+                {'name': 'Seated Dumbbell Shoulder Press', 'muscle': 'Shoulder Delts', 'tip': 'Controlled 3s lowering phase.'},
+                {'name': 'Cable Chest Fly (High-to-Low)', 'muscle': 'Lower & Inner Pec Squeeze', 'tip': 'Focus on intense peak contraction.'},
+                {'name': 'Dumbbell Lateral Raise (Heavy Partial + Full)', 'muscle': 'Lateral Deltoids', 'tip': 'High volume, maximum side delt burn.'},
+                {'name': 'Tricep Rope Pushdown Drop-Set', 'muscle': 'Triceps Lateral Head', 'tip': 'Squeeze hard at lockout.'}
             ]
         },
         {
-            'title': 'Day 5 - Pull & Upper Back',
-            'focus': 'Upper Back, Traps, Forearms',
+            'title': 'Day 5 - Pull & Posterior Detail',
+            'focus': 'Lats Width, Upper Back, Traps, Forearms',
             'exercises': [
-                {'name': 'Rack Pulls below Knee', 'muscle': 'Erectors & Upper Traps', 'tip': 'Heavy lockouts.'},
+                {'name': 'Rack Pulls below Knee', 'muscle': 'Erectors & Upper Traps', 'tip': 'Heavy explosive lockouts.'},
                 {'name': 'Seated Cable Row with V-Grip', 'muscle': 'Mid Back', 'tip': 'Squeeze back hard at torso.'},
-                {'name': 'Incline Dumbbell Hammer Curl', 'muscle': 'Brachialis', 'tip': 'Controlled negative.'},
-                {'name': 'Dumbbell Shrugs with 2s hold', 'muscle': 'Upper Trapezius', 'tip': 'Straight up and down, no rolling.'}
+                {'name': 'Chest-Supported Row', 'muscle': 'Rhomboids & Mid Traps', 'tip': 'Isolate upper back without spinal fatigue.'},
+                {'name': 'Cable Reverse Pec Deck Fly', 'muscle': 'Rear Deltoids', 'tip': 'Keep arms almost straight, squeeze rear delts.'},
+                {'name': 'Dumbbell Shrugs with 2s hold', 'muscle': 'Upper Trapezius', 'tip': 'Straight up and down, no shoulder rolling.'},
+                {'name': 'Preacher Curl / Spider Curl', 'muscle': 'Biceps Short Head', 'tip': 'Strict isolation without shoulder assist.'}
+            ]
+        },
+        {
+            'title': 'Day 6 - Legs & Shoulders Complete',
+            'focus': 'Quad Sweep, Hamstrings, 3D Delts & Traps',
+            'exercises': [
+                {'name': 'Front Squat or Bulgarian Split Squat', 'muscle': 'Quad Dominance & Core', 'tip': 'Upright torso, deep stretch at bottom.'},
+                {'name': 'Seated Leg Extension & Curl Superset', 'muscle': 'Quads & Hamstrings Isolation', 'tip': 'Continuous tension through entire set.'},
+                {'name': 'Standing Overhead Barbell Push Press', 'muscle': 'Total Shoulder Power', 'tip': 'Explosive drive from legs, strict lockout.'},
+                {'name': 'Cable Face Pull to Overhead Press', 'muscle': 'Rear Delts & Lower Traps', 'tip': 'Great for rotator cuff and 3D shoulder shape.'},
+                {'name': 'Heavy Dumbbell Lateral Raise', 'muscle': 'Side Delts', 'tip': 'Controlled movement, lead with elbows.'},
+                {'name': 'Farmer\'s Walk or Heavy Trap Shrugs', 'muscle': 'Trapezius & Grip Strength', 'tip': 'Chest proud, shoulders back, smooth stride.'}
             ]
         }
     ],

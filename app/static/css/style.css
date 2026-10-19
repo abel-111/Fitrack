@@ -42,14 +42,170 @@
     --border-subtle: rgba(167, 139, 250, 0.16);
     --border-highlight: rgba(167, 139, 250, 0.4);
     --text-primary: #f3f0ff;
-    --text-secondary: #b8b0db;
-    --text-muted: #8076a8;
-    --text-accent: #a78bfa;
+    --text-secondary: #c5bde3;
+    --text-muted: #958abf;
+    --text-accent: #c4b5fd;
     --text-on-brand: #ffffff;
-    --brand-primary: #8b5cf6;
-    --brand-primary-hover: #7c3aed;
-    --brand-primary-glow: rgba(139, 92, 246, 0.3);
+    --brand-primary: #a78bfa;
+    --brand-primary-hover: #9061f9;
+    --brand-primary-glow: rgba(167, 139, 250, 0.35);
+    --accent-emerald: #34d399;
+    --accent-amber: #fbbf24;
+    --accent-cyan: #38bdf8;
+    --accent-purple-soft: #c4b5fd;
     --shadow-card: 0 4px 20px rgba(0, 0, 0, 0.35), 0 1px 4px rgba(0, 0, 0, 0.25);
+}
+
+/* Dark mode explicit contrast overrides for badges, chips, pills, alerts and containers */
+[data-theme="dark"] .navbar-custom {
+    background: rgba(24, 21, 40, 0.92);
+    border-bottom: 1px solid var(--border-subtle);
+    box-shadow: 0 1px 16px rgba(0, 0, 0, 0.4);
+}
+
+[data-theme="dark"] .badge-coral {
+    background: rgba(167, 139, 250, 0.18);
+    color: #c4b5fd;
+    border-color: rgba(167, 139, 250, 0.35);
+}
+
+[data-theme="dark"] .badge-purple {
+    background: rgba(167, 139, 250, 0.18);
+    color: #c4b5fd;
+    border-color: rgba(167, 139, 250, 0.35);
+}
+
+[data-theme="dark"] .badge-coach,
+[data-theme="dark"] .badge-emerald {
+    background: rgba(52, 211, 153, 0.16);
+    color: #34d399;
+    border-color: rgba(52, 211, 153, 0.35);
+}
+
+[data-theme="dark"] .badge-amber {
+    background: rgba(251, 191, 36, 0.16);
+    color: #fbbf24;
+    border-color: rgba(251, 191, 36, 0.35);
+}
+
+[data-theme="dark"] .badge-cyan {
+    background: rgba(56, 189, 248, 0.16);
+    color: #38bdf8;
+    border-color: rgba(56, 189, 248, 0.35);
+}
+
+[data-theme="dark"] .badge-ai {
+    background: rgba(196, 181, 253, 0.18);
+    color: #e0e7ff;
+    border-color: rgba(196, 181, 253, 0.4);
+}
+
+[data-theme="dark"] .badge-macro-cals {
+    background: rgba(167, 139, 250, 0.18);
+    color: #c4b5fd;
+}
+
+[data-theme="dark"] .badge-macro-prot {
+    background: rgba(52, 211, 153, 0.16);
+    color: #34d399;
+}
+
+[data-theme="dark"] .badge-macro-kcal {
+    background: rgba(248, 113, 113, 0.18);
+    color: #f87171;
+}
+
+[data-theme="dark"] .badge-goal-pill {
+    background: rgba(52, 211, 153, 0.15);
+    color: #34d399;
+    border-color: rgba(52, 211, 153, 0.35);
+}
+
+[data-theme="dark"] .badge-custom-pill {
+    background: rgba(251, 191, 36, 0.15);
+    color: #fbbf24;
+    border-color: rgba(251, 191, 36, 0.35);
+}
+
+[data-theme="dark"] .macro-pill-cals {
+    background: rgba(167, 139, 250, 0.18);
+    color: #c4b5fd;
+}
+
+[data-theme="dark"] .macro-pill-protein {
+    background: rgba(52, 211, 153, 0.16);
+    color: #34d399;
+}
+
+[data-theme="dark"] .macro-pill-carb {
+    background: rgba(56, 189, 248, 0.16);
+    color: #38bdf8;
+}
+
+[data-theme="dark"] .macro-pill-fat {
+    background: rgba(251, 191, 36, 0.16);
+    color: #fbbf24;
+}
+
+[data-theme="dark"] .meal-role-benefit {
+    background: rgba(52, 211, 153, 0.12);
+    border-left-color: #34d399;
+    color: #a7f3d0;
+}
+
+[data-theme="dark"] .alert-danger {
+    background: rgba(239, 68, 68, 0.15);
+    color: #fca5a5;
+    border-color: rgba(239, 68, 68, 0.35);
+}
+
+[data-theme="dark"] .alert-success {
+    background: rgba(52, 211, 153, 0.15);
+    color: #6ee7b7;
+    border-color: rgba(52, 211, 153, 0.35);
+}
+
+[data-theme="dark"] .alert-info {
+    background: rgba(167, 139, 250, 0.15);
+    color: #c4b5fd;
+    border-color: rgba(167, 139, 250, 0.35);
+}
+
+[data-theme="dark"] .form-control:focus,
+[data-theme="dark"] .form-group input:focus,
+[data-theme="dark"] .form-group select:focus,
+[data-theme="dark"] .form-group textarea:focus,
+[data-theme="dark"] .ai-chat-input:focus {
+    background: #25203b;
+    color: #f3f0ff;
+    border-color: var(--brand-primary);
+}
+
+[data-theme="dark"] .meal-card.completed {
+    background: linear-gradient(135deg, rgba(24, 21, 40, 0.98), rgba(5, 150, 105, 0.12));
+    border-color: rgba(52, 211, 153, 0.4);
+}
+
+[data-theme="dark"] .custom-table th {
+    color: var(--text-muted);
+}
+
+[data-theme="dark"] .custom-table td {
+    color: var(--text-primary);
+    border-bottom: 1px solid rgba(167, 139, 250, 0.08);
+}
+
+[data-theme="dark"] .custom-table tr:hover td {
+    background: rgba(167, 139, 250, 0.06);
+}
+
+[data-theme="dark"] .overload-banner {
+    background: rgba(5, 150, 105, 0.12);
+    border-color: rgba(52, 211, 153, 0.3);
+}
+
+[data-theme="dark"] .overload-value {
+    color: #34d399;
 }
 
 /* Telegram-Style Smooth Circular Theme Transition */

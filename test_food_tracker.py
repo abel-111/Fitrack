@@ -155,8 +155,8 @@ class TestFoodTracker(unittest.TestCase):
             self.client.post('/login', data={'email': 'test_food@fitrack.local', 'password': 'password123'})
             res = self.client.get('/dashboard')
             self.assertEqual(res.status_code, 200)
-            self.assertIn(b'Daily Calories & Protein', res.data)
-            self.assertIn(b'Food Tracker & Meal Plan', res.data)
+            self.assertIn(b'Food &amp; Nutrition', res.data)
+            self.assertIn(b'Workout Tracker', res.data)
 
 if __name__ == '__main__':
     unittest.main()

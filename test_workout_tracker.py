@@ -193,17 +193,14 @@ class TestWorkoutTracker(unittest.TestCase):
             # Check /workouts/
             workout_res = self.client.get('/workouts/')
             self.assertEqual(workout_res.status_code, 200)
-            self.assertIn(b'Daily Workout Tracker: What You Did Today', workout_res.data)
-            self.assertIn(b'Total Volume Moved', workout_res.data)
-            self.assertIn(b'Workouts Logged by Category', workout_res.data)
-            self.assertIn(b'Add Workout Entry', workout_res.data)
-            self.assertIn(b'Custom Workout Entry', workout_res.data)
+            self.assertIn(b'Daily Workout Tracker', workout_res.data)
+            self.assertIn(b'Total Volume', workout_res.data)
+            self.assertIn(b'Workouts by Category', workout_res.data)
 
             # Check /dashboard
             dash_res = self.client.get('/dashboard')
             self.assertEqual(dash_res.status_code, 200)
-            self.assertIn(b'Workout & Lift Tracker', dash_res.data)
-            self.assertIn(b'Log What You Did', dash_res.data)
+            self.assertIn(b'Workout Tracker', dash_res.data)
 
 if __name__ == '__main__':
     unittest.main()

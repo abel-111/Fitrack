@@ -52,7 +52,7 @@
                     <span style="font-size:13px; color:var(--text-secondary);">→ Target: {{ current_user.target_weight_kg }} kg</span>
                 {% endif %}
             </div>
-            <div class="stat-subtext" style="color:#cbd5e1;">{{ insights.weight_insight }}</div>
+            <div class="stat-subtext">{{ insights.weight_insight }}</div>
         </div>
 
         <div class="stat-card">
@@ -82,14 +82,14 @@
 
     <!-- Role Training & Mobility Adaptation -->
     <div class="stat-card" style="margin-bottom:1.8rem;">
-        <h3 style="font-size:18px; font-weight:700; color:#fff; display:flex; align-items:center; gap:8px; margin-bottom:10px;">
+        <h3 style="font-size:18px; font-weight:700; color:var(--text-primary); display:flex; align-items:center; gap:8px; margin-bottom:10px;">
             <span>{{ role_info.icon }}</span> Training & Mobility Focus for {{ role_info.title }}
         </h3>
-        <p style="color:#cbd5e1; font-size:14px; margin-bottom:14px;">{{ insights.workout_focus }}</p>
+        <p style="color:var(--text-secondary); font-size:14px; margin-bottom:14px;">{{ insights.workout_focus }}</p>
         
         <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(260px, 1fr)); gap:1rem;">
             {% for tip in insights.role_tips %}
-            <div style="background:rgba(255,255,255,0.03); border:1px solid var(--border-subtle); border-radius:var(--radius-sm); padding:12px; font-size:13px; color:#e2e8f0; display:flex; gap:8px;">
+            <div style="background:var(--bg-surface-elevated); border:1px solid var(--border-subtle); border-radius:var(--radius-sm); padding:12px; font-size:13px; color:var(--text-primary); display:flex; gap:8px;">
                 <span style="color:var(--accent-emerald); font-weight:bold;">✔</span>
                 <span>{{ tip }}</span>
             </div>
